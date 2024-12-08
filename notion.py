@@ -88,7 +88,8 @@ class ComandosNotion:
                 "select": {"name": data["prioridad"]}
             }
         }
-        self.create_notion_entry(self.DATABASE_IDS["projects"], properties)
+        respuesta = self.create_notion_entry(self.DATABASE_IDS["projects"], properties)
+        return respuesta
 
     def crear_sprint(self, data):
         properties = {

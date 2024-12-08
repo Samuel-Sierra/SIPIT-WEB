@@ -11,6 +11,7 @@ client = OpenAI()
 def switch_comandos(data):
 
     respuesta
+    n=""
     for item in data:
         accion=item.get("accion")
         if accion =="crear":
@@ -69,8 +70,12 @@ def switch_comandos(data):
                 cn.eliminar_minuta(item.get("nombre"))
             else:
                 print(f"Tipo desconocido: {tipo}")
-    return respuesta
-
+        n = "El comando "+accion +tipo 
+    if (respuesta.status_code==200):
+        n = n + " se concreto correctamente"
+    else: 
+        n = n + " no se concreto"
+    return respuesta, n
 
 def generarJson(content):
 
@@ -116,8 +121,8 @@ def generarJson(content):
     completos = json.dumps(completos, indent=4)
 
     if completos !=[] :
-        respuesta = switch_comandos(completos)
-        return respuesta
+        respuesta, n = switch_comandos(completos)
+        return respuesta, n 
 
 
     incompletos = json.dumps(incompletos, indent=4)

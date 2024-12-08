@@ -17,14 +17,13 @@ def home():
 @app.post('/comandos/')
 def comandos(texto:str):
 
-    respuesta = generarJson(texto)
-    #respuesta = (texto)
+    respuesta, n = generarJson(texto)
     
     if respuesta.status_code == 200:
-        content={"respuesta":"Concretado"}
+        content={"respuesta":n}
         return JSONResponse(content=content, status_code=200)
     else:
-        content={"respuesta":"No se proporcionó respuesta en el servidor."}
+        content={"respuesta":n}
         return JSONResponse(content=content, status_code=respuesta.status_code)
 
 @app.post('/minutatxt/')
