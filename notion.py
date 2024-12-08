@@ -4,7 +4,7 @@ from langchain_groq import ChatGroq
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 import os
-os.environ["GROQ_API_KEY"] = "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"
+#os.environ["GROQ_API_KEY"] = "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"
 
 class comandosNotion:
 
