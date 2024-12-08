@@ -13,9 +13,8 @@ class Comando(BaseModel):
 def home():
     return "Hola mundo!"
 
-@app.post('/comandos')
-def comandos(data: Comando):
-    texto = data.texto
+@app.post('/comandos/{texto}')
+def comandos(texto):
 
     respuesta = cn.CrearTarea(texto)
     
