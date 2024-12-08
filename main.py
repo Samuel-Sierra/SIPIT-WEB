@@ -16,15 +16,19 @@ def home():
 
 @app.post('/comandos/')
 def comandos(texto:str):
+    try:
+        respuesta, n = generarJson(texto)
+        
+        if respuesta.status_code == 200:
+            content={"respuesta":n}
+            return JSONResponse(content=content, status_code=200)
+        else:
+            content={"respuesta":n}
+            return JSONResponse(content=content, status_code=respuesta.status_code)
+    except Exception as e:
+        ab = f"Error en {str(e)}"
+        return ab
 
-    respuesta, n = generarJson(texto)
-    
-    if respuesta.status_code == 200:
-        content={"respuesta":n}
-        return JSONResponse(content=content, status_code=200)
-    else:
-        content={"respuesta":n}
-        return JSONResponse(content=content, status_code=respuesta.status_code)
 
 @app.post('/minutatxt/')
 def minuta(texto_minuta:str):
