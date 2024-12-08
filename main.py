@@ -1,10 +1,10 @@
 from fastapi import FastAPI
-from notion import comandosNotion
+from notion import ComandosNotion
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from llm import generarJson
 
-cn = comandosNotion()
+cn = ComandosNotion()
 app = FastAPI()
 
 class Comando(BaseModel):
