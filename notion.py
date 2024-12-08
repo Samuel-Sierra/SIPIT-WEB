@@ -576,82 +576,8 @@ class ComandosNotion:
             print(f"Excepción al realizar la solicitud: {e}")
             return None
 
-def switch_comandos(data):
-    cn = ComandosNotion()
-    respuesta
-    for item in data:
-        accion=item.get("accion")
-        if accion =="crear":
-            tipo = item.get("tipo")
-            print(accion)
-            if tipo == "tarea":
-                respuesta = cn.crear_tarea(item)
-            elif tipo == "proyecto":
-                cn.crear_proyecto(item)
-            elif tipo == "sprint":
-                cn.crear_sprint(item)
-            elif tipo == "minuta":
-                cn.crear_minuta(item)
-            else:
-                print(f"Tipo desconocido: {tipo}")
-
-        elif accion == "consultar":
-            tipo = item.get("tipo")
-            if tipo == "tarea":
-                n=cn.consultar_tarea(item, True)
-                print(n)
-            elif tipo == "proyecto":
-                n = cn.consultar_proyecto(item, True)
-                print(n)
-            elif tipo == "sprint":
-                n = cn.consultar_sprint(item, True)
-                print(n)
-            elif tipo == "minuta":
-                n = cn.consultar_minuta(item, True)
-                print(n)
-            else:
-                print(f"Tipo desconocido: {tipo}")
-
-        elif accion == "actualizar":
-            tipo = item.get("tipo")
-            if tipo == "tarea":
-                cn.modificar_tarea(item)
-            elif tipo == "proyecto":
-                cn.modificar_proyecto(item)
-            elif tipo == "sprint":
-                cn.modificar_sprint(item)
-                print("si?")
-            elif tipo == "minuta":
-                cn.modificar_minuta(item)
-            else:
-                print(f"Tipo desconocido: {tipo}")
-                
-        elif accion == "eliminar":
-            tipo = item.get("tipo")
-            if tipo == "tarea":
-                cn.eliminar_tarea(item.get("nombre"))
-            elif tipo == "proyecto":
-                cn.eliminar_proyecto(item.get("nombre"))
-            elif tipo == "sprint":
-                cn.eliminar_sprint(item.get("nombre"))
-            elif tipo == "minuta":
-                cn.eliminar_minuta(item.get("nombre"))
-            else:
-                print(f"Tipo desconocido: {tipo}")
-
-if __name__ == "__main__":
-    # JSON de ejemplo
-    data = [
-        
-    {
-        "tipo": "proyecto",
-        "accion": "eliminar",
-        "nombre": "YUJU"
-    }
 
 
-    ]
-    switch_comandos(data)
 
 
     # Ejemplo de uso
