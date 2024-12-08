@@ -31,8 +31,8 @@ def comandos(texto:str):
 
 @app.post('/minutatxt/')
 def minuta(texto_minuta:str):
-    
-    return texto_minuta
+    content={"respuesta":"Se recibió la minuta con éxito"+texto_minuta}
+    return JSONResponse(content=content, status_code=200)
     
 
 
