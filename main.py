@@ -1,11 +1,9 @@
 from fastapi import FastAPI
 from notion import comandosNotion
 from fastapi.responses import JSONResponse
-from mangum import Mangum
 
 cn = comandosNotion()
 app = FastAPI()
-handler = Mangum(app)
 
 @app.get('/')
 def home():
