@@ -15,7 +15,7 @@ def home():
 
 @app.post('/comandos')
 def comandos(data: Comando):
-    texto = data.get("texto")
+    texto = data.texto
     try:
         respuesta = cn.CrearTarea(texto)
         
