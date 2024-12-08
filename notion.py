@@ -2,8 +2,6 @@ import json
 import requests
 from openai import OpenAI
 
-
-
 class ComandosNotion:
     def __init__(self):
         self.NOTION_API_URL = "https://api.notion.com/v1/pages"
@@ -106,8 +104,9 @@ class ComandosNotion:
                 "status": {"name": data["estado"]}
             }
         }
-        self.create_notion_entry(self.DATABASE_IDS["sprints"], properties)
-
+        respuesta = self.create_notion_entry(self.DATABASE_IDS["sprints"], properties)
+        return respuesta
+    
     def crear_minuta(self, data):
         proyecto_id = self.obtener_id_por_nombre(data["nombre_proyecto"], "proyecto")
         sprint_id = self.obtener_id_por_nombre(data["nombre_sprint"], "sprint")
@@ -134,8 +133,10 @@ class ComandosNotion:
                 "relation": [{"id": proyecto_id}]
             }
         }
-        self.create_notion_entry(self.DATABASE_IDS["minutas"], properties)
 
+        respuesta = self.create_notion_entry(self.DATABASE_IDS["minutas"], properties)
+        return respuesta
+    
     def consultar_datos_notion(self, url_pregunta, cabecera, valor1,tipo, page_size=10):
         if tipo=="minuta":
             valor2="Nombre"
