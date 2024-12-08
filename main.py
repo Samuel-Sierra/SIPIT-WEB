@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from notion import ComandosNotion
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from llm import generarJson
+from llm import generarJsonComando, generarJsonMinuta
 
 cn = ComandosNotion()
 app = FastAPI()
@@ -17,7 +17,7 @@ def home():
 @app.post('/comandos/')
 def comandos(texto:str):
     try:
-        respuesta, n = generarJson(texto)
+        respuesta, n = generarJsonComando(texto)
         
         if respuesta.status_code == 200:
             content={"respuesta":n}
