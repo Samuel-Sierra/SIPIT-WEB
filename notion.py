@@ -1,111 +1,657 @@
 import json
 import requests
-from langchain_groq import ChatGroq
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-#os.environ["GROQ_API_KEY"] = "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"
+from openai import OpenAI
 
-class comandosNotion:
 
+
+class ComandosNotion:
     def __init__(self):
-
-        self.model = ChatGroq(
-            model="llama3-8b-8192",
-            temperature=0,
-            max_tokens=None,
-            timeout=None,
-            max_retries=2,
-            # other params...
-        )
-        
-        self.TOKEN_NOTION = "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"
-        self.ID_DATABASE = "1232595bac6f812d8674d1f4e4012af9"
-        self.URL_CREACION = "https://api.notion.com/v1/pages"
-        self.URL_BUSQUEDA = "https://api.notion.com/v1/databases/{}/query".format(self.ID_DATABASE)
-        self.URL_ACTUALIZACION = "https://api.notion.com/v1/pages/{page_id}"
-        self.CABECERA = {
-            "Authorization": f"Bearer {self.TOKEN_NOTION}",
+        self.NOTION_API_URL = "https://api.notion.com/v1/pages"
+        self.NOTION_TOKEN = "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"
+        self.HEADERS = {
+            "Authorization": f"Bearer {self.NOTION_TOKEN}",
             "Content-Type": "application/json",
-            "Notion-Version": "2022-02-22"
+            "Notion-Version": "2022-06-28"
         }
 
-        # Constantes de datos
-        self.TITULAR = {
-            "id": "notion%3A%2F%2Ftasks%2Fassign_property",
-            "type": "people",
-            "people": [
-                {
-                    "object": "user",
-                    "id": "52530542-7f01-412e-a370-662a3cb775dc",
-                    "name": "Karina Santiago",
-                    "type": "person",
-                    "person": {
-                        "email": "asantiagom1802@alumno.ipn.mx"
-                    }
-                }
-            ]
+        self.DATABASE_IDS = {
+            "tasks": "1232595bac6f812d8674d1f4e4012af9",
+            "projects": "1232595bac6f81659e03db547d901cb9",
+            "sprints": "1232595bac6f8146a026d520ac1b0fed",
+            "minutas": "13f2595bac6f80c1b9e1d5d80cc7bbbe"
         }
 
-        self.ETIQUETAS = [{"name": "Web"}, {"name": "Mejora"}]
-        self.ESTADO = "En curso"
-        self.ID_PROYECTO = "1232595b-ac6f-816c-9240-dae9cbd7dfd8"
-    
-    def CrearTarea(self,texto):
-        # Definir el prompt para extraer valores del texto de entrada
-        promptc = ChatPromptTemplate.from_template("""
-        Extrae el nombre del proyecto, el nombre de la tarea, la fecha de inicio, la fecha de conclusión, el nivel de prioridad, el nombre
-        de la persona a la que esta asignada, el estado y la descripción del siguiente comando:
-        {texto}
-        y que los valores tengan este formato: nombre_proyecto="valor",nombre_tarea="valor",nombre_persona="valor", estado="valor", fecha_inicio="YYYY-MM-DD", fecha_fin="YYYY-MM-DD", prioridad="valor", resumen="valor".
-        Devuelve estos datos como un diccionario JSON con las claves "nombre_proyecto","nombre_tarea","nombre_persona", "estado", "fecha_inicio", "fecha_fin", "prioridad" y "resumen".
-        Unicamente devuelve el JSON. Sin comentarios ni explicación.
-        """)
+    def create_notion_entry(self, database_id, properties):
+        data = {
+            "parent": {"database_id": database_id},
+            "properties": properties
+        }
+        response = requests.post(self.NOTION_API_URL, headers=self.HEADERS, json=data)
+        return response
 
-        # Extraer los datos necesarios con el modelo
-        chainc = promptc | self.model | StrOutputParser()
-        resultado_prompt = chainc.invoke({"texto": texto})
-        datos_tarea = json.loads(resultado_prompt)
-
-        # Definir los datos de la nueva entrada combinando los parámetros extraídos y las constantes
-        nueva_entrada = {
-            "parent": {"database_id": self.ID_DATABASE},
-            "properties": {
-                "Nombre de la tarea": {
-                    "title": [{"text": {"content": datos_tarea["nombre_tarea"]}}]
-                },
-                "Titular": self.TITULAR,
-                #"Estado": {
-                #    "status": {"name": ESTADO}
-                #},
-                "Persona asignada": {
-                "multi_select": [{"name": datos_tarea["nombre_persona"]}]
-                                    },
-                "Estado": {
-                    "status": {"name": datos_tarea["estado"]}
-                },
-                "Fecha": {
-                    "date": {
-                        "start": datos_tarea["fecha_inicio"],
-                        "end": datos_tarea["fecha_fin"]
-                    }
-                },
-                "Proyecto": {
-                    "id": "notion%3A%2F%2Ftasks%2Ftask_to_project_relation",
-                    "type": "relation",
-                    "relation": [{"id": self.ID_PROYECTO}]
-                },
-                "Prioridad": {
-                    "select": {"name": datos_tarea["prioridad"]}
-                },
-                "Descripción": {
-                    "rich_text": [{"text": {"content": datos_tarea["resumen"]}}]
+    def crear_tarea(self, data):
+        proyecto_id = self.obtener_id_por_nombre(data["nombre_proyecto"], "proyecto")
+        sprint_id = self.obtener_id_por_nombre(data["nombre_sprint"], "sprint")
+        properties = {
+            "Nombre de la tarea": {
+                "title": [{"text": {"content": data["nombre_tarea"]}}]
+            },
+            "Estado": {
+                "status": {"name": data["estado"]}
+            },
+            # Hay que cambiar la columna de tipo People a texto, o en su defecto a texto para ingresar el name de cada persona
+            #"Asignado a": {
+            #    "rich_text": [{"text": {"content": data["nombre_persona"]}}]
+            #},
+            "Fecha": {
+                "date": {
+                    "start": data["fecha_inicio"],
+                    "end": data["fecha_fin"]
                 }
+            },
+            "Prioridad": {
+                "select": {"name": data["prioridad"]}
+            },
+            "Sprint": {
+                "relation": [{"id": sprint_id}]
+            },
+            "Nombre del Proyecto": {
+                "relation": [{"id": proyecto_id}]
+            },
+            "Descripción": {
+                "rich_text": [{"text": {"content": data["resumen"]}}]
+            }
+        }
+        respuesta = self.create_notion_entry(self.DATABASE_IDS["tasks"], properties)
+        return respuesta
+
+    def crear_proyecto(self, data):
+        properties = {
+            "Nombre del proyecto": {
+                #"title": [{"text": {"content": {"content": data["nombre_proyecto"]}}}]
+                "title": [{"text": {"content": data["nombre_proyecto"]}}]
+            },
+            "Estado": {
+                "status": {"name": data["estado"]}
+            },
+            # Hay que cambiar la columna de tipo People a texto, o en su defecto a texto para ingresar el name de cada persona
+            #"Titular": {
+            #    "rich_text": [{"text": {"content": data["nombre_persona"]}}]
+            #},
+            "Fechas": {
+                "date": {
+                    "start": data["fecha_inicio"],
+                    "end": data["fecha_fin"]
+                }
+            },
+            "Prioridad": {
+                "select": {"name": data["prioridad"]}
+            }
+        }
+        self.create_notion_entry(self.DATABASE_IDS["projects"], properties)
+
+    def crear_sprint(self, data):
+        properties = {
+            "Nombre del Sprint": {
+                "title": [{"text": {"content": data["nombre"]}}]
+            },
+            "Fechas": {
+                "date": {
+                    "start": data["fecha_inicio"],
+                    "end": data["fecha_fin"]
+                }
+            },
+            "Estado de Sprint": {
+                "status": {"name": data["estado"]}
+            }
+        }
+        self.create_notion_entry(self.DATABASE_IDS["sprints"], properties)
+
+    def crear_minuta(self, data):
+        proyecto_id = self.obtener_id_por_nombre(data["nombre_proyecto"], "proyecto")
+        sprint_id = self.obtener_id_por_nombre(data["nombre_sprint"], "sprint")
+        properties = {
+            "Nombre": {
+                "title": [{"text": {"content": data["nombre"]}}]
+            },
+            "Objetivo": {
+                "rich_text": [{"text": {"content": data["objetivo"]}}]
+            },
+            "Fecha": {
+                "date": {"start": data["fecha_inicio"]}
+            },
+            "Participantes": {
+                "rich_text": [{"text": {"content": data["participantes"]}}]
+            },
+            "Resumen": {
+                "rich_text": [{"text": {"content": data["resumen"]}}]
+            },
+            "Sprint": {
+                "relation": [{"id": sprint_id}]
+            },
+            "Proyecto": {
+                "relation": [{"id": proyecto_id}]
+            }
+        }
+        self.create_notion_entry(self.DATABASE_IDS["minutas"], properties)
+
+    def consultar_datos_notion(self, url_pregunta, cabecera, valor1,tipo, page_size=10):
+        if tipo=="minuta":
+            valor2="Nombre"
+        elif tipo=="tarea":
+            valor2="Nombre de la tarea"
+        elif tipo=="proyecto":
+            valor2="Nombre del proyecto"
+        elif tipo=="sprint":
+            valor2="Nombre del Sprint"
+        # Cuerpo de la solicitud
+        busqueda = {
+            "page_size": page_size,
+            "filter": {
+                "and": [
+                    {
+                        "property": valor2,
+                        "title": {
+                            "equals": valor1
+                        }
+                    }
+                ]
             }
         }
 
-        # Realizar la solicitud POST a la API de Notion para crear una nueva entrada
-        respuesta = requests.post(self.URL_CREACION, headers=self.CABECERA, data=json.dumps(nueva_entrada))
-        return respuesta
+        try:
+            # Realizar la solicitud a la API
+            respuesta = requests.post(url_pregunta, headers=cabecera, data=json.dumps(busqueda))
+            if respuesta.status_code == 200:
+                print("Datos obtenidos con éxito")
+                return respuesta.json()
+            else:
+                print(f"Error {respuesta.status_code}: {respuesta.text}")
+                return None
+        except Exception as e:
+            print(f"Excepción al realizar la solicitud: {e}")
+            return None
+
+
+
+    def consultar_proyecto(self, data, flag):
+        # Validar si 'nombre' está presente en 'data'
+        if "nombre" not in data:
+            print("Error: Falta el parámetro 'nombre' en los datos proporcionados.")
+            return None
+
+        nombre_proyecto = data["nombre"]
+        url = "https://api.notion.com/v1/databases/1232595bac6f81659e03db547d901cb9/query"
+        tipo=data["tipo"]
+        resultado = self.consultar_datos_notion(url, self.HEADERS, nombre_proyecto,tipo, page_size=10)
+        if len(resultado.get("results")) == 0:
+            return "No se encontrarón resultados"
+        else:
+            if flag:
+                interpretacion=self.interpretar_informacion(resultado)
+                return interpretacion
+            else:
+                return resultado
+
+    def consultar_sprint(self, data, flag):
+        # Validar si 'nombre' está presente en 'data'
+        if "nombre" not in data:
+            print("Error: Falta el parámetro 'nombre' en los datos proporcionados.")
+            return None
+
+        nombre_proyecto = data["nombre"]
+        tipo=data["tipo"]
+        url = "https://api.notion.com/v1/databases/1232595bac6f8146a026d520ac1b0fed/query"
+        resultado = self.consultar_datos_notion(url, self.HEADERS, nombre_proyecto,tipo, page_size=10)
+        if len(resultado.get("results")) == 0:
+            return "No se encontrarón resultados"
+        else:
+            if flag:
+                interpretacion=self.interpretar_informacion(resultado)
+                return interpretacion
+            else:
+                return resultado
+
+    def consultar_tarea(self, data, flag):
+        # Validar si 'nombre' está presente en 'data'
+        if "nombre" not in data:
+            print("Error: Falta el parámetro 'nombre' en los datos proporcionados.")
+            return None
+
+        nombre_proyecto = data["nombre"]
+        tipo=data["tipo"]
+        url = "https://api.notion.com/v1/databases/1232595bac6f812d8674d1f4e4012af9/query"
+        resultado = self.consultar_datos_notion(url, self.HEADERS, nombre_proyecto,tipo, page_size=10)
+        if len(resultado.get("results")) == 0:
+            return "No se encontrarón resultados"
+        else:
+            if flag:
+                interpretacion=self.interpretar_informacion(resultado)
+                return interpretacion
+            else:
+                return resultado
+
+
+    def interpretar_informacion(self,datos):
+        client = OpenAI()
+        content = json.dumps(datos)
+        # se utiliza el role para que gpt entienda que hacer y content es el contenido del archivo que seleccionamos
+        completion = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system",
+            "content": "interpreta la información y dame un resumen"
+            },
+
+            {
+            "role": "user",
+            "content": content
+            }
+        ]
+        )
+        response_dict = completion.to_dict()
+
+        # Capturar el mensaje de salida
+        output_message = response_dict['choices'][0]['message']['content']
+
+        # Guardar el mensaje en una variable
+        resultado = output_message
+        return resultado
+
+    def consultar_minuta(self, data, flag):
+        # Validar si 'nombre' está presente en 'data'
+        if "nombre" not in data:
+            print("Error: Falta el parámetro 'nombre' en los datos proporcionados.")
+            return None
+
+        nombre = data["nombre"]
+        url = "https://api.notion.com/v1/databases/13f2595bac6f80c1b9e1d5d80cc7bbbe/query"
+        tipo=data["tipo"]
+        resultado = self.consultar_datos_notion(url, self.HEADERS, nombre,tipo, page_size=10)
+        if len(resultado.get("results")) == 0:
+            return "No se encontrarón resultados"
+        else:
+            if flag:
+                interpretacion=self.interpretar_informacion(resultado)
+                return interpretacion
+            else:
+                return resultado
+    
+    def obtener_id_por_nombre(self, nombre, tipo):
+        """
+        Consulta un proyecto, tarea o sprint por nombre y devuelve su ID.
+        """
+        if tipo == "proyecto":
+            resultado = self.consultar_proyecto({"nombre": nombre, "tipo": "proyecto"},False)
+        elif tipo == "tarea":
+            resultado = self.consultar_tarea({"nombre": nombre, "tipo": "tarea"},False)
+        elif tipo == "sprint":
+            resultado = self.consultar_sprint({"nombre": nombre, "tipo": "sprint"},False)
+        elif tipo == "minuta":
+            resultado = self.consultar_minuta({"nombre": nombre, "tipo": "minuta"},False)
+        else:
+            print("Tipo desconocido.")
+            return None
+
+        if resultado and "results" in resultado and len(resultado["results"]) > 0:
+            print(resultado["results"][0]["id"])
+            return resultado["results"][0]["id"]  # Retorna el ID del primer resultado encontrado
+        else:
+            print(f"No se encontró ningún {tipo} con el nombre '{nombre}'.")
+            return None
+    def extraer_datos_proyecto(self,json_completo):
+        # Extraer datos del JSON
+        proyecto = {
+            "nombre_proyecto": json_completo.get("Nombre del proyecto", {}).get("title", [{}])[0].get("plain_text", ""),
+            "estado": json_completo.get("Estado", {}).get("status", {}).get("name", ""),
+            "titular": json_completo.get("Titular", {}).get("people", [{}])[0].get("name", ""),
+            "fecha_inicio": json_completo.get("Fechas", {}).get("date", {}).get("start", ""),
+            "fecha_fin": json_completo.get("Fechas", {}).get("date", {}).get("end", ""),
+            "prioridad": json_completo.get("Prioridad", {}).get("select", {}).get("name", "")
+        }
+        return proyecto
+
+    def modificar_proyecto(self, data):
+        datos_previos = self.consultar_proyecto({"nombre": data["nombre_proyecto"], "tipo": "proyecto"},False)
+        if not datos_previos:
+            return None
+        id_proyecto = datos_previos["results"][0]["id"]
+        datos_previos = datos_previos.get("results")[0]
+        aux = datos_previos.get("properties")
+        datos_ant = self.extraer_datos_proyecto(aux)
+        modificar = data
+        properties = {}
+        if "nombre_nuevo" in modificar:
+            if datos_ant["nombre_proyecto"] != modificar["nombre_nuevo"]:
+                properties["Nombre del proyecto"] = {"title": [{"text": {"content": modificar["nombre_nuevo"]}}]}
+        if "estado" in modificar:
+            if datos_ant["estado"] != modificar["estado"]:
+                properties["Estado"] = {"status": {"name": modificar["estado"]}}
+        if "fecha_inicio" in modificar and "fecha_fin" in modificar:
+            properties["Fechas"] = {"date": {"start": modificar.get("fecha_inicio"), "end": modificar.get("fecha_fin")}}
+        elif "fecha_inicio" in modificar:
+            properties["Fechas"] = {"date": {"start": modificar.get("fecha_inicio"), "end": datos_ant.get("fecha_fin")}}
+        elif "fecha_fin" in modificar:
+            properties["Fechas"] = {"date": {"start": datos_ant.get("fecha_inicio"), "end": modificar.get("fecha_fin")}}
+        if "prioridad" in modificar:
+            properties["Prioridad"] = {"select": {"name": modificar["prioridad"]}}
+
+        response = requests.patch(f"{self.NOTION_API_URL}/{id_proyecto}", headers=self.HEADERS, json={"properties": properties})
+        if response.status_code == 200:
+            print("Modificación exitosa")
+        else:
+            print(f"Error en la modificación: {response.status_code} - {response.text}")
+    def modificar_tarea(self, data):
+        datos_previos = self.consultar_tarea({"nombre": data["nombre_tarea"], "tipo": "tarea"}, False)
+        if not datos_previos:
+            return None
+        id_tarea = datos_previos["results"][0]["id"]
+        datos_previos = datos_previos.get("results")[0]
+        aux = datos_previos.get("properties")
+        datos_ant = {
+            "nombre_tarea": aux.get("Nombre de la tarea", {}).get("title", [{}])[0].get("plain_text", ""),
+            "estado": aux.get("Estado", {}).get("status", {}).get("name", ""),
+            "fecha_inicio": aux.get("Fecha", {}).get("date", {}).get("start", ""),
+            "fecha_fin": aux.get("Fecha", {}).get("date", {}).get("end", ""),
+            "prioridad": aux.get("Prioridad", {}).get("select", {}).get("name", ""),
+            "nombre_proyecto": aux.get("Nombre del Proyecto", {}).get("relation", [{}])[0].get("id", ""),
+            "nombre_sprint": aux.get("Sprint", {}).get("relation", [{}])[0].get("id", ""),
+            "resumen": aux.get("Descripción", {}).get("rich_text", [{}])[0].get("plain_text", "")
+        }
+
+        properties = {}
+        if "nombre_nuevo" in data and datos_ant["nombre_tarea"] != data["nombre_nuevo"]:
+            properties["Nombre de la tarea"] = {"title": [{"text": {"content": data["nombre_nuevo"]}}]}
+        if "estado" in data and datos_ant["estado"] != data["estado"]:
+            properties["Estado"] = {"status": {"name": data["estado"]}}
+        if "fecha_inicio" in data or "fecha_fin" in data:
+            properties["Fecha"] = {"date": {
+                "start": data.get("fecha_inicio", datos_ant["fecha_inicio"]),
+                "end": data.get("fecha_fin", datos_ant["fecha_fin"])
+            }}
+        if "prioridad" in data and datos_ant["prioridad"] != data["prioridad"]:
+            properties["Prioridad"] = {"select": {"name": data["prioridad"]}}
+        if "nombre_proyecto" in data and datos_ant["nombre_proyecto"] != data["nombre_proyecto"]:
+            proyecto_id = self.obtener_id_por_nombre(data["nombre_proyecto"], "proyecto")
+            properties["Nombre del Proyecto"] ={"relation": [{"id": proyecto_id}]}
+        if "nombre_sprint" in data and datos_ant["nombre_sprint"] != data["nombre_sprint"]:
+            sprint_id = self.obtener_id_por_nombre(data["nombre_sprint"], "sprint")
+            properties["Sprint"] ={"relation": [{"id": sprint_id}]}
+        if "resumen" in data and datos_ant["resumen"] != data["resumen"]:
+            properties["Descripción"] = {"rich_text": [{"text": {"content": data["resumen"]}}]}
+
+        response = requests.patch(f"{self.NOTION_API_URL}/{id_tarea}", headers=self.HEADERS, json={"properties": properties})
+        if response.status_code == 200:
+            print("Tarea modificada con éxito")
+        else:
+            print(f"Error al modificar la tarea: {response.status_code} - {response.text}")
+
+    def modificar_sprint(self, data):
+        datos_previos = self.consultar_sprint({"nombre": data["nombre"], "tipo": "sprint"}, False)
+        if not datos_previos:
+            return None
+        id_sprint = datos_previos["results"][0]["id"]
+        datos_previos = datos_previos.get("results")[0]
+        aux = datos_previos.get("properties")
+        datos_ant = {
+            "nombre": aux.get("Nombre del Sprint", {}).get("title", [{}])[0].get("plain_text", ""),
+            "estado": aux.get("Estado de Sprint", {}).get("status", {}).get("name", ""),
+            "fecha_inicio": aux.get("Fechas", {}).get("date", {}).get("start", ""),
+            "fecha_fin": aux.get("Fechas", {}).get("date", {}).get("end", "")
+        }
+
+        properties = {}
+        if "nombre_nuevo" in data and datos_ant["nombre"] != data["nombre_nuevo"]:
+            properties["Nombre del Sprint"] = {"title": [{"text": {"content": data["nombre_nuevo"]}}]}
+        if "estado" in data and datos_ant["estado"] != data["estado"]:
+            properties["Estado de Sprint"] = {"status": {"name": data["estado"]}}
+        if "fecha_inicio" in data or "fecha_fin" in data:
+            properties["Fechas"] = {"date": {
+                "start": data.get("fecha_inicio", datos_ant["fecha_inicio"]),
+                "end": data.get("fecha_fin", datos_ant["fecha_fin"])
+            }}
+
+        response = requests.patch(f"{self.NOTION_API_URL}/{id_sprint}", headers=self.HEADERS, json={"properties": properties})
+        if response.status_code == 200:
+            print("Sprint modificado con éxito")
+        else:
+            print(f"Error al modificar el sprint: {response.status_code} - {response.text}")
+
+    def modificar_minuta(self, data):
+        datos_previos = self.consultar_minuta({"nombre": data["nombre"], "tipo": "minuta"}, False)
+        if not datos_previos:
+            return None
+        id_minuta = datos_previos["results"][0]["id"]
+        datos_previos = datos_previos.get("results")[0]
+        aux = datos_previos.get("properties")
+        datos_ant = {
+            "nombre": aux.get("Nombre", {}).get("title", [{}])[0].get("plain_text", ""),
+            "objetivo": aux.get("Objetivo", {}).get("rich_text", [{}])[0].get("plain_text", ""),
+            "fecha_inicio": aux.get("Fecha", {}).get("date", {}).get("start", ""),
+            "participantes": aux.get("Participantes", {}).get("rich_text", [{}])[0].get("plain_text", ""),
+            "resumen": aux.get("Resumen", {}).get("rich_text", [{}])[0].get("plain_text", ""),
+            "nombre_sprint": aux.get("Sprint", {}).get("relation", [{}])[0].get("id", ""),
+            "nombre_proyecto": aux.get("Proyecto", {}).get("relation", [{}])[0].get("id", "")
+        }
+
+        properties = {}
+        if "nombre_nuevo" in data and datos_ant["nombre"] != data["nombre_nuevo"]:
+            properties["Nombre"] = {"title": [{"text": {"content": data["nombre_nuevo"]}}]}
+        if "objetivo" in data and datos_ant["objetivo"] != data["objetivo"]:
+            properties["Objetivo"] = {"rich_text": [{"text": {"content": data["objetivo"]}}]}
+        if "fecha_inicio" in data and datos_ant["fecha_inicio"] != data["fecha_inicio"]:
+            properties["Fecha"] = {"date": {"start": data["fecha_inicio"]}}
+        if "participantes" in data and datos_ant["participantes"] != data["participantes"]:
+            properties["Participantes"] = {"rich_text": [{"text": {"content": data["participantes"]}}]}
+        if "resumen" in data and datos_ant["resumen"] != data["resumen"]:
+            properties["Resumen"] = {"rich_text": [{"text": {"content": data["resumen"]}}]}
+        if "nombre_sprint" in data and datos_ant["nombre_sprint"] != data["nombre_sprint"]:
+            sprint_id = self.obtener_id_por_nombre(data["nombre_sprint"], "sprint")
+            properties["Sprint"] = {"relation": [{"id": sprint_id}]}
+        if "nombre_proyecto" in data and datos_ant["nombre_proyecto"] != data["nombre_proyecto"]:
+            proyecto_id = self.obtener_id_por_nombre(data["nombre_proyecto"], "proyecto")
+            properties["Proyecto"] = {"relation": [{"id": proyecto_id}]}
+
+        response = requests.patch(f"{self.NOTION_API_URL}/{id_minuta}", headers=self.HEADERS, json={"properties": properties})
+        if response.status_code == 200:
+            print("Minuta modificada con éxito")
+        else:
+            print(f"Error al modificar la minuta: {response.status_code} - {response.text}")
+
+    def eliminar_minuta(self, nombre_minuta):
+        id_minuta = self.obtener_id_por_nombre(nombre_minuta, "minuta")
+        if not id_minuta:
+            print(f"No se encontró ninguna minuta con el nombre '{nombre_minuta}' para archivar.")
+            return None
+        
+        # Realizar la acción de archivo
+        response = requests.patch(
+            f"{self.NOTION_API_URL}/{id_minuta}",
+            headers=self.HEADERS,
+            json={"archived": True}
+        )
+        if response.status_code == 200:
+            print("Minuta archivada con éxito")
+        else:
+            print(f"Error al archivar la minuta: {response.status_code} - {response.text}")
+
+    def eliminar_tarea(self, nombre_tarea):
+        id_tarea = self.obtener_id_por_nombre(nombre_tarea, "tarea")
+        if not id_tarea:
+            print(f"No se encontró ninguna tarea con el nombre '{nombre_tarea}' para archivar.")
+            return None
+
+        # Verificar ID obtenido
+        print(f"ID obtenido para '{nombre_tarea}': {id_tarea}")
+        
+        # Realizar la acción de archivo
+        response = requests.patch(
+            f"{self.NOTION_API_URL}/{id_tarea}",
+            headers=self.HEADERS,
+            json={"archived": True}
+        )
+        if response.status_code == 200:
+            print("Tarea archivada con éxito")
+        else:
+            print(f"Error al archivar la tarea: {response.status_code} - {response.text}")
+
+    def eliminar_proyecto(self, nombre_proyecto):
+        id_proyecto = self.obtener_id_por_nombre(nombre_proyecto, "proyecto")
+        if not id_proyecto:
+            print(f"No se encontró ningún proyecto con el nombre '{nombre_proyecto}' para archivar.")
+            return None
+
+        # Verificar ID obtenido
+        print(f"ID obtenido para '{nombre_proyecto}': {id_proyecto}")
+        
+        # Realizar la acción de archivo
+        response = requests.patch(
+            f"{self.NOTION_API_URL}/{id_proyecto}",
+            headers=self.HEADERS,
+            json={"archived": True}
+        )
+        if response.status_code == 200:
+            print("Proyecto archivado con éxito")
+        else:
+            print(f"Error al archivar el proyecto: {response.status_code} - {response.text}")
+
+    def eliminar_sprint(self, nombre_sprint):
+        id_sprint = self.obtener_id_por_nombre(nombre_sprint, "sprint")
+        if not id_sprint:
+            print(f"No se encontró ningún sprint con el nombre '{nombre_sprint}' para archivar.")
+            return None
+
+        # Verificar ID obtenido
+        print(f"ID obtenido para '{nombre_sprint}': {id_sprint}")
+        
+        # Realizar la acción de archivo
+        response = requests.patch(
+            f"{self.NOTION_API_URL}/{id_sprint}",
+            headers=self.HEADERS,
+            json={"archived": True}
+        )
+        if response.status_code == 200:
+            print("Sprint archivado con éxito")
+        else:
+            print(f"Error al archivar el sprint: {response.status_code} - {response.text}")
+
+    def consultar_datos_notion(self, url_pregunta, cabecera, valor1, tipo, page_size=10):
+        if tipo == "minuta":
+            valor2 = "Nombre"
+        elif tipo == "tarea":
+            valor2 = "Nombre de la tarea"
+        elif tipo == "proyecto":
+            valor2 = "Nombre del proyecto"
+        elif tipo == "sprint":
+            valor2 = "Nombre del Sprint"
+        else:
+            print(f"Tipo desconocido: {tipo}")
+            return None
+
+        # Cuerpo de la solicitud
+        busqueda = {
+            "page_size": page_size,
+            "filter": {
+                "and": [
+                    {
+                        "property": valor2,
+                        "title": {
+                            "equals": valor1  # Asegúrate de que valor1 sea un string válido
+                        }
+                    }
+                ]
+            }
+        }
+
+        try:
+            # Realizar la solicitud a la API
+            respuesta = requests.post(url_pregunta, headers=cabecera, data=json.dumps(busqueda))
+            if respuesta.status_code == 200:
+                print("Datos obtenidos con éxito")
+                return respuesta.json()
+            else:
+                print(f"Error {respuesta.status_code}: {respuesta.text}")
+                return None
+        except Exception as e:
+            print(f"Excepción al realizar la solicitud: {e}")
+            return None
+
+def switch_comandos(data):
+    cn = ComandosNotion()
+    respuesta
+    for item in data:
+        accion=item.get("accion")
+        if accion =="crear":
+            tipo = item.get("tipo")
+            print(accion)
+            if tipo == "tarea":
+                respuesta = cn.crear_tarea(item)
+            elif tipo == "proyecto":
+                cn.crear_proyecto(item)
+            elif tipo == "sprint":
+                cn.crear_sprint(item)
+            elif tipo == "minuta":
+                cn.crear_minuta(item)
+            else:
+                print(f"Tipo desconocido: {tipo}")
+
+        elif accion == "consultar":
+            tipo = item.get("tipo")
+            if tipo == "tarea":
+                n=cn.consultar_tarea(item, True)
+                print(n)
+            elif tipo == "proyecto":
+                n = cn.consultar_proyecto(item, True)
+                print(n)
+            elif tipo == "sprint":
+                n = cn.consultar_sprint(item, True)
+                print(n)
+            elif tipo == "minuta":
+                n = cn.consultar_minuta(item, True)
+                print(n)
+            else:
+                print(f"Tipo desconocido: {tipo}")
+
+        elif accion == "actualizar":
+            tipo = item.get("tipo")
+            if tipo == "tarea":
+                cn.modificar_tarea(item)
+            elif tipo == "proyecto":
+                cn.modificar_proyecto(item)
+            elif tipo == "sprint":
+                cn.modificar_sprint(item)
+                print("si?")
+            elif tipo == "minuta":
+                cn.modificar_minuta(item)
+            else:
+                print(f"Tipo desconocido: {tipo}")
+                
+        elif accion == "eliminar":
+            tipo = item.get("tipo")
+            if tipo == "tarea":
+                cn.eliminar_tarea(item.get("nombre"))
+            elif tipo == "proyecto":
+                cn.eliminar_proyecto(item.get("nombre"))
+            elif tipo == "sprint":
+                cn.eliminar_sprint(item.get("nombre"))
+            elif tipo == "minuta":
+                cn.eliminar_minuta(item.get("nombre"))
+            else:
+                print(f"Tipo desconocido: {tipo}")
+
+if __name__ == "__main__":
+    # JSON de ejemplo
+    data = [
+        
+    {
+        "tipo": "proyecto",
+        "accion": "eliminar",
+        "nombre": "YUJU"
+    }
+
+
+    ]
+    switch_comandos(data)
 
 
     # Ejemplo de uso
