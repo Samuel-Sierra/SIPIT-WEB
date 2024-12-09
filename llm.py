@@ -194,7 +194,6 @@ def generarJsonComando(content):
         return respuesta, n 
     else:
         incompletos.append(datos)
-        incompletos = json.dumps(incompletos, indent=4)
 
 def generarJsonMinuta(content):
 
@@ -237,11 +236,7 @@ def generarJsonMinuta(content):
         else:
             incompletos.append(dato)
 
-    completos = json.dumps(completos, indent=4)
 
     if completos !=[] :
         respuesta, n = switch_comandos(completos)
         return respuesta, n 
-
-
-    incompletos = json.dumps(incompletos, indent=4)

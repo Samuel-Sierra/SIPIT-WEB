@@ -4,7 +4,6 @@ from fastapi.responses import JSONResponse
 from fastapi.requests import Request
 from pydantic import BaseModel
 from llm import generarJsonComando, generarJsonMinuta
-from llm import generarJson
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import os
