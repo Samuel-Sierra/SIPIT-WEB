@@ -4,19 +4,12 @@ import json
 from notion import ComandosNotion
 
 cn = ComandosNotion()
-from dotenv import find_dotenv, load_dotenv
-
-env_file = find_dotenv()
-if (env_file):
-    load_dotenv(env_file)
 
 fecha_hora_actual = datetime.now()
 client = OpenAI()
 
-
 def switch_minuta(data):
 
-    respuesta
     n=""
     for item in data:
         accion=item.get("accion")
@@ -37,7 +30,6 @@ def switch_minuta(data):
             tipo = item.get("tipo")
             if tipo == "tarea":
                 n=cn.consultar_tarea(item, True)
-                
             elif tipo == "proyecto":
                 n = cn.consultar_proyecto(item, True)
                 print(n)
