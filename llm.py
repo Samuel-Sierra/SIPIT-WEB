@@ -11,7 +11,7 @@ if (env_file):
     load_dotenv(env_file)
 
 fecha_hora_actual = datetime.now()
-aclient = OpenAI()
+client = OpenAI()
 
 
 def switch_minuta(data):
