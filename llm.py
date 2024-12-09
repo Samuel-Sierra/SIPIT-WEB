@@ -4,9 +4,14 @@ import json
 from notion import ComandosNotion
 
 cn = ComandosNotion()
+from dotenv import find_dotenv, load_dotenv
+
+env_file = find_dotenv()
+if (env_file):
+    load_dotenv(env_file)
 
 fecha_hora_actual = datetime.now()
-client = OpenAI()
+aclient = OpenAI()
 
 
 def switch_minuta(data):
