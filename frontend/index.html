@@ -14,18 +14,7 @@
 
   <!-- TEMPLATE ZONE -->
 
-  <!-- Template para cada tarea -->
-<template id="tem-task-editable-item">
-	<li class="task-list__item" id="item_task1">
-		<div class="form-check">
-			<input type="checkbox" name="task1" id="task1" class="form-check-input">
-			<label for="task1" class="form-check-label" contenteditable="true">Create initial layout for homepage</label>
-		</div>
-		<span class="tag tag-success" id="edit_task1" onclick="save_task(this, 'task1')">Editar</span>
-        <span class="tag tag-success" id="edit_task1" onclick="save_task(this, 'task1')">pendiente</span>
-        <span class="tag tag-success" id="edit_task1" onclick="save_task(this, 'task1')">alta</span>
-	</li>
-</template>
+
   
 <!-- Template para cada elemento de tareas -->
 <template id="tem-task-item">
@@ -38,7 +27,7 @@
         </div>
         <div class="task-spans" >
             <span class="tag tag-status tag-info">In Progress</span>
-            <span class="tag tag-priority tag-danger">High</span>
+            <span class="tag tag-priority ">High</span>
             <span class="tag tag-edit tag-info">Edit</span>
         </div>
     </li>

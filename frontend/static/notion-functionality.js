@@ -11,9 +11,10 @@ class Proyecto {
 }
 
 class Tarea {
-    constructor(id, nombre, persona, inicio, termino, prioridad, estado) {
+    constructor(id, nombre, proyecto, persona, inicio, termino, prioridad, estado) {
         this.id = id; // ID de la tarea, combinación de la ID del proyecto y la posición de la tarea en el arreglo de tareas
         this.nombre = nombre;
+        this.proyecto = proyecto; // La ID del proyecto al que pertenecen
         this.persona = persona;
         this.inicio = inicio;
         this.termino = termino;
@@ -123,7 +124,7 @@ function create_project_list(data) {
         if (item.tipo === 'tarea') {
             let project = Proyectos.find(proj => proj.nombre === item.nombre_proyecto) || Proyectos[0];
             let taskId = `${project.id}-Task-${project.tareas.length}`;
-            let newTask = new Tarea(taskId, item.nombre_tarea, item.nombre_persona, item.fecha_inicio, item.fecha_fin, item.prioridad, item.estado);
+            let newTask = new Tarea(taskId, item.nombre_tarea, item.nombre_proyecto, item.nombre_persona, item.fecha_inicio, item.fecha_fin, item.prioridad, item.estado);
             project.tareas.push(newTask);
 
             let personas = item.nombre_persona.split(' y ');
@@ -167,7 +168,9 @@ function show_project_tasks(project_id) {
                 let task = taskItem.querySelector('.task-list__item');
                 let checkbox = task.querySelector('.form-check-input');
                 let label = task.querySelector('.form-check-label');
-                let status = task.querySelector('.tag');
+                let status = task.querySelector('.tag-status');
+                let priority = task.querySelector('.tag-priority');
+                let editButton = task.querySelector('.tag-edit');
 
                 task.id = tarea.id;
                 checkbox.id = tarea.id;
@@ -175,6 +178,16 @@ function show_project_tasks(project_id) {
                 label.setAttribute('for', tarea.id);
                 label.textContent = tarea.nombre;
                 status.textContent = tarea.estado;
+                priority.textContent = tarea.prioridad;
+
+                if (tarea.prioridad === 'alta') {
+                    priority.classList.add('tag-danger');
+                } else if (tarea.prioridad === 'media') {
+                    priority.classList.add('tag-info');
+                }
+
+                editButton.id = `edit-${tarea.id}`;
+                editButton.addEventListener('click', () => edit_task(tarea.id));
                 taskList.appendChild(taskItem);
             }
         });
@@ -236,27 +249,111 @@ function stop_it(event) {
     event.preventDefault();
 }
 
+function edit_task(task_id) {
+    let task = document.getElementById(task_id);
+    let taskData = Proyectos.flatMap(proj => proj.tareas).find(tarea => tarea.id === task_id);
 
-// Makes a label editable by taking the checkbox's id and making its label editable, toggling the contenteditable attribute
-function edit_task(current_caller, task_id) {
-    
-    var task = document.getElementById(task_id);
-    var label = task.labels[0];
-    label.contentEditable = true;
-    label.focus();
-    label.addEventListener('click', stop_it);
+    let popupContent = `
+        <div class="popup-content">
+            <label>Nombre: <input type="text" id="edit-task-name" value="${taskData.nombre}"></label>
+            <label>Persona: 
+                <select id="edit-task-persona">
+                    ${Personas.map(persona => `<option value="${persona}" ${taskData.persona.includes(persona) ? 'selected' : ''}>${persona}</option>`).join('')}
+                </select>
+                <button class="icon" id="edit-persona-btn"><img class="icon" src="static/edit.png" alt="edit"></button>
+            </label>
+            <label>Proyecto: 
+                <select id="edit-task-proyecto">
+                    ${Proyectos.map(proj => `<option value="${proj.id}" ${proj.id === taskData.id.split('-')[0] ? 'selected' : ''}>${proj.nombre}</option>`).join('')}
+                </select>
+                <button class="icon" id="edit-proyecto-btn"><img class="icon" src="static/edit.png" alt="edit"></button>
+            </label>
+            <label>Fecha Inicio: <input type="date" id="edit-task-inicio" value="${taskData.inicio}"></label>
+            <label>Fecha Fin: <input type="date" id="edit-task-fin" value="${taskData.termino}"></label>
+            <label>Prioridad: 
+                <select id="edit-task-prioridad">
+                    <option value="alta" ${taskData.prioridad === 'alta' ? 'selected' : ''}>Alta</option>
+                    <option value="media" ${taskData.prioridad === 'media' ? 'selected' : ''}>Media</option>
+                    <option value="baja" ${taskData.prioridad === 'baja' ? 'selected' : ''}>Baja</option>
+                </select>
+            </label>
+            <label>Estado: 
+                <select id="edit-task-estado">
+                    <option value="pendiente" ${taskData.estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+                    <option value="completado" ${taskData.estado === 'completado' ? 'selected' : ''}>Completado</option>
+                </select>
+            </label>
+            <button id="save-task-btn">Guardar</button>
+            <button id="delete-task-btn">Eliminar</button>
+            <button id="cancel-task-btn">Cancelar</button>
+        </div>
+    `;
 
-    // Change this tag's value to editing text and it's class 'tag-info' to 'tag-success'
-    current_caller.innerHTML = "Save";
-    current_caller.classList.remove('tag-info');
-    current_caller.classList.add('tag-success');
-    current_caller.onclick = function() { save_task(current_caller, task_id); }
+    let popup = new Popup({
+        content: popupContent, 
+        width: '400px',
+        height: 'auto',
+        title: 'Editar tarea',
+        fontSizeMultiplier: 0.8
+    });
+
+    popup.show();
+
+    document.getElementById('edit-persona-btn').addEventListener('click', () => {
+        let personaInput = document.createElement('input');
+        personaInput.type = 'text';
+        personaInput.id = 'edit-task-persona';
+        document.querySelector('#edit-task-persona').replaceWith(personaInput);
+    });
+
+    document.getElementById('edit-proyecto-btn').addEventListener('click', () => {
+        let proyectoInput = document.createElement('input');
+        proyectoInput.type = 'text';
+        proyectoInput.id = 'edit-task-proyecto';
+        document.querySelector('#edit-task-proyecto').replaceWith(proyectoInput);
+    });
+
+    document.getElementById('save-task-btn').addEventListener('click', () => {
+        let newName = document.getElementById('edit-task-name').value;
+        let newPersona = document.getElementById('edit-task-persona').value;
+        let newProyecto = document.getElementById('edit-task-proyecto').value;
+        let newInicio = document.getElementById('edit-task-inicio').value;
+        let newFin = document.getElementById('edit-task-fin').value;
+        let newPrioridad = document.getElementById('edit-task-prioridad').value;
+        let newEstado = document.getElementById('edit-task-estado').value;
+
+        let currentProject = Proyectos.find(proj => proj.id === taskData.id.split('-')[0]);
+        let newProject = Proyectos.find(proj => proj.id === newProyecto) || new Proyecto(`Project-${Proyectos.length}`, newProyecto, '', newInicio, newFin);
+
+        if (!Proyectos.includes(newProject)) {
+            Proyectos.push(newProject);
+        }
+
+        currentProject.tareas = currentProject.tareas.filter(tarea => tarea.id !== task_id);
+        newProject.tareas.push(new Tarea(task_id, newName, newPersona, newInicio, newFin, newPrioridad, newEstado));
+
+        popup.hide();
+        show_project_tasks(active_project_id);
+    });
+
+    document.getElementById('delete-task-btn').addEventListener('click', () => {
+        if (confirm('¿Estás seguro de que deseas eliminar esta tarea?')) {
+            let currentProject = Proyectos.find(proj => proj.id === taskData.id.split('-')[0]);
+            currentProject.tareas = currentProject.tareas.filter(tarea => tarea.id !== task_id);
+            popup.hide();
+            show_project_tasks(active_project_id);
+        }
+    });
+
+    document.getElementById('cancel-task-btn').addEventListener('click', () => {
+        popup.hide();
+    });
 }
 
 
 function save_task(current_caller, task_id) {
     var task = document.getElementById(task_id);
-    var label = task.labels[0];
+    var label = task.querySelector('.form-check-label');
     label.contentEditable = false;
     label.removeEventListener('click', stop_it);
 

@@ -336,3 +336,10 @@ body {
   width: 50%;
   justify-content: flex-end;
 }
+
+.icon {
+  width: 24px;
+  height: 24px;
+  fill: var(--info-color-darkest);
+  border-style: none;
+}
