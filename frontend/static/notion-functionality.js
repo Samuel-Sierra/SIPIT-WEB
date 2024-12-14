@@ -5,7 +5,7 @@ class Proyecto {
         this.resumen = resumen;
         this.fecha_inicio = fecha_inicio;
         this.fecha_fin = fecha_fin;
-        this.tareas = [];
+        this.prioridad;
         this.personas = [];
     }
 }
@@ -138,93 +138,49 @@ function create_project_list(data) {
         }
     });
 }
-
 function show_project_tasks(project_id) {
-    let project = Proyectos.find(proj => proj.id === project_id);
     let project_detail = document.querySelector('.project-detail');
-    let header = document.createElement('h1');
-    header.textContent = project.nombre;
-    let summary = document.createElement('p');
-    summary.textContent = project.resumen;
-
     project_detail.innerHTML = '';
+
+    let header = document.createElement('h1');
+    header.textContent = 'Datos Incompletos';
     project_detail.appendChild(header);
-    project_detail.appendChild(summary);
 
+    let incompleteDataList = document.createElement('ul');
+    incompleteDataList.classList.add('incomplete-data-list');
 
-    let personas = [...new Set(project.personas)];
-    personas.forEach(persona => {
-        let sectionTemplate = document.getElementById('tem-task-section');
-        let sectionItem = sectionTemplate.content.cloneNode(true);
-        let section = sectionItem.querySelector('.section');
-        section.id = `tareas-${persona}`;
-        section.querySelector('.section-title h2').textContent = `Tareas de ${persona}`;
-        let taskList = section.querySelector('.task-list');
+    Datos_incompletos.forEach(data => {
+        let listItem = document.createElement('li');
+        listItem.classList.add('incomplete-data-item');
 
-        project.tareas.forEach(tarea => {
-            if (tarea.persona.includes(persona)) {
-                let taskTemplate = document.getElementById('tem-task-item');
-                let taskItem = taskTemplate.content.cloneNode(true);
-                let task = taskItem.querySelector('.task-list__item');
-                let checkbox = task.querySelector('.form-check-input');
-                let label = task.querySelector('.form-check-label');
-                let status = task.querySelector('.tag-status');
-                let priority = task.querySelector('.tag-priority');
-                let editButton = task.querySelector('.tag-edit');
+        if (data.tipo === 'tarea') {
+            listItem.innerHTML = `
+                <strong>Tarea:</strong> ${data.nombre_tarea} <br>
+                <strong>Persona:</strong> ${data.nombre_persona} <br>
+                <strong>Fecha Inicio:</strong> ${data.fecha_inicio} <br>
+                <strong>Fecha Fin:</strong> ${data.fecha_fin} <br>
+                <strong>Prioridad:</strong> ${data.prioridad} <br>
+                <strong>Resumen:</strong> ${data.resumen}
+            `;
+        } else if (data.tipo === 'proyecto') {
+            listItem.innerHTML = `
+                <strong>Proyecto:</strong> ${data.nombre_proyecto || 'Sin nombre'} <br>
+                <strong>Estado:</strong> ${data.estado} <br>
+                <strong>Fecha Inicio:</strong> ${data.fecha_inicio} <br>
+                <strong>Fecha Fin:</strong> ${data.fecha_fin} <br>
+                <strong>Prioridad:</strong> ${data.prioridad} <br>
+                <strong>Resumen:</strong> ${data.resumen}
+            `;
+        }
 
-                task.id = tarea.id;
-                checkbox.id = tarea.id;
-                checkbox.name = tarea.id;
-                label.setAttribute('for', tarea.id);
-                label.textContent = tarea.nombre;
-                status.textContent = tarea.estado;
-                priority.textContent = tarea.prioridad;
-
-                if (tarea.prioridad === 'alta') {
-                    priority.classList.add('tag-danger');
-                } else if (tarea.prioridad === 'media') {
-                    priority.classList.add('tag-info');
-                }
-
-                editButton.id = `edit-${tarea.id}`;
-                editButton.addEventListener('click', () => edit_task(tarea.id));
-                taskList.appendChild(taskItem);
-            }
-        });
-
-        project_detail.appendChild(sectionItem);
+        incompleteDataList.appendChild(listItem);
     });
 
-    let unassignedSectionTemplate = document.getElementById('tem-task-section');
-    let unassignedSectionItem = unassignedSectionTemplate.content.cloneNode(true);
-    let unassignedSection = unassignedSectionItem.querySelector('.section');
-    unassignedSection.id = 'tareas-sin-persona';
-    unassignedSection.querySelector('.section-title h2').textContent = 'Tareas sin persona asignada';
-    let unassignedTaskList = unassignedSection.querySelector('.task-list');
-
-    let unassignedTasks = project.tareas.filter(tarea => !tarea.persona);
-    if (unassignedTasks.length > 0) {
-        unassignedTasks.forEach(tarea => {
-            let taskTemplate = document.getElementById('tem-task-item');
-            let taskItem = taskTemplate.content.cloneNode(true);
-            let task = taskItem.querySelector('.task-list__item');
-            let checkbox = task.querySelector('.form-check-input');
-            let label = task.querySelector('.form-check-label');
-            let status = task.querySelector('.tag');
-
-            task.id = tarea.id;
-            checkbox.id = tarea.id;
-            checkbox.name = tarea.id;
-            label.setAttribute('for', tarea.id);
-            label.textContent = tarea.nombre;
-            status.textContent = tarea.estado;
-            unassignedTaskList.appendChild(taskItem);
-        });
-    } else {
-        unassignedTaskList.innerHTML = '<li>Sin tareas no asignadas</li>';
+    if (Datos_incompletos.length === 0) {
+        incompleteDataList.innerHTML = '<li>No hay datos incompletos.</li>';
     }
 
-    project_detail.appendChild(unassignedSectionItem);
+    project_detail.appendChild(incompleteDataList);
 }
 
 function show_project_blocks() {
