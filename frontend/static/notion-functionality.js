@@ -148,7 +148,6 @@ function show_project_tasks() {
     project_detail.appendChild(header);
 
     const container = document.getElementById('datos-incompletos-container');
-    container.innerHTML = '';
 
     Datos_incompletos.forEach(data => {
         let listItem = document.createElement('li');
