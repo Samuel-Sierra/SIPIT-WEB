@@ -147,41 +147,42 @@ function show_project_tasks() {
     header.textContent = 'Datos Incompletos';
     project_detail.appendChild(header);
 
-    let incompleteDataList = document.createElement('ul');
-    incompleteDataList.classList.add('incomplete-data-list');
+    const container = document.getElementById('datos-incompletos-container');
+    container.innerHTML = '';
 
     Datos_incompletos.forEach(data => {
         let listItem = document.createElement('li');
         listItem.classList.add('incomplete-data-item');
 
-        if (data.tipo === 'tarea') {
-            listItem.innerHTML = `
-                <strong>Tarea:</strong> ${data.nombre_tarea} <br>
-                <strong>Persona:</strong> ${data.nombre_persona} <br>
-                <strong>Fecha Inicio:</strong> ${data.fecha_inicio} <br>
-                <strong>Fecha Fin:</strong> ${data.fecha_fin} <br>
-                <strong>Prioridad:</strong> ${data.prioridad} <br>
-                <strong>Resumen:</strong> ${data.resumen}
-            `;
-        } else if (data.tipo === 'proyecto') {
-            listItem.innerHTML = `
-                <strong>Proyecto:</strong> ${data.nombre_proyecto || 'Sin nombre'} <br>
-                <strong>Estado:</strong> ${data.estado} <br>
-                <strong>Fecha Inicio:</strong> ${data.fecha_inicio} <br>
-                <strong>Fecha Fin:</strong> ${data.fecha_fin} <br>
-                <strong>Prioridad:</strong> ${data.prioridad} <br>
-                <strong>Resumen:</strong> ${data.resumen}
-            `;
-        }
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/incompletos/`
 
-        incompleteDataList.appendChild(listItem);
+        data.forEach(key => {
+            const input = document.createElement('input');
+            if (key == null){
+                input.name = key;
+                input.type = 'string';                    
+            }else{
+                input.type = 'hidden';
+                input.name = key;
+                input.value = data[key]; // Por ejemplo, el índice del dato.
+            }
+            form.appendChild(input)
+        });
+        const saveButton = document.createElement('button');
+        saveButton.textContent = 'Guardar';
+        saveButton.type = 'submit';
+        form.appendChild(saveButton);
+        container.appendChild(form);
+        
     });
 
     if (Datos_incompletos.length === 0) {
-        incompleteDataList.innerHTML = '<li>No hay datos incompletos.</li>';
+        container.innerHTML = '<p>No hay datos incompletos.</p>';
     }
 
-    project_detail.appendChild(incompleteDataList);
+    project_detail.appendChild(container);
 }
 
 function show_project_blocks() {
