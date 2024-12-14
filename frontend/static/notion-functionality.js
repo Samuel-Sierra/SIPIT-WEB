@@ -138,7 +138,8 @@ function create_project_list(data) {
         }
     });
 }
-function show_project_tasks(project_id) {
+
+function show_project_tasks() {
     let project_detail = document.querySelector('.project-detail');
     project_detail.innerHTML = '';
 
@@ -379,8 +380,5 @@ function edit_task_details(task_id) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    create_project_list(Datos_incompletos);
-    show_project_blocks();
-    set_active(document.getElementById(active_project_id));
-    show_project_tasks(active_project_id);
+    show_project_tasks();
 });
