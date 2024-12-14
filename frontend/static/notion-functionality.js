@@ -158,8 +158,11 @@ function show_project_tasks() {
         for (let key in data ){
             const input = document.createElement('input');
             if (data[key] === ""){
+                const label = document.createElement('label')
+                label.value = key;
                 input.name = key;
-                input.type = 'string';                    
+                input.type = 'string';     
+                form.append(label);               
             }else{
                 input.type = 'hidden';
                 input.name = key;
