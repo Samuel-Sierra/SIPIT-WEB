@@ -159,7 +159,7 @@ function show_project_tasks() {
             const input = document.createElement('input');
             if (data[key] === ""){
                 const label = document.createElement('label')
-                label.value = key;
+                label.textContent = `${key}:`;
                 input.name = key;
                 input.type = 'string';     
                 form.append(label);               
@@ -179,10 +179,10 @@ function show_project_tasks() {
     });
 
     if (Datos_incompletos.length === 0) {
-        container.innerHTML = '<p>No hay datos incompletos.</p>';
+        project_detail.innerHTML = '<p>No hay datos incompletos.</p>';
     }
 
-    project_detail.appendChild(container);
+    
 }
 
 function show_project_blocks() {
