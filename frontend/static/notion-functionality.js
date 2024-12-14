@@ -157,7 +157,7 @@ function show_project_tasks() {
         form.method = 'POST';
         form.action = `/incompletos/`
 
-        data.forEach(key => {
+        for (let key in data ){
             const input = document.createElement('input');
             if (key == null){
                 input.name = key;
@@ -168,7 +168,7 @@ function show_project_tasks() {
                 input.value = data[key]; // Por ejemplo, el índice del dato.
             }
             form.appendChild(input)
-        });
+        };
         const saveButton = document.createElement('button');
         saveButton.textContent = 'Guardar';
         saveButton.type = 'submit';
