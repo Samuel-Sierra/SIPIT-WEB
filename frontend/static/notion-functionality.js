@@ -147,11 +147,9 @@ function show_project_tasks() {
     header.textContent = 'Datos Incompletos';
     project_detail.appendChild(header);
 
-    const container = document.getElementById('datos-incompletos-container');
 
     Datos_incompletos.forEach(data => {
-        let listItem = document.createElement('li');
-        listItem.classList.add('incomplete-data-item');
+
 
         const form = document.createElement('form');
         form.method = 'POST';
@@ -173,7 +171,7 @@ function show_project_tasks() {
         saveButton.textContent = 'Guardar';
         saveButton.type = 'submit';
         form.appendChild(saveButton);
-        container.appendChild(form);
+        project_detail.appendChild(form);
         
     });
 
