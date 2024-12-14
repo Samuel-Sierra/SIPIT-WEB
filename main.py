@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from notion import ComandosNotion
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from fastapi.requests import Request
 from llm import generarJsonComando, generarJsonMinuta
 from fastapi.staticfiles import StaticFiles
@@ -36,13 +36,17 @@ def comandos(texto:str):
 @app.post('/minutatxt/')
 def minuta(texto_minuta:str):
     content={"respuesta":"Se recibió la minuta con éxito"+texto_minuta}
-    respuesta, n = generarJsonMinuta (content)
-    if respuesta.status_code == 200:
-        content={"respuesta":n}
-        return JSONResponse(content=content, status_code=200)
+    respuesta, n= generarJsonMinuta (content)
+
+    if n[0]==-1 :
+
+        if respuesta.status_code == 200:
+            return JSONResponse(content=content, status_code=200)
+        else:
+            return JSONResponse(content=content, status_code=respuesta.status_code)
     else:
-        content={"respuesta":n}
-        return JSONResponse(content=content, status_code=respuesta.status_code)
+        return JSONResponse(content=n, status_code=200)
+
     
 
 if __name__ == "__main__":

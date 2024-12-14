@@ -225,6 +225,7 @@ def generarJsonMinuta(content):
     completos = []
     incompletos = []
     incompletos.append(id)
+    incompletos_cookies = []
 
     # Clasificar los datos
     for dato in datos:
@@ -234,14 +235,20 @@ def generarJsonMinuta(content):
             incompletos.append(dato)
 
     respuesta=""
-    n=""
+    n=[]
+    n.append(-1)
+    n.append(2)
 
     if completos !=[] :
-        respuesta, n = switch_comandos(completos)
+        respuesta, temp = switch_comandos(completos)
         
     if incompletos !=[] :
         for x in incompletos:
-            db = get_db()
-            db.minutas.insert_one(x)
-
-    return respuesta, n 
+            for key in x:
+                if x[key] == "":
+                    incompletos_cookies.append(x)
+            #db = get_db()
+            #db.minutas.insert_one(x)
+    else:
+        incompletos_cookies = n
+    return respuesta, incompletos_cookies
