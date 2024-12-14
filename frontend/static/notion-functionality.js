@@ -157,7 +157,7 @@ function show_project_tasks() {
 
         for (let key in data ){
             const input = document.createElement('input');
-            if (key === ""){
+            if (data[key] === ""){
                 input.name = key;
                 input.type = 'string';                    
             }else{
