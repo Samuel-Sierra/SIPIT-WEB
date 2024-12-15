@@ -10,6 +10,7 @@ from schemas import projectEntity, projectsEntity, taskEntity, tasksEntity, resu
 from config.db import get_db
 from bson import ObjectId
 from info import obtenerTodo
+import json
 
 
 app = FastAPI()
@@ -25,8 +26,8 @@ cn = ComandosNotion()
 def home(request: Request):
     try:
         todo = obtenerTodo()
-
-        return templates.TemplateResponse("index.html", {"request": request, "todo": todo})
+        todo_json = json.dumps(todo, ensure_ascii=False)
+        return templates.TemplateResponse("index.html", {"request": request, "todo": todo_json})
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
     

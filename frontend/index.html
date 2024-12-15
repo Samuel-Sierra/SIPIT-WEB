@@ -10,7 +10,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@simondmc/popup-js@1.4.3/popup.min.js"></script>
   <script>
     // Inyectar la variable 'todo' desde Python a JS
-    const Datos_incompletos = {{ todo | tojson }};
+    const Datos_incompletos = {{ todo | safe }};
     console.log("Datos cargados:", Datos_incompletos);
 </script>
 </head>
