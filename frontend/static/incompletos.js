@@ -174,6 +174,6 @@ function deleteAllCookies() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    show_project_tasks();
+    //show_project_tasks();
     deleteAllCookies();
 });

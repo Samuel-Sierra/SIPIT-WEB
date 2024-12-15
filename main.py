@@ -51,13 +51,18 @@ def obtenerIncompletos(request: Request):
     try:
         db = get_db()
         task = taskEntity(db.minutas.find_one({"tipo":"proyecto"}))
-        respuesta = templates.TemplateResponse("minuta.html",{"request": request})
+        names = []
+        data = []
         for i in task: 
-            if task[i]=="":
-                respuesta.set_cookie(key = i, value = task[i])
+            names.append(i)
+            data.append(task[i])
+        respuesta = templates.TemplateResponse("minuta.html",{"request": request, "names": names, "data": data})
         return respuesta
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
+    my_string = "Hola, esta es una cadena enviada desde FastAPI"
+    # Renderizar la plantilla HTML con el string
+    return templates.TemplateResponse("index.html", {"request": request, "message": my_string})
 
 if __name__ == "__main__":
     import uvicorn

@@ -102,6 +102,12 @@
             </svg></a>
     </article>
     <article class="project-detail">
+        <h1>Mensajes desde FastAPI:</h1>
+    <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
     </article>
 </main>
 <!-- partial -->
