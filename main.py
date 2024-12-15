@@ -175,6 +175,7 @@ def acompletar(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...
             "resumen": resumen,
         }
         respuesta, n = switch_comandos(datos)
+        return datos
 
         db = get_db()
 
