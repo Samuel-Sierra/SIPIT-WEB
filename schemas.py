@@ -1,5 +1,6 @@
 def projectEntity(item) -> dict:
     return{
+        "id": str(item["_id"]),
         "tipo":item["tipo"],
         "accion":item["accion"],
         "nombre_proyecto":item["nombre_proyecto"],
@@ -15,6 +16,7 @@ def projectsEntity(entity) -> list:
 
 def taskEntity(item) -> dict:
     return{
+        "id": str(item["_id"]),
         "tipo":item["tipo"],
         "accion":item["accion"],
         "nombre_proyecto":item["nombre_proyecto"],

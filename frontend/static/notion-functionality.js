@@ -5,7 +5,7 @@ class Proyecto {
         this.resumen = resumen;
         this.fecha_inicio = fecha_inicio;
         this.fecha_fin = fecha_fin;
-        this.prioridad;
+        this.tareas = [];
         this.personas = [];
     }
 }
@@ -139,50 +139,92 @@ function create_project_list(data) {
     });
 }
 
-function show_project_tasks() {
+function show_project_tasks(project_id) {
+    let project = Proyectos.find(proj => proj.id === project_id);
     let project_detail = document.querySelector('.project-detail');
-    project_detail.innerHTML = '';
-
     let header = document.createElement('h1');
-    header.textContent = 'Datos Incompletos';
+    header.textContent = project.nombre;
+    let summary = document.createElement('p');
+    summary.textContent = project.resumen;
+
+    project_detail.innerHTML = '';
     project_detail.appendChild(header);
+    project_detail.appendChild(summary);
 
 
-    Datos_incompletos.forEach(data => {
+    let personas = [...new Set(project.personas)];
+    personas.forEach(persona => {
+        let sectionTemplate = document.getElementById('tem-task-section');
+        let sectionItem = sectionTemplate.content.cloneNode(true);
+        let section = sectionItem.querySelector('.section');
+        section.id = `tareas-${persona}`;
+        section.querySelector('.section-title h2').textContent = `Tareas de ${persona}`;
+        let taskList = section.querySelector('.task-list');
 
+        project.tareas.forEach(tarea => {
+            if (tarea.persona.includes(persona)) {
+                let taskTemplate = document.getElementById('tem-task-item');
+                let taskItem = taskTemplate.content.cloneNode(true);
+                let task = taskItem.querySelector('.task-list__item');
+                let checkbox = task.querySelector('.form-check-input');
+                let label = task.querySelector('.form-check-label');
+                let status = task.querySelector('.tag-status');
+                let priority = task.querySelector('.tag-priority');
+                let editButton = task.querySelector('.tag-edit');
 
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/incompletos/`
+                task.id = tarea.id;
+                checkbox.id = tarea.id;
+                checkbox.name = tarea.id;
+                label.setAttribute('for', tarea.id);
+                label.textContent = tarea.nombre;
+                status.textContent = tarea.estado;
+                priority.textContent = tarea.prioridad;
 
-        for (let key in data ){
-            const input = document.createElement('input');
-            if (data[key] === ""){
-                const label = document.createElement('label')
-                label.textContent = `${key}:`;
-                input.name = key;
-                input.type = 'string';     
-                form.append(label);               
-            }else{
-                input.type = 'hidden';
-                input.name = key;
-                input.value = data[key]; // Por ejemplo, el índice del dato.
+                if (tarea.prioridad === 'alta') {
+                    priority.classList.add('tag-danger');
+                } else if (tarea.prioridad === 'media') {
+                    priority.classList.add('tag-info');
+                }
+
+                editButton.id = `edit-${tarea.id}`;
+                editButton.addEventListener('click', () => edit_task(tarea.id));
+                taskList.appendChild(taskItem);
             }
-            form.appendChild(input)
-        };
-        const saveButton = document.createElement('button');
-        saveButton.textContent = 'Guardar';
-        saveButton.type = 'submit';
-        form.appendChild(saveButton);
-        project_detail.appendChild(form);
-        
+        });
+
+        project_detail.appendChild(sectionItem);
     });
 
-    if (Datos_incompletos.length === 0) {
-        project_detail.innerHTML = '<p>No hay datos incompletos.</p>';
+    let unassignedSectionTemplate = document.getElementById('tem-task-section');
+    let unassignedSectionItem = unassignedSectionTemplate.content.cloneNode(true);
+    let unassignedSection = unassignedSectionItem.querySelector('.section');
+    unassignedSection.id = 'tareas-sin-persona';
+    unassignedSection.querySelector('.section-title h2').textContent = 'Tareas sin persona asignada';
+    let unassignedTaskList = unassignedSection.querySelector('.task-list');
+
+    let unassignedTasks = project.tareas.filter(tarea => !tarea.persona);
+    if (unassignedTasks.length > 0) {
+        unassignedTasks.forEach(tarea => {
+            let taskTemplate = document.getElementById('tem-task-item');
+            let taskItem = taskTemplate.content.cloneNode(true);
+            let task = taskItem.querySelector('.task-list__item');
+            let checkbox = task.querySelector('.form-check-input');
+            let label = task.querySelector('.form-check-label');
+            let status = task.querySelector('.tag');
+
+            task.id = tarea.id;
+            checkbox.id = tarea.id;
+            checkbox.name = tarea.id;
+            label.setAttribute('for', tarea.id);
+            label.textContent = tarea.nombre;
+            status.textContent = tarea.estado;
+            unassignedTaskList.appendChild(taskItem);
+        });
+    } else {
+        unassignedTaskList.innerHTML = '<li>Sin tareas no asignadas</li>';
     }
 
-    
+    project_detail.appendChild(unassignedSectionItem);
 }
 
 function show_project_blocks() {
@@ -381,5 +423,8 @@ function edit_task_details(task_id) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    show_project_tasks();
+    create_project_list(Datos_incompletos);
+    show_project_blocks();
+    set_active(document.getElementById(active_project_id));
+    show_project_tasks(active_project_id);
 });

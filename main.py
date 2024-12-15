@@ -8,6 +8,7 @@ from fastapi.templating import Jinja2Templates
 import os
 from schemas import projectEntity, projectsEntity, taskEntity, tasksEntity
 from config.db import get_db
+from bson import ObjectId
 
 
 app = FastAPI()
@@ -53,8 +54,7 @@ def minutatxt(texto_minuta:str):
 def obtenerProyectosIncompletos(request: Request):
     try:
         db = get_db()
-        #resumen_minuta = db.minutasResumen.find()
-        resumen_minuta = "cuak"
+        resumen_minuta = db.minutasResumen.find()
         num_pro = db.minutas.count_documents({"tipo": "proyecto"})
         combined= []
         combineds= []
@@ -94,14 +94,13 @@ def obtenerProyectosIncompletos(request: Request):
 def obtenerTareasIncompletos(request: Request):
     try:
         db = get_db()
-        #resumen_minuta = db.minutasResumen.find()
-        resumen_minuta = "cuak"
+        resumen_minuta = db.minutasResumen.find()
         num_task = db.minutas.count_documents({"tipo": "tarea"})
         combined= []
         combineds= []
 
         if (num_task == 1):
-            tasks = projectEntity(db.minutas.find_one({"tipo":"tarea"}))
+            tasks = taskEntity(db.minutas.find_one({"tipo":"tarea"}))
             names = []
             data = []
             for i in tasks: 
@@ -113,7 +112,7 @@ def obtenerTareasIncompletos(request: Request):
 
         elif (num_task>1):
             
-            tasks = projectsEntity(db.minutas.find({"tipo":"tarea"}))
+            tasks = tasksEntity(db.minutas.find({"tipo":"tarea"}))
             names = []
             data = []
             for task in tasks:
@@ -132,7 +131,7 @@ def obtenerTareasIncompletos(request: Request):
 
 
 @app.post('/acompletar/')
-def acompletar(tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), estado: str = Form(...),
+def acompletar(id:str = Form(...),tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), estado: str = Form(...),
                fecha_inicio: str = Form(...), fecha_fin: str = Form(...), prioridad: str = Form(...), resumen: str = Form(...)):
     datos = {
         "tipo": tipo,
@@ -145,6 +144,11 @@ def acompletar(tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: 
         "resumen": resumen,
     }
     respuesta, n = switch_comandos(datos)
+
+
+    db = get_db()
+
+    db.minutas.find_one_and_delete({"_id": ObjectId(id)})
 
 
     if respuesta.status_code == 200:
