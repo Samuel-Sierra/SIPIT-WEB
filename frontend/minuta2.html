@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/alphardex/aqua.css/dist/aqua.min.css'>
   <link rel="stylesheet" href="/static/style.css">
-  <script src="/static/notion-functionality.js" defer></script>
+  <script src="/static/incompletos.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@simondmc/popup-js@1.4.3/popup.min.js"></script>
   <a href="https://www.flaticon.com/free-icons/edit" title="edit icons">Edit icons created by alkhalifi design - Flaticon</a>
 </head>
@@ -72,9 +72,7 @@
     <article class="projects">
         <header class="welcome-banner">
             <h1>Hola de nuevo</h1>
-            <a href="/obtenerProyectosIncompletos/">Comandos de proyectos incompletos</a>
-            <a href="/obtenerTareasIncompletos/">Comandos de tareas incompletos</a>
-
+            <p>{{res_min}}</p>
         </header>
         <section class="section" id="projects">
             <div class="section-title">
@@ -104,6 +102,20 @@
             </svg></a>
     </article>
     <article class="project-detail">
+        <h1>Mensajes desde FastAPI:</h1>
+        {% for combined in combineds %}
+        <form action="/acompletar/" method="POST">
+            {% for name, dat in combined %}
+                <label>
+                    {{ name }}
+                    <input type="text" name="{{ name }}" value="{{ dat }}">
+                </label><br>
+            {% endfor %}
+            <input type="submit" value="Aceptar">
+        </form>
+        {% endfor %}
+        
+    
     </article>
 </main>
 <!-- partial -->

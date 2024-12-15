@@ -2,11 +2,11 @@ from fastapi import FastAPI, Form
 from notion import ComandosNotion
 from fastapi.responses import JSONResponse, Response
 from fastapi.requests import Request
-from llm import generarJsonComando, generarJsonMinuta, generarResumenMinuta
+from llm import generarJsonComando, generarJsonMinuta, generarResumenMinuta, switch_comandos
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import os
-from schemas import projectEntity, projectsEntity
+from schemas import projectEntity, projectsEntity, taskEntity, tasksEntity
 from config.db import get_db
 
 
@@ -49,14 +49,16 @@ def minutatxt(texto_minuta:str):
         content={"respuesta":"Se recibió la minuta con éxito"+n}
         return JSONResponse(content=content, status_code=respuesta.status_code)
     
-@app.get('/obtenerIncompletos/')
-def obtenerIncompletos(request: Request):
+@app.get('/obtenerProyectosIncompletos/')
+def obtenerProyectosIncompletos(request: Request):
     try:
         db = get_db()
         #resumen_minuta = db.minutasResumen.find()
         resumen_minuta = "cuak"
         num_pro = db.minutas.count_documents({"tipo": "proyecto"})
-        
+        combined= []
+        combineds= []
+
         if (num_pro == 1):
             tasks = projectEntity(db.minutas.find_one({"tipo":"proyecto"}))
             names = []
@@ -65,8 +67,11 @@ def obtenerIncompletos(request: Request):
                 names.append(i)
                 data.append(tasks[i])
             combined = zip(names,data)
+            respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combined": combined, "res_min": resumen_minuta})
+            
+
         elif (num_pro>1):
-            combineds = []
+            
             tasks = projectsEntity(db.minutas.find({"tipo":"proyecto"}))
             names = []
             data = []
@@ -76,16 +81,104 @@ def obtenerIncompletos(request: Request):
                     data.append(tasks[i])
                 combined = zip(names,data)
             combineds.append(combined)
-
+            respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "combineds": combineds, "res_min": resumen_minuta})
         
-        respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combined": combined, "res_min": resumen_minuta})
+        
+        
         return respuesta
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
+
     
+@app.get('/obtenerTareasIncompletos/')
+def obtenerTareasIncompletos(request: Request):
+    try:
+        db = get_db()
+        #resumen_minuta = db.minutasResumen.find()
+        resumen_minuta = "cuak"
+        num_task = db.minutas.count_documents({"tipo": "tarea"})
+        combined= []
+        combineds= []
+
+        if (num_task == 1):
+            tasks = projectEntity(db.minutas.find_one({"tipo":"proyecto"}))
+            names = []
+            data = []
+            for i in tasks: 
+                names.append(i)
+                data.append(tasks[i])
+            combined = zip(names,data)
+            respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combined": combined, "res_min": resumen_minuta})
+            
+
+        elif (num_task>1):
+            
+            tasks = projectsEntity(db.minutas.find({"tipo":"proyecto"}))
+            names = []
+            data = []
+            for task in tasks:
+                for i in task:
+                    names.append(i)
+                    data.append(tasks[i])
+                combined = zip(names,data)
+            combineds.append(combined)
+            respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "combineds": combineds, "res_min": resumen_minuta})
+        
+        
+        
+        return respuesta
+    except Exception as e:
+        return f"Excepción al realizar la solicitud: {e}"
+
+
 @app.post('/acompletar/')
-def acompletar(nombre_proyecto: str = Form(...), msg: str = Form(...)):
-    return nombre_proyecto
+def acompletar(tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), estado: str = Form(...),
+               fecha_inicio: str = Form(...), fecha_fin: str = Form(...), prioridad: str = Form(...), resumen: str = Form(...)):
+    datos = {
+        "tipo": tipo,
+        "accion": accion,
+        "nombre_proyecto": nombre_proyecto,
+        "estado": estado,
+        "fecha_inicio": fecha_inicio,
+        "fecha_fin": fecha_fin,
+        "prioridad": prioridad,
+        "resumen": resumen,
+    }
+    respuesta, n = switch_comandos(datos)
+
+
+    if respuesta.status_code == 200:
+        content={"respuesta":n}
+        return JSONResponse(content=content, status_code=200)
+    else:
+        content={"respuesta":n}
+        return JSONResponse(content=content, status_code=respuesta.status_code)
+
+@app.post('/acompletar/')
+def acompletar(tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), nombre_tarea: str = Form(...),
+            nombre_persona: str = Form(...), estado: str = Form(...), fecha_inicio: str = Form(...), fecha_fin: str = Form(...), prioridad: str = Form(...), 
+            resumen: str = Form(...)):
+    datos = {
+        "tipo": tipo,
+        "accion": accion,
+        "nombre_proyecto": nombre_proyecto,
+        "nombre_tarea": nombre_tarea,
+        "nombre_persona": nombre_persona,
+        "estado": estado,
+        "fecha_inicio": fecha_inicio,
+        "fecha_fin": fecha_fin,
+        "prioridad": prioridad,
+        "resumen": resumen,
+    }
+    respuesta, n = switch_comandos(datos)
+
+
+    if respuesta.status_code == 200:
+        content={"respuesta":n}
+        return JSONResponse(content=content, status_code=200)
+    else:
+        content={"respuesta":n}
+        return JSONResponse(content=content, status_code=respuesta.status_code)
 
 
 if __name__ == "__main__":
