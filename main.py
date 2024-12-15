@@ -27,8 +27,7 @@ def home(request: Request):
 @app.post('/comandos/')
 def comandos(texto:str):
     try:
-        respuesta= generarJsonComando(texto)
-        return respuesta
+        respuesta, n = generarJsonComando(texto)
 
         if respuesta.status_code == 200:
             content={"respuesta":n}
