@@ -50,7 +50,7 @@ def minutatxt(texto_minuta:str):
 def obtenerIncompletos():
     try:
         db = get_db()
-        return tasksEntity(db.minutas.find())
+        return db.minutas.find()
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
 
