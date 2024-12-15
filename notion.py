@@ -137,32 +137,6 @@ class ComandosNotion:
         respuesta = self.create_notion_entry(self.DATABASE_IDS["minutas"], properties)
         return respuesta
     
-    def interpretar_informacion(self,datos):
-        client = OpenAI()
-        content = json.dumps(datos)
-        # se utiliza el role para que gpt entienda que hacer y content es el contenido del archivo que seleccionamos
-        completion = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system",
-            "content": "interpreta la información y dame un resumen"
-            },
-
-            {
-            "role": "user",
-            "content": content
-            }
-        ]
-        )
-        response_dict = completion.to_dict()
-
-        # Capturar el mensaje de salida
-        output_message = response_dict['choices'][0]['message']['content']
-
-        # Guardar el mensaje en una variable
-        resultado = output_message
-        return resultado
-    
     def consultar_datos_notion(self, url_pregunta, cabecera, valor1,tipo, page_size=10):
         if tipo=="minuta":
             valor2="Nombre"
@@ -219,7 +193,7 @@ class ComandosNotion:
                 interpretacion=self.interpretar_informacion(resultado)
                 return interpretacion
             else:
-                return 0
+                return resultado
 
     def consultar_sprint(self, data, flag):
         # Validar si 'nombre' está presente en 'data'
@@ -238,7 +212,7 @@ class ComandosNotion:
                 interpretacion=self.interpretar_informacion(resultado)
                 return interpretacion
             else:
-                return 0
+                return resultado
 
     def consultar_tarea(self, data, flag):
         # Validar si 'nombre' está presente en 'data'
@@ -257,7 +231,34 @@ class ComandosNotion:
                 interpretacion=self.interpretar_informacion(resultado)
                 return interpretacion
             else:
-                return 0
+                return resultado
+
+
+    def interpretar_informacion(self,datos):
+        client = OpenAI()
+        content = json.dumps(datos)
+        # se utiliza el role para que gpt entienda que hacer y content es el contenido del archivo que seleccionamos
+        completion = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system",
+            "content": "interpreta la información y dame un resumen"
+            },
+
+            {
+            "role": "user",
+            "content": content
+            }
+        ]
+        )
+        response_dict = completion.to_dict()
+
+        # Capturar el mensaje de salida
+        output_message = response_dict['choices'][0]['message']['content']
+
+        # Guardar el mensaje en una variable
+        resultado = output_message
+        return resultado
 
     def consultar_minuta(self, data, flag):
         # Validar si 'nombre' está presente en 'data'
@@ -276,7 +277,7 @@ class ComandosNotion:
                 interpretacion=self.interpretar_informacion(resultado)
                 return interpretacion
             else:
-                return 0
+                return resultado
     
     def obtener_id_por_nombre(self, nombre, tipo):
         """
@@ -338,8 +339,10 @@ class ComandosNotion:
             properties["Prioridad"] = {"select": {"name": modificar["prioridad"]}}
 
         response = requests.patch(f"{self.NOTION_API_URL}/{id_proyecto}", headers=self.HEADERS, json={"properties": properties})
-        return response
-    
+        if response.status_code == 200:
+            print("Modificación exitosa")
+        else:
+            print(f"Error en la modificación: {response.status_code} - {response.text}")
     def modificar_tarea(self, data):
         datos_previos = self.consultar_tarea({"nombre": data["nombre_tarea"], "tipo": "tarea"}, False)
         if not datos_previos:
@@ -380,7 +383,10 @@ class ComandosNotion:
             properties["Descripción"] = {"rich_text": [{"text": {"content": data["resumen"]}}]}
 
         response = requests.patch(f"{self.NOTION_API_URL}/{id_tarea}", headers=self.HEADERS, json={"properties": properties})
-        return response
+        if response.status_code == 200:
+            print("Tarea modificada con éxito")
+        else:
+            print(f"Error al modificar la tarea: {response.status_code} - {response.text}")
 
     def modificar_sprint(self, data):
         datos_previos = self.consultar_sprint({"nombre": data["nombre"], "tipo": "sprint"}, False)
@@ -408,7 +414,10 @@ class ComandosNotion:
             }}
 
         response = requests.patch(f"{self.NOTION_API_URL}/{id_sprint}", headers=self.HEADERS, json={"properties": properties})
-        return response
+        if response.status_code == 200:
+            print("Sprint modificado con éxito")
+        else:
+            print(f"Error al modificar el sprint: {response.status_code} - {response.text}")
 
     def modificar_minuta(self, data):
         datos_previos = self.consultar_minuta({"nombre": data["nombre"], "tipo": "minuta"}, False)
@@ -446,7 +455,10 @@ class ComandosNotion:
             properties["Proyecto"] = {"relation": [{"id": proyecto_id}]}
 
         response = requests.patch(f"{self.NOTION_API_URL}/{id_minuta}", headers=self.HEADERS, json={"properties": properties})
-        return response
+        if response.status_code == 200:
+            print("Minuta modificada con éxito")
+        else:
+            print(f"Error al modificar la minuta: {response.status_code} - {response.text}")
 
     def eliminar_minuta(self, nombre_minuta):
         id_minuta = self.obtener_id_por_nombre(nombre_minuta, "minuta")
@@ -460,7 +472,10 @@ class ComandosNotion:
             headers=self.HEADERS,
             json={"archived": True}
         )
-        return response
+        if response.status_code == 200:
+            print("Minuta archivada con éxito")
+        else:
+            print(f"Error al archivar la minuta: {response.status_code} - {response.text}")
 
     def eliminar_tarea(self, nombre_tarea):
         id_tarea = self.obtener_id_por_nombre(nombre_tarea, "tarea")
@@ -521,6 +536,50 @@ class ComandosNotion:
             print("Sprint archivado con éxito")
         else:
             print(f"Error al archivar el sprint: {response.status_code} - {response.text}")
+
+    def consultar_datos_notion(self, url_pregunta, cabecera, valor1, tipo, page_size=10):
+        if tipo == "minuta":
+            valor2 = "Nombre"
+        elif tipo == "tarea":
+            valor2 = "Nombre de la tarea"
+        elif tipo == "proyecto":
+            valor2 = "Nombre del proyecto"
+        elif tipo == "sprint":
+            valor2 = "Nombre del Sprint"
+        else:
+            print(f"Tipo desconocido: {tipo}")
+            return None
+
+        # Cuerpo de la solicitud
+        busqueda = {
+            "page_size": page_size,
+            "filter": {
+                "and": [
+                    {
+                        "property": valor2,
+                        "title": {
+                            "equals": valor1  # Asegúrate de que valor1 sea un string válido
+                        }
+                    }
+                ]
+            }
+        }
+
+        try:
+            # Realizar la solicitud a la API
+            respuesta = requests.post(url_pregunta, headers=cabecera, data=json.dumps(busqueda))
+            if respuesta.status_code == 200:
+                print("Datos obtenidos con éxito")
+                return respuesta.json()
+            else:
+                print(f"Error {respuesta.status_code}: {respuesta.text}")
+                return None
+        except Exception as e:
+            print(f"Excepción al realizar la solicitud: {e}")
+            return None
+
+
+
 
 
     # Ejemplo de uso

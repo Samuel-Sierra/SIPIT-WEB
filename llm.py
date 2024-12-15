@@ -77,11 +77,11 @@ def switch_minuta(data):
     else: 
         n = n + " no se concreto"
     return respuesta, n
-
-def switch_comandos(item):
+def switch_comandos(data):
 
     respuesta=[]
     n=""
+    item=data
     accion=item.get("accion")
     if accion =="crear":
         tipo = item.get("tipo")
@@ -99,21 +99,19 @@ def switch_comandos(item):
     elif accion == "consultar":
         tipo = item.get("tipo")
         if tipo == "tarea":
-            pren = cn.consultar_tarea(item, True)
+            n=cn.consultar_tarea(item, True)
             
         elif tipo == "proyecto":
-            pren = cn.consultar_proyecto(item, True)
-
+            n = cn.consultar_proyecto(item, True)
+            print(n)
         elif tipo == "sprint":
-            pren = cn.consultar_sprint(item, True)
-
+            n = cn.consultar_sprint(item, True)
+            print(n)
         elif tipo == "minuta":
-            pren = cn.consultar_minuta(item, True)
-
+            n = cn.consultar_minuta(item, True)
+            print(n)
         else:
             print(f"Tipo desconocido: {tipo}")
-        if pren != 0:
-            n = pren
 
     elif accion == "actualizar":
         tipo = item.get("tipo")
@@ -123,6 +121,7 @@ def switch_comandos(item):
             respuesta = cn.modificar_proyecto(item)
         elif tipo == "sprint":
             respuesta = cn.modificar_sprint(item)
+            print("si?")
         elif tipo == "minuta":
             respuesta = cn.modificar_minuta(item)
         else:
@@ -140,14 +139,11 @@ def switch_comandos(item):
             cn.eliminar_minuta(item.get("nombre"))
         else:
             print(f"Tipo desconocido: {tipo}")
-
-    if accion != "consultar":
-        n = "El comando "+accion +tipo 
-        if (respuesta.status_code==200):
-            n = n + " se concreto correctamente"
-        else: 
-            n = n + " no se concreto"
-
+    n = "El comando "+accion +tipo 
+    if (respuesta.status_code==200):
+        n = n + " se concreto correctamente"
+    else: 
+        n = n + " no se concreto"
     return respuesta, n
 
 def generarJsonComando(content):
