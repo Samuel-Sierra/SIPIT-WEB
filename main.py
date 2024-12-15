@@ -46,7 +46,7 @@ def minutatxt(texto_minuta:str):
         #resumen_minuta = generarResumenMinuta (texto_minuta)
         #db = get_db()
         #db.minutasResumen.insert_one(resumen_minuta)
-        if n == 2:
+        if n == -1:
             content={"respuesta":"Se recibió la minuta con éxito"+", hay comandos incompletos, checar pagina"}
             return JSONResponse(content=content, status_code=202)
         else:
