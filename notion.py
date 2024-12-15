@@ -340,6 +340,21 @@ class ComandosNotion:
 
         response = requests.patch(f"{self.NOTION_API_URL}/{id_proyecto}", headers=self.HEADERS, json={"properties": properties})
         return response
+    
+    def extraer_datos_tareas(self,aux):
+        # Extraer datos del JSON
+        proyecto = {
+            "nombre_tarea": aux.get("Nombre de la tarea", {}).get("title", [{}])[0].get("plain_text", ""),
+            "estado": aux.get("Estado", {}).get("status", {}).get("name", ""),
+            "fecha_inicio": aux.get("Fecha", {}).get("date", {}).get("start", ""),
+            "fecha_fin": aux.get("Fecha", {}).get("date", {}).get("end", ""),
+            "prioridad": aux.get("Prioridad", {}).get("select", {}).get("name", ""),
+            "nombre_proyecto": aux.get("Nombre del Proyecto", {}).get("relation", [{}])[0].get("id", "") if aux.get("Nombre del Proyecto", {}).get("relation", []) else "",
+            "nombre_sprint": aux.get("Sprint", {}).get("relation", [{}])[0].get("id", "") if aux.get("Sprint", {}).get("relation", []) else ""  ,
+            "resumen": aux.get("Descripción", {}).get("rich_text", [{}])[0].get("plain_text", "") if aux.get("Descripción", {}).get("rich_text", []) else ""  ,
+        }
+        return proyecto
+    
     def modificar_tarea(self, data):
         datos_previos = self.consultar_tarea({"nombre": data["nombre_tarea"], "tipo": "tarea"}, False)
         if not datos_previos:
@@ -381,6 +396,14 @@ class ComandosNotion:
 
         response = requests.patch(f"{self.NOTION_API_URL}/{id_tarea}", headers=self.HEADERS, json={"properties": properties})
         return response
+    
+    def extraer_datos_sprint(self,aux):
+        return {
+            "nombre": aux.get("Nombre del Sprint", {}).get("title", [{}])[0].get("plain_text", ""),
+            "estado": aux.get("Estado de Sprint", {}).get("status", {}).get("name", ""),
+            "fecha_inicio": aux.get("Fechas", {}).get("date", {}).get("start", ""),
+            "fecha_fin": aux.get("Fechas", {}).get("date", {}).get("end", "")
+        }
 
     def modificar_sprint(self, data):
         datos_previos = self.consultar_sprint({"nombre": data["nombre"], "tipo": "sprint"}, False)
@@ -409,6 +432,17 @@ class ComandosNotion:
 
         response = requests.patch(f"{self.NOTION_API_URL}/{id_sprint}", headers=self.HEADERS, json={"properties": properties})
         return response
+    
+    def extraer_datos_minuta(self,aux):
+        return  {
+            "nombre": aux.get("Nombre", {}).get("title", [{}])[0].get("plain_text", ""),
+            "objetivo": aux.get("Objetivo", {}).get("rich_text", [{}])[0].get("plain_text", ""),
+            "fecha_inicio": aux.get("Fecha", {}).get("date", {}).get("start", ""),
+            "participantes": aux.get("Participantes", {}).get("rich_text", [{}])[0].get("plain_text", ""),
+            "resumen": aux.get("Resumen", {}).get("rich_text", [{}])[0].get("plain_text", ""),
+            "nombre_sprint": aux.get("Sprint", {}).get("relation", [{}])[0].get("id", ""),
+            "nombre_proyecto": aux.get("Proyecto", {}).get("relation", [{}])[0].get("id", "")
+        }
 
     def modificar_minuta(self, data):
         datos_previos = self.consultar_minuta({"nombre": data["nombre"], "tipo": "minuta"}, False)
