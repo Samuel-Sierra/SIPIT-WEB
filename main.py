@@ -55,16 +55,28 @@ def obtenerIncompletos(request: Request):
         db = get_db()
         #resumen_minuta = db.minutasResumen.find()
         resumen_minuta = "cuak"
-        tasks = projectsEntity(db.minutas.find_one({"tipo":"proyecto"}))
-        names = []
-        data = []
-        combineds = []
+        num_pro = db.minutas.count_documents({"tipo": "proyecto"})
         
-        
-        for i in tasks: 
-            names.append(i)
-            data.append(tasks[i])
-        combined = zip(names,data)
+        if (num_pro == 1):
+            tasks = projectEntity(db.minutas.find_one({"tipo":"proyecto"}))
+            names = []
+            data = []
+            for i in tasks: 
+                names.append(i)
+                data.append(tasks[i])
+            combined = zip(names,data)
+        elif (num_pro>1):
+            combineds = []
+            tasks = projectsEntity(db.minutas.find({"tipo":"proyecto"}))
+            names = []
+            data = []
+            for task in tasks:
+                for i in task:
+                    names.append(i)
+                    data.append(tasks[i])
+                combined = zip(names,data)
+            combineds.append(combined)
+
         
         respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combined": combined, "res_min": resumen_minuta})
         return respuesta
