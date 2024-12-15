@@ -270,6 +270,8 @@ def generarJsonMinuta(content):
                 db = get_db()
                 db.minutas.insert_one(x)
             status = 2
+        else:
+            status = 1
 
         return status
 

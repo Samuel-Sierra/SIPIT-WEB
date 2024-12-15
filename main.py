@@ -48,9 +48,9 @@ def minutatxt(texto_minuta:str):
         #db.minutasResumen.insert_one(resumen_minuta)
         if n == 2:
             content={"respuesta":"Se recibió la minuta con éxito"+", hay comandos incompletos, checar pagina"}
-            return JSONResponse(content=content, status_code=202)
+            return JSONResponse(content=content, status_code=200)
         else:
-            content={"respuesta":"Se recibió la minuta con éxito"+" comandos realizados con exito"}
+            content={"respuesta":"Se recibió la minuta con éxito"+" no hay comandos"}
             return JSONResponse(content=content, status_code=200)
     
     except Exception as e:
@@ -67,7 +67,7 @@ def minuta_resumen(texto_minuta:str):
         db.minutasResumen.insert_one(collection)
         
         content={"respuesta":"Se recibió la minuta con éxito"+", se generó el resumen"}
-        return JSONResponse(content=content, status_code=202)
+        return JSONResponse(content=content, status_code=200)
 
     
     except Exception as e:
