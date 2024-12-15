@@ -26,15 +26,17 @@ def home(request: Request):
 
 @app.post('/comandos/')
 def comandos(texto:str):
-    respuesta, n = generarJsonComando(texto)
+    try:
+        respuesta, n = generarJsonComando(texto)
 
-    if respuesta.status_code == 200:
-        content={"respuesta":n}
-        return JSONResponse(content=content, status_code=200)
-    else:
-        content={"respuesta":n}
-        return JSONResponse(content=content, status_code=respuesta.status_code)
-
+        if respuesta.status_code == 200:
+            content={"respuesta":n}
+            return JSONResponse(content=content, status_code=200)
+        else:
+            content={"respuesta":n}
+            return JSONResponse(content=content, status_code=respuesta.status_code)
+    except Exception as e:
+        return f"Excepción al realizar la solicitud: {e}"
 
 @app.post('/minutatxt/')
 def minutatxt(texto_minuta:str):
@@ -49,6 +51,7 @@ def minutatxt(texto_minuta:str):
     else:
         content={"respuesta":"Se recibió la minuta con éxito"+n}
         return JSONResponse(content=content, status_code=respuesta.status_code)
+    
     
 @app.get('/obtenerProyectosIncompletos/')
 def obtenerProyectosIncompletos(request: Request):
