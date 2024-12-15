@@ -13,6 +13,7 @@ client = OpenAI()
 def switch_minuta(data):
 
     n=""
+
     for item in data:
         accion=item.get("accion")
         if accion =="crear":
@@ -255,14 +256,14 @@ def generarJsonMinuta(content):
                 completos.append(dato)
             else:
                 incompletos.append(dato)
-        status = -1
+        status = 2
 
         if completos !=[] :
-            respuesta, n = switch_comandos(completos)
+            respuesta, n = switch_minuta(completos)
             if (respuesta.status_code==200):
-                status = 1
+                status = 2
             else:
-                status = 0
+                status = 2
             
         if incompletos !=[] :
             for x in incompletos:
