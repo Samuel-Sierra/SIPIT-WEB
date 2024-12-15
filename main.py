@@ -131,7 +131,7 @@ def obtenerTareasIncompletos(request: Request):
 
 
 @app.post('/acompletar/')
-def acompletar(id:str = Form(...),tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), estado: str = Form(...),
+def acompletar(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), estado: str = Form(...),
                fecha_inicio: str = Form(...), fecha_fin: str = Form(...), prioridad: str = Form(...), resumen: str = Form(...)):
     datos = {
         "tipo": tipo,
@@ -159,7 +159,7 @@ def acompletar(id:str = Form(...),tipo: str = Form(...), accion: str = Form(...)
         return JSONResponse(content=content, status_code=respuesta.status_code)
 
 @app.post('/acompletar/')
-def acompletar(tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), nombre_tarea: str = Form(...),
+def acompletar(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), nombre_tarea: str = Form(...),
             nombre_persona: str = Form(...), estado: str = Form(...), fecha_inicio: str = Form(...), fecha_fin: str = Form(...), prioridad: str = Form(...), 
             resumen: str = Form(...)):
     datos = {
