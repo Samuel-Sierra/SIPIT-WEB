@@ -189,104 +189,111 @@ def generarJsonComando(content):
 
 def generarJsonMinuta(content):
 
-    completion = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system",
-            "content": (
-            f"Eres un asistente eficiente y preciso para tomar notas en reuniones. La fecha de hoy es {fecha_hora_actual}. "
-            "Analiza cuidadosamente el contenido de la reunión y genera JSONs en función de la información proporcionada. "
-            "Sigue estas reglas: \n\n"
-            "1. Para cada tarea asignada, devuelve un JSON con este formato:\n"
-            "{'tipo': 'tarea', 'accion': 'crear/eliminar', 'nombre_proyecto': 'valor', 'nombre_tarea': 'valor', 'nombre_sprint':'valor',"
-            "'nombre_persona': 'valor', 'estado': 'valor', 'fecha_inicio': 'YYYY-MM-DD', 'fecha_fin': 'YYYY-MM-DD', "
-            "'prioridad': 'baja/media/alta', 'resumen': 'valor'}\n\n"
-            "2. Para cada proyecto mencionado, devuelve un JSON con este formato:\n"
-            "{'tipo': 'proyecto', 'accion': 'crear/eliminar', 'nombre_proyecto': 'valor', 'estado': 'valor', "
-            "'fecha_inicio': 'YYYY-MM-DD', 'fecha_fin': 'YYYY-MM-DD', 'prioridad': 'baja/media/alta', 'resumen': 'valor'}\n\n"
-            "3. Si se menciona un nuevo sprint, devuelve un JSON con este formato:\n"
-            "{'tipo': 'sprint', 'accion':'''nombre': 'valor', 'fecha_inicio': 'YYYY-MM-DD', 'fecha_fin': 'YYYY-MM-DD'}\n\n"
-            "Reglas adicionales:\n"
-            "-accion indica si se desea crear, consultar o modificar\n"
-            "-prioridad solo puede tomar los siguientes valores: baja, media y alta\n"
-            "-el nombre de la persona en caso de tipo tarea debe ser el nombre de la persona a la que se le asigno la tarea\n"
-            "-los valores que puede tomar en estado son unicamente: En curso, Atraso, Planificación, En pausa, Hecho y Cancelado.-\n"
-            "-Para el caso de estado en sprints los valores que puede tomar son: Past, Last, Next, Future y Current.\n"
-            "- Si no se menciona explícitamente un valor, infiérelo solo si es razonable hacerlo. De lo contrario, déjalo vacío.\n"
-            "- No inventes datos.\n"
-            "- Devuelve únicamente los JSONs,  con comillas dobles, sin comentarios ni explicación ni acentos."),
-            },
+    try:
+        completion = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system",
+                "content": (
+                f"Eres un asistente eficiente y preciso para tomar notas en reuniones. La fecha de hoy es {fecha_hora_actual}. "
+                "Analiza cuidadosamente el contenido de la reunión y genera JSONs en función de la información proporcionada. "
+                "Sigue estas reglas: \n\n"
+                "1. Para cada tarea asignada, devuelve un JSON con este formato:\n"
+                "{'tipo': 'tarea', 'accion': 'crear/eliminar', 'nombre_proyecto': 'valor', 'nombre_tarea': 'valor', 'nombre_sprint':'valor',"
+                "'nombre_persona': 'valor', 'estado': 'valor', 'fecha_inicio': 'YYYY-MM-DD', 'fecha_fin': 'YYYY-MM-DD', "
+                "'prioridad': 'baja/media/alta', 'resumen': 'valor'}\n\n"
+                "2. Para cada proyecto mencionado, devuelve un JSON con este formato:\n"
+                "{'tipo': 'proyecto', 'accion': 'crear/eliminar', 'nombre_proyecto': 'valor', 'estado': 'valor', "
+                "'fecha_inicio': 'YYYY-MM-DD', 'fecha_fin': 'YYYY-MM-DD', 'prioridad': 'baja/media/alta', 'resumen': 'valor'}\n\n"
+                "3. Si se menciona un nuevo sprint, devuelve un JSON con este formato:\n"
+                "{'tipo': 'sprint', 'accion':'''nombre': 'valor', 'fecha_inicio': 'YYYY-MM-DD', 'fecha_fin': 'YYYY-MM-DD'}\n\n"
+                "Reglas adicionales:\n"
+                "-accion indica si se desea crear, consultar o modificar\n"
+                "-prioridad solo puede tomar los siguientes valores: baja, media y alta\n"
+                "-el nombre de la persona en caso de tipo tarea debe ser el nombre de la persona a la que se le asigno la tarea\n"
+                "-los valores que puede tomar en estado son unicamente: En curso, Atraso, Planificación, En pausa, Hecho y Cancelado.-\n"
+                "-Para el caso de estado en sprints los valores que puede tomar son: Past, Last, Next, Future y Current.\n"
+                "- Si no se menciona explícitamente un valor, infiérelo solo si es razonable hacerlo. De lo contrario, déjalo vacío.\n"
+                "- No inventes datos.\n"
+                "- Devuelve únicamente los JSONs,  con comillas dobles, sin comentarios ni explicación ni acentos."),
+                },
+                
+                {
+                    "role": "user",
+                    "content": content
+                }
+            ]
+        )
+        response_dict = completion.to_dict()
+
+        # Capturar el mensaje de salida
+        output_message = response_dict['choices'][0]['message']['content']
+
+        # Guardar el mensaje en una variable
+        resultado = output_message
+
+        # Texto inicial (puede ser una lista o texto que luego se convierte en JSON)
+        texto = resultado
+
+        # Convertir el texto a una lista de diccionarios
+
+        datos = json.loads(texto)
+
+        import re
+        # Buscar solo las líneas que empiezan y terminan con llaves válidas
+        limpio = re.findall(r'\{.*?\}', resultado, re.DOTALL)
+
+        datos = [json.loads(line) for line in limpio]
+
+        # Listas para almacenar los datos completos y los incompletos
+        completos = []
+        incompletos = []
+
+        # Clasificar los datos
+        for dato in datos:
+            if all(dato[key] != "" for key in dato):  # Verificar si no hay campos vacíos
+                completos.append(dato)
+            else:
+                incompletos.append(dato)
+
+        respuesta=""
+        n=""
+
+        if completos !=[] :
+            respuesta, n = switch_comandos(completos)
             
-            {
-                "role": "user",
-                "content": content
-            }
-        ]
-    )
-    response_dict = completion.to_dict()
+        if incompletos !=[] :
+            for x in incompletos:
+                db = get_db()
+                db.minutas.insert_one(x)
+            n = "hay datos incompletos, checar la pagina"
 
-    # Capturar el mensaje de salida
-    output_message = response_dict['choices'][0]['message']['content']
+        return respuesta, n 
 
-    # Guardar el mensaje en una variable
-    resultado = output_message
-
-    # Texto inicial (puede ser una lista o texto que luego se convierte en JSON)
-    texto = resultado
-
-    # Convertir el texto a una lista de diccionarios
-
-    datos = json.loads(texto)
-
-    import re
-    # Buscar solo las líneas que empiezan y terminan con llaves válidas
-    limpio = re.findall(r'\{.*?\}', resultado, re.DOTALL)
-
-    datos = [json.loads(line) for line in limpio]
-
-    # Listas para almacenar los datos completos y los incompletos
-    completos = []
-    incompletos = []
-
-    # Clasificar los datos
-    for dato in datos:
-        if all(dato[key] != "" for key in dato):  # Verificar si no hay campos vacíos
-            completos.append(dato)
-        else:
-            incompletos.append(dato)
-
-    respuesta=""
-    n=""
-
-    if completos !=[] :
-        respuesta, n = switch_comandos(completos)
-        
-    if incompletos !=[] :
-        for x in incompletos:
-            db = get_db()
-            db.minutas.insert_one(x)
-        n = "hay datos incompletos, checar la pagina"
-
-    return respuesta, n 
+    except Exception as e:
+        return f"Error en jsonminuta {e}"
 
 def generarResumenMinuta(content):
-    completion = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system",
-            "content": f"eres una secretaria muy buena, tu trabajo consiste en hacer un resumen de las cosas mas importantes que sucedieron en una reunion, debes hacer el resumen tomando en cuenta las tareas proyectos u otras cosas que se desean crear o eliminar, a quien han sido asignadas la fecha de inicio y fecha de entrega además de los detalles que consideres relevantes considera que hoy es {fecha_hora_actual} y si no te dan fecha de inicio toma el dia de hoy como inicio"
-            },
-            
-            {
-                "role": "user",
-                "content": content
-            }
-        ]
-    )
-    response_dict = completion.to_dict()
-    # Capturar el mensaje de salida
-    output_message = response_dict['choices'][0]['message']['content']
+    try:
+        completion = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system",
+                "content": f"eres una secretaria muy buena, tu trabajo consiste en hacer un resumen de las cosas mas importantes que sucedieron en una reunion, debes hacer el resumen tomando en cuenta las tareas proyectos u otras cosas que se desean crear o eliminar, a quien han sido asignadas la fecha de inicio y fecha de entrega además de los detalles que consideres relevantes considera que hoy es {fecha_hora_actual} y si no te dan fecha de inicio toma el dia de hoy como inicio"
+                },
+                
+                {
+                    "role": "user",
+                    "content": content
+                }
+            ]
+        )
+        response_dict = completion.to_dict()
+        # Capturar el mensaje de salida
+        output_message = response_dict['choices'][0]['message']['content']
 
-    # Guardar el mensaje en una variable
-    minuta = output_message
-    return minuta
+        # Guardar el mensaje en una variable
+        minuta = output_message
+        return minuta
+    except Exception as e:
+        return f"Error en resumen {e}"
