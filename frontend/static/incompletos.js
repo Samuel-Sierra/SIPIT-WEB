@@ -109,12 +109,18 @@ Datos_incompletos = [
 
 function show_project_tasks() {
 
-    getCookie=(cname)=>{
-        let name = cname + "=";
+    getCookie=()=>{
         let decode =decodeURIComponent(document.cookie)
-        alert(decode)
+        let arr = decode.split(";")
+        let nombres = []
+        for (let a in arr){
+            let conjunto = arr[a].split("=")
+            let nombre = conjunto.at(0)
+            nombres.push(nombre)
+        }
+        return nombres
     }
-    getCookie("cuak");
+    alert(getCookie());
     let project_detail = document.querySelector('.project-detail');
     project_detail.innerHTML = '';
 
@@ -159,8 +165,15 @@ function show_project_tasks() {
 
     
 }
-
+function deleteAllCookies() {
+    document.cookie.split(';').forEach(cookie => {
+        const eqPos = cookie.indexOf('=');
+        const name = eqPos > -1 ? cookie.substring(0, eqPos) : cookie;
+        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    });
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     show_project_tasks();
+    deleteAllCookies();
 });
