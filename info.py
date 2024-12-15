@@ -11,11 +11,13 @@ def obtenerTodo():
             "nombre": name
         }
         id_proyecto = cn.obtener_id_por_nombre(name,"proyecto")
+        
         datos_previos = cn.consultar_proyecto(item, False)
         datos_previos = datos_previos.get("results")[0]
         n = datos_previos.get("properties")
         
         a = cn.extraer_datos_proyecto(n)
+        a["id_proyecto"] = id_proyecto
         todo.append(a)
 
     # Obtener todos los nombres de los sprints
