@@ -21,7 +21,7 @@ def taskEntity(item) -> dict:
         "nombre_proyecto":item["nombre_proyecto"],
         "nombre_tarea":item["nombre_tarea"],
         "nombre_persona":item["nombre_persona"],
-        "nombre_sprint":item["nombre_sprint"],
+        #"nombre_sprint":item["nombre_sprint"],
         "estado":item["estado"],
         "fecha_inicio":item["fecha_inicio"],
         "fecha_fin":item["fecha_fin"],
