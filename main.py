@@ -63,7 +63,7 @@ def minuta_resumen(texto_minuta:str):
         #n = generarJsonMinuta (texto_minuta)
         resumen_minuta = generarResumenMinuta (texto_minuta)
         db = get_db()
-        db.minutasResumen.insert_one(resumen_minuta)
+        db.minutasResumen.insert_one("resumen:"+resumen_minuta)
         
         content={"respuesta":"Se recibió la minuta con éxito"+", se generó el resumen"}
         return JSONResponse(content=content, status_code=202)
