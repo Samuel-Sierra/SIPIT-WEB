@@ -23,8 +23,11 @@ cn = ComandosNotion()
 
 @app.get('/')
 def home(request: Request):
-    todo = obtenerTodo()
-    return todo
+    try:
+        todo = obtenerTodo()
+        return todo
+    except Exception as e:
+        return f"Excepción al realizar la solicitud: {e}"
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post('/comandos/')
