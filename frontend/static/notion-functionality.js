@@ -106,13 +106,14 @@ Datos_incompletos = [
         "resumen": "Desarrollo y revisión del módulo de autenticación con protocolos de seguridad actualizados."
     }
 ];
+Datos_incompletos = {{todo}}
 
 function create_project_list(data) {
     data.forEach((item, index) => {
         if (item.tipo === 'proyecto') {
             let projectExists = Proyectos.some(proj => proj.nombre === item.nombre_proyecto);
             if (!projectExists) {
-                let projectId = `Project-${Proyectos.length}`;
+                let projectId = item.id;
                 let projectName = item.nombre_proyecto || `${projectId} Proyecto sin nombre`;
                 let newProject = new Proyecto(projectId, projectName, item.resumen, item.fecha_inicio, item.fecha_fin);
                 Proyectos.push(newProject);
