@@ -9,3 +9,6 @@ def taskEntity(item) -> dict:
         "prioridad":item["prioridad"],
         "resumen":item["resumen"]
     }
+
+def tasksEntity(entity) -> list:
+    [taskEntity(item) for item in entity]
