@@ -121,7 +121,6 @@ def switch_comandos(data):
             respuesta = cn.modificar_proyecto(item)
         elif tipo == "sprint":
             respuesta = cn.modificar_sprint(item)
-            print("si?")
         elif tipo == "minuta":
             respuesta = cn.modificar_minuta(item)
         else:

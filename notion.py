@@ -339,10 +339,7 @@ class ComandosNotion:
             properties["Prioridad"] = {"select": {"name": modificar["prioridad"]}}
 
         response = requests.patch(f"{self.NOTION_API_URL}/{id_proyecto}", headers=self.HEADERS, json={"properties": properties})
-        if response.status_code == 200:
-            print("Modificación exitosa")
-        else:
-            print(f"Error en la modificación: {response.status_code} - {response.text}")
+        return response
     def modificar_tarea(self, data):
         datos_previos = self.consultar_tarea({"nombre": data["nombre_tarea"], "tipo": "tarea"}, False)
         if not datos_previos:
@@ -383,10 +380,7 @@ class ComandosNotion:
             properties["Descripción"] = {"rich_text": [{"text": {"content": data["resumen"]}}]}
 
         response = requests.patch(f"{self.NOTION_API_URL}/{id_tarea}", headers=self.HEADERS, json={"properties": properties})
-        if response.status_code == 200:
-            print("Tarea modificada con éxito")
-        else:
-            print(f"Error al modificar la tarea: {response.status_code} - {response.text}")
+        return response
 
     def modificar_sprint(self, data):
         datos_previos = self.consultar_sprint({"nombre": data["nombre"], "tipo": "sprint"}, False)
@@ -414,10 +408,7 @@ class ComandosNotion:
             }}
 
         response = requests.patch(f"{self.NOTION_API_URL}/{id_sprint}", headers=self.HEADERS, json={"properties": properties})
-        if response.status_code == 200:
-            print("Sprint modificado con éxito")
-        else:
-            print(f"Error al modificar el sprint: {response.status_code} - {response.text}")
+        return response
 
     def modificar_minuta(self, data):
         datos_previos = self.consultar_minuta({"nombre": data["nombre"], "tipo": "minuta"}, False)
@@ -455,10 +446,7 @@ class ComandosNotion:
             properties["Proyecto"] = {"relation": [{"id": proyecto_id}]}
 
         response = requests.patch(f"{self.NOTION_API_URL}/{id_minuta}", headers=self.HEADERS, json={"properties": properties})
-        if response.status_code == 200:
-            print("Minuta modificada con éxito")
-        else:
-            print(f"Error al modificar la minuta: {response.status_code} - {response.text}")
+        return response
 
     def eliminar_minuta(self, nombre_minuta):
         id_minuta = self.obtener_id_por_nombre(nombre_minuta, "minuta")
@@ -472,10 +460,7 @@ class ComandosNotion:
             headers=self.HEADERS,
             json={"archived": True}
         )
-        if response.status_code == 200:
-            print("Minuta archivada con éxito")
-        else:
-            print(f"Error al archivar la minuta: {response.status_code} - {response.text}")
+        return response
 
     def eliminar_tarea(self, nombre_tarea):
         id_tarea = self.obtener_id_por_nombre(nombre_tarea, "tarea")
@@ -497,6 +482,8 @@ class ComandosNotion:
         else:
             print(f"Error al archivar la tarea: {response.status_code} - {response.text}")
 
+        return response
+    
     def eliminar_proyecto(self, nombre_proyecto):
         id_proyecto = self.obtener_id_por_nombre(nombre_proyecto, "proyecto")
         if not id_proyecto:
@@ -517,6 +504,8 @@ class ComandosNotion:
         else:
             print(f"Error al archivar el proyecto: {response.status_code} - {response.text}")
 
+        return response 
+    
     def eliminar_sprint(self, nombre_sprint):
         id_sprint = self.obtener_id_por_nombre(nombre_sprint, "sprint")
         if not id_sprint:
@@ -536,6 +525,7 @@ class ComandosNotion:
             print("Sprint archivado con éxito")
         else:
             print(f"Error al archivar el sprint: {response.status_code} - {response.text}")
+        return response
 
     def consultar_datos_notion(self, url_pregunta, cabecera, valor1, tipo, page_size=10):
         if tipo == "minuta":
@@ -578,10 +568,74 @@ class ComandosNotion:
             print(f"Excepción al realizar la solicitud: {e}")
             return None
 
+        
+    def consultar_todo_notion(self, url_pregunta, cabecera, tipo, page_size=10):
+        if tipo == "minuta":
+            valor2 = "Nombre"
+        elif tipo == "tarea":
+            valor2 = "Nombre de la tarea"
+        elif tipo == "proyecto":
+            valor2 = "Nombre del proyecto"
+        elif tipo == "sprint":
+            valor2 = "Nombre del Sprint"
+
+        # Cuerpo de la solicitud SIN filtro
+        busqueda = {
+            "page_size": page_size
+        }
+
+        try:
+            # Realizar la solicitud a la API
+            respuesta = requests.post(url_pregunta, headers=cabecera, data=json.dumps(busqueda))
+            if respuesta.status_code == 200:
+                return respuesta.json()
+            else:
+                print(f"Error {respuesta.status_code}: {respuesta.text}")
+                return None
+        except Exception as e:
+            print(f"Excepción al realizar la solicitud: {e}")
+            return None
 
 
+    def obtener_nombres(self, tipo):
+        """
+        Obtiene todos los nombres de una base de datos específica.
+        """
+        if tipo == "proyecto":
+            url = "https://api.notion.com/v1/databases/1232595bac6f81659e03db547d901cb9/query"
+        elif tipo == "sprint":
+            url = "https://api.notion.com/v1/databases/1232595bac6f8146a026d520ac1b0fed/query"
+        elif tipo == "tarea":
+            url = "https://api.notion.com/v1/databases/1232595bac6f812d8674d1f4e4012af9/query"
+        elif tipo == "minuta":
+            url = "https://api.notion.com/v1/databases/13f2595bac6f80c1b9e1d5d80cc7bbbe/query"
+        else:
+            print("Error: Tipo desconocido.")
+            return None
 
+        datos = self.consultar_todo_notion(url, self.HEADERS, tipo, page_size=100)
 
+        if datos and "results" in datos:
+            nombres = []
+            for entrada in datos["results"]:
+                propiedades = entrada.get("properties", {})
+                if tipo == "proyecto":
+                    nombre = propiedades.get("Nombre del proyecto", {}).get("title", [{}])[0].get("plain_text", "")
+                elif tipo == "sprint":
+                    nombre = propiedades.get("Nombre del Sprint", {}).get("title", [{}])[0].get("plain_text", "")
+                elif tipo == "tarea":
+                    nombre = propiedades.get("Nombre de la tarea", {}).get("title", [{}])[0].get("plain_text", "")
+                elif tipo == "minuta":
+                    nombre = propiedades.get("Nombre", {}).get("title", [{}])[0].get("plain_text", "")
+                
+                if nombre:
+                    nombres.append(nombre)
+            
+            return nombres
+        else:
+            return "No se encontraron datos."
+
+        
     # Ejemplo de uso
     #texto = """SIPIT, crea una tarea con nombre "probando", que tenga fecha de inicio "01-11-2024" y con una fecha de conclusión "15-11-2024",
     #con un nivel de prioridad "Alta", con la descripción "Revisar y ajustar los puntos críticos del proyecto", la persona asignada es Sam, y el estado es En curso."""

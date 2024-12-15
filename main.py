@@ -9,6 +9,7 @@ import os
 from schemas import projectEntity, projectsEntity, taskEntity, tasksEntity, resumenEntity, resumenesEntity
 from config.db import get_db
 from bson import ObjectId
+from info import obtenerTodo
 
 
 app = FastAPI()
@@ -22,6 +23,8 @@ cn = ComandosNotion()
 
 @app.get('/')
 def home(request: Request):
+    todo = obtenerTodo
+    return todo
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post('/comandos/')
