@@ -70,7 +70,7 @@ def obtenerProyectosIncompletos(request: Request):
                 names.append(i)
                 data.append(tasks[i])
             combined = zip(names,data)
-            respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combined": combined, "res_min": resumen_minuta})
+            respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combined": combined, "res_min": resumen_minuta, "tipo":"proyecto"})
             
 
         elif (num_pro>1):
@@ -84,7 +84,7 @@ def obtenerProyectosIncompletos(request: Request):
                     data.append(tasks[i])
                 combined = zip(names,data)
             combineds.append(combined)
-            respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "combineds": combineds, "res_min": resumen_minuta})
+            respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "combineds": combineds, "res_min": resumen_minuta, "tipo":"proyecto"})
         
         return respuesta
     except Exception as e:
@@ -108,7 +108,7 @@ def obtenerTareasIncompletos(request: Request):
                 names.append(i)
                 data.append(tasks[i])
             combined = zip(names,data)
-            respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combined": combined, "res_min": resumen_minuta})
+            respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combined": combined, "res_min": resumen_minuta, "tipo":"tarea"})
             
 
         elif (num_task>1):
@@ -122,7 +122,7 @@ def obtenerTareasIncompletos(request: Request):
                     data.append(tasks[i])
                 combined = zip(names,data)
             combineds.append(combined)
-            respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "combineds": combineds, "res_min": resumen_minuta})
+            respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "combineds": combineds, "res_min": resumen_minuta, "tipo":"tarea"})
         
         
         
@@ -131,7 +131,7 @@ def obtenerTareasIncompletos(request: Request):
         return f"Excepción al realizar la solicitud: {e}"
 
 
-@app.post('/acompletar/')
+@app.post('/acompletarproyecto/')
 def acompletar(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), estado: str = Form(...),
                fecha_inicio: str = Form(...), fecha_fin: str = Form(...), prioridad: str = Form(...)):
     datos = {
@@ -156,9 +156,9 @@ def acompletar(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...
         content={"respuesta":n}
         return JSONResponse(content=content, status_code=respuesta.status_code)
 
-@app.post('/acompletar/')
+@app.post('/acompletartarea/')
 def acompletar(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), nombre_tarea: str = Form(...),
-            nombre_persona: str = Form(...), estado: str = Form(...), fecha_inicio: str = Form(...), fecha_fin: str = Form(...), prioridad: str = Form(...), 
+            nombre_persona: str = Form(...), nombre_sprint:str = Form(...), estado: str = Form(...), fecha_inicio: str = Form(...), fecha_fin: str = Form(...), prioridad: str = Form(...), 
             resumen: str = Form(...)):
     try:
         datos = {
@@ -167,6 +167,7 @@ def acompletar(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...
             "nombre_proyecto": nombre_proyecto,
             "nombre_tarea": nombre_tarea,
             "nombre_persona": nombre_persona,
+            "nombre_sprint": nombre_sprint,
             "estado": estado,
             "fecha_inicio": fecha_inicio,
             "fecha_fin": fecha_fin,

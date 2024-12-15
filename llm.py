@@ -211,6 +211,7 @@ def generarJsonMinuta(content):
             "-prioridad solo puede tomar los siguientes valores: baja, media y alta\n"
             "-el nombre de la persona en caso de tipo tarea debe ser el nombre de la persona a la que se le asigno la tarea\n"
             "-los valores que puede tomar en estado son unicamente: En curso, Atraso, Planificación, En pausa, Hecho y Cancelado.-\n"
+            "-Para el caso de estado en sprints los valores que puede tomar son: Past, Last, Next, Future y Current.\n"
             "- Si no se menciona explícitamente un valor, infiérelo solo si es razonable hacerlo. De lo contrario, déjalo vacío.\n"
             "- No inventes datos.\n"
             "- Devuelve únicamente los JSONs,  con comillas dobles, sin comentarios ni explicación ni acentos."),

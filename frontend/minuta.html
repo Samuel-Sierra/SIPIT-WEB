@@ -104,13 +104,17 @@
     <article class="project-detail">
         <h1>Mensajes desde FastAPI:</h1>
         
-        <form action="/acompletar/" method="POST">
+        <form action="/acompletar{{tipo}}/" method="POST">
             {% for name, dat in combined %}
                 <label>
                     {{ name }}
                     <input type="text" name="{{ name }}" value="{{ dat }}" >
                 </label><br>
             {% endfor %}
+            <label>
+                Sprint
+                <input type="text" name="sprint">
+            </label><br>
             <input type="submit" value="Aceptar">
         </form>
         
