@@ -247,3 +247,25 @@ def generarJsonMinuta(content):
         n = "hay datos incompletos, checar la pagina"
 
     return respuesta, n 
+
+def generarResumenMinuta(content):
+    completion = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system",
+            "content": f"eres una secretaria muy buena, tu trabajo consiste en hacer un resumen de las cosas mas importantes que sucedieron en una reunion, debes hacer el resumen tomando en cuenta las tareas proyectos u otras cosas que se desean crear o eliminar, a quien han sido asignadas la fecha de inicio y fecha de entrega además de los detalles que consideres relevantes considera que hoy es {fecha_hora_actual} y si no te dan fecha de inicio toma el dia de hoy como inicio"
+            },
+            
+            {
+                "role": "user",
+                "content": content
+            }
+        ]
+    )
+    response_dict = completion.to_dict()
+    # Capturar el mensaje de salida
+    output_message = response_dict['choices'][0]['message']['content']
+
+    # Guardar el mensaje en una variable
+    minuta = output_message
+    return minuta

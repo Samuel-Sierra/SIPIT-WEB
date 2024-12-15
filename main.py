@@ -1,8 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Form
 from notion import ComandosNotion
 from fastapi.responses import JSONResponse, Response
 from fastapi.requests import Request
-from llm import generarJsonComando, generarJsonMinuta
+from llm import generarJsonComando, generarJsonMinuta, generarResumenMinuta
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import os
@@ -39,6 +39,9 @@ def comandos(texto:str):
 def minutatxt(texto_minuta:str):
 
     respuesta, n = generarJsonMinuta (texto_minuta)
+    resumen_minuta = generarResumenMinuta (texto_minuta)
+    db = get_db()
+    db.minutasResumen.insert_one(resumen_minuta)
     if respuesta.status_code == 200:
         content={"respuesta":"Se recibió la minuta con éxito"+n}
         return JSONResponse(content=content, status_code=200)
@@ -50,16 +53,24 @@ def minutatxt(texto_minuta:str):
 def obtenerIncompletos(request: Request):
     try:
         db = get_db()
+        #resumen_minuta = db.minutasResumen.find()
+        resumen_minuta = "cuak"
         task = taskEntity(db.minutas.find_one({"tipo":"proyecto"}))
         names = []
         data = []
         for i in task: 
             names.append(i)
             data.append(task[i])
-        respuesta = templates.TemplateResponse("minuta.html",{"request": request, "names": names, "data": data})
+        combined = zip(names,data)
+        respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combined": combined, "res_min": resumen_minuta})
         return respuesta
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
+    
+@app.post('/acompletar/')
+def acompletar(nombre_proyecto: str = Form(...), msg: str = Form(...)):
+    return nombre_proyecto
+
 
 if __name__ == "__main__":
     import uvicorn

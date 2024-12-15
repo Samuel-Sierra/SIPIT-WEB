@@ -72,7 +72,7 @@
     <article class="projects">
         <header class="welcome-banner">
             <h1>Hola de nuevo</h1>
-            <p>Puedes ver los proyectos creados junto a sus Sprints.</p>
+            <p>{{res_min}}</p>
         </header>
         <section class="section" id="projects">
             <div class="section-title">
@@ -103,11 +103,15 @@
     </article>
     <article class="project-detail">
         <h1>Mensajes desde FastAPI:</h1>
-    <ul>
-        {% for name in names %}
-            <li>{{ name }}</li>
-        {% endfor %}
-    </ul>
+        <form action="/acompletar/" method="POST">
+            {% for name, dat in combined %}
+                <label>
+                    {{ name }}
+                    <input type="text" name="{{ name }}" value="{{ dat }}">
+                </label>
+            {% endfor %}
+        </form>
+    
     </article>
 </main>
 <!-- partial -->
