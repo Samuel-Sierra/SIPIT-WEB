@@ -25,7 +25,7 @@ cn = ComandosNotion()
 def home(request: Request):
     try:
         todo = obtenerTodo()
-        
+        return todo
         return templates.TemplateResponse("index.html", {"request": request, "todo": todo})
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
