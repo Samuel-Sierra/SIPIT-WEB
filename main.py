@@ -41,17 +41,20 @@ def comandos(texto:str):
 @app.post('/minutatxt/')
 def minutatxt(texto_minuta:str):
     
-    respuesta, n = generarJsonMinuta (texto_minuta)
-    resumen_minuta = generarResumenMinuta (texto_minuta)
-    db = get_db()
-    db.minutasResumen.insert_one(resumen_minuta)
-    if respuesta.status_code == 200:
-        content={"respuesta":"Se recibió la minuta con éxito"+n}
-        return JSONResponse(content=content, status_code=200)
-    else:
-        content={"respuesta":"Se recibió la minuta con éxito"+n}
-        return JSONResponse(content=content, status_code=respuesta.status_code)
+    try:
+        respuesta, n = generarJsonMinuta (texto_minuta)
+        resumen_minuta = generarResumenMinuta (texto_minuta)
+        db = get_db()
+        db.minutasResumen.insert_one(resumen_minuta)
+        if respuesta.status_code == 200:
+            content={"respuesta":"Se recibió la minuta con éxito"+n}
+            return JSONResponse(content=content, status_code=200)
+        else:
+            content={"respuesta":"Se recibió la minuta con éxito"+n}
+            return JSONResponse(content=content, status_code=respuesta.status_code)
     
+    except Exception as e:
+        return f"Error en minutatxt {e}"
     
     
 @app.get('/obtenerProyectosIncompletos/')
