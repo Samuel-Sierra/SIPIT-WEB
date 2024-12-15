@@ -238,6 +238,12 @@ def generarJsonMinuta(content):
 
     datos = json.loads(texto)
 
+    import re
+    # Buscar solo las líneas que empiezan y terminan con llaves válidas
+    limpio = re.findall(r'\{.*?\}', resultado, re.DOTALL)
+
+    datos = [json.loads(line) for line in limpio]
+
     # Listas para almacenar los datos completos y los incompletos
     completos = []
     incompletos = []
