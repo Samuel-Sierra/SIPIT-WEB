@@ -176,7 +176,9 @@ def acompletar(tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: 
     }
     respuesta, n = switch_comandos(datos)
 
+    db = get_db()
 
+    db.minutas.find_one_and_delete({"_id": ObjectId(id)})
     if respuesta.status_code == 200:
         content={"respuesta":n}
         return JSONResponse(content=content, status_code=200)
