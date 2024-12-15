@@ -8,11 +8,26 @@
   <link rel="stylesheet" href="/static/style.css">
   <script src="/static/notion-functionality.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@simondmc/popup-js@1.4.3/popup.min.js"></script>
+  <script>
+    // Inyectar la variable 'todo' desde Python a JS
+    const Datos_incompletos = {{ todo | tojson }};
+    console.log("Datos cargados:", Datos_incompletos);
+    </script>
   <a href="https://www.flaticon.com/free-icons/edit" title="edit icons">Edit icons created by alkhalifi design - Flaticon</a>
 </head>
 <body>
 
   <!-- TEMPLATE ZONE -->
+<script>
+    // Aquí puedes trabajar con 'Datos_incompletos', que contiene los datos de 'todo' de Python
+    document.addEventListener('DOMContentLoaded', function() {
+        // Usa los datos de 'Datos_incompletos'
+        create_project_list(Datos_incompletos);
+        show_project_blocks();
+        set_active(document.getElementById(active_project_id));
+        show_project_tasks(active_project_id);
+    });
+</script>
 
 
   
