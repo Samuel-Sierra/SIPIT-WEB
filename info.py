@@ -14,7 +14,7 @@ def obtenerTodo():
         datos_previos = datos_previos.get("results")[0]
         n = datos_previos.get("properties")
         a = cn.extraer_datos_proyecto(n)
-    todo.append(a)
+        todo.append(a)
 
     # Obtener todos los nombres de los sprints
     #nombres_sprints = cn.obtener_nombres("sprint")
@@ -43,19 +43,19 @@ def obtenerTodo():
         datos_previos = datos_previos.get("results")[0]
         n = datos_previos.get("properties")
         a = cn.extraer_datos_tareas(n)
-    todo.append(a)
+        todo.append(a)
 
 # Obtener todos los nombres de las minutas
-    nombres_minutas = cn.obtener_nombres("minuta")
-    for name in nombres_minutas:
-        item = {
-            "tipo": "minuta",
-            "accion": "consultar",
-            "nombre": name
-        }
-        datos_previos = cn.consultar_minuta(item, False)
-        datos_previos = datos_previos.get("results")[0]
-        n = datos_previos.get("properties")
-        a = cn.extraer_datos_minuta(n)
-    todo.append(a)
+  #  nombres_minutas = cn.obtener_nombres("minuta")
+  #  for name in nombres_minutas:
+  #      item = {
+  #          "tipo": "minuta",
+  #          "accion": "consultar",
+  ##          "nombre": name
+   #     }
+   ##     datos_previos = cn.consultar_minuta(item, False)
+    #    datos_previos = datos_previos.get("results")[0]
+    #    n = datos_previos.get("properties")
+     #   a = cn.extraer_datos_minuta(n)
+    ##todo.append(a)
     return todo
