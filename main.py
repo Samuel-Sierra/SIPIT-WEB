@@ -101,7 +101,7 @@ def obtenerTareasIncompletos(request: Request):
         combineds= []
 
         if (num_task == 1):
-            tasks = projectEntity(db.minutas.find_one({"tipo":"proyecto"}))
+            tasks = projectEntity(db.minutas.find_one({"tipo":"tarea"}))
             names = []
             data = []
             for i in tasks: 
@@ -113,7 +113,7 @@ def obtenerTareasIncompletos(request: Request):
 
         elif (num_task>1):
             
-            tasks = projectsEntity(db.minutas.find({"tipo":"proyecto"}))
+            tasks = projectsEntity(db.minutas.find({"tipo":"tarea"}))
             names = []
             data = []
             for task in tasks:

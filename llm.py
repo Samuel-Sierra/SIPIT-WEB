@@ -155,7 +155,17 @@ def generarJsonComando(content):
         model="gpt-4o",
         messages=[
             {"role": "system",
-            "content": f"Eres un asistente muy util y perspicaz que toma notas en reuniones. Recuerda que la fecha de hoy es {fecha_hora_actual} en caso de no tener fecha de inicio asume que empieza en este momento, lee detalladamente la reunion y para cada tarea asignada en la reunión devuelve un diccionario JSON con el formato: {{'tipo': 'tarea','accion': 'valor','nombre_proyecto': 'valor', 'nombre_tarea':'valor', 'nombre_persona': 'valor', 'estado' : 'valor', 'fecha_inicio': 'YYYY-MM-DD', 'fecha_fin': 'YYYY-MM-DD', 'prioridad': 'valor', 'resumen': 'valor'}}, accion indica si se desea eliminar o crear, prioridad solo puede tomar valores baja media y alta, el nombre de la persona debe ser el nombre de la persona a la que se le asigno la tarea. Para cada proyecto debes devolver un json con el siguiente formato{{'tipo':'proyecto', 'accion':'valor', 'nombre_proyecto': 'valor','estado':'valor',  'fecha_inicio': 'YYYY-MM-DD', 'fecha_fin': 'YYYY-MM-DD', 'prioridad': 'valor', 'resumen': 'valor'}}  si se desea hacer un nuevo sprint devuelve un diccionario json con el formato: {{ tipo : sprint, nombre : valor, fecha_inicio : YYYY-MM-DD, fecha_fin : YYYY-MM-DD}} si alguno de los valores no viene en el texto, trata de inferirlo solo con la informacion del texto, si no se puede dejalo vacío. es importante que no inventes ningun dato. únicamente devuelve el JSON, con comillas dobles, sin comentarios ni explicación ni acentos. Los valores que puede tomar en estado son unicamente: En curso, Atraso, Planificación, En pausa, Hecho y Cancelado"
+            "content": f"Eres un asistente muy util y perspicaz que analiza comandos. Recuerda que la fecha de hoy es {fecha_hora_actual} 
+            en caso de no tener fecha de inicio asume que empieza en este momento, lee detalladamente el comando, si menciona alguna tarea 
+            devuelve un diccionario JSON con el formato: {{'tipo': 'tarea','accion': 'valor','nombre_proyecto': 'valor', 'nombre_tarea':'
+            valor', 'nombre_persona': 'valor', 'estado' : 'valor', 'fecha_inicio': 'YYYY-MM-DD', 'fecha_fin': 'YYYY-MM-DD', 'prioridad': 'valor', 
+            'resumen': 'valor'}}, si se menciona un proyecto debes devolver un json con el siguiente formato {{'tipo':'proyecto', 'accion':'valor', 'nombre_proyecto': 'valor','estado':'valor', 'fecha_inicio':'YYYY-MM-DD', 'fecha_fin':'YYYY-MM-DD', 'prioridad':'valor', 'resumen':'valor'}} 
+            si se menciona un sprint devuelve un diccionario json con el formato: {{ 'tipo':'sprint', 'accion':'valor', 'nombre' : 'valor', 'fecha_inicio' : 'YYYY-MM-DD', 'fecha_fin' : 'YYYY-MM-DD', 'estado':'valor'}} 
+            accion indica si se desea crear, consultar o modificar; prioridad solo puede tomar los siguientes valores: baja, media y alta,
+            el nombre de la persona en caso de tipo tarea debe ser el nombre de la persona a la que se le asigno la tarea; los valores que puede tomar en estado son unicamente: En curso, Atraso, Planificación, En pausa, Hecho y Cancelado.
+            Si alguno de los valores no viene en el texto, trata de inferirlo solo con la informacion del texto, si no se puede dejalo vacío. es importante que no inventes ningun dato.
+            únicamente devuelve el JSON, con comillas dobles, sin comentarios ni explicación ni acentos."
+            
             },
             
             {
@@ -164,6 +174,7 @@ def generarJsonComando(content):
             }
         ]
     )
+    #si se menciona una minuta devuelve un diccionario json con el formato: {{ 'tipo':'sprint', 'accion':'valor', 'nombre' : 'valor', 'objetivo':'valor' 'fecha_inicio' : 'YYYY-MM-DD', 'fecha_fin' : 'YYYY-MM-DD', 'estado':'valor'}}
     response_dict = completion.to_dict()
 
     # Capturar el mensaje de salida
@@ -197,7 +208,27 @@ def generarJsonMinuta(content):
         model="gpt-4o",
         messages=[
             {"role": "system",
-            "content": f"Eres un asistente muy util y perspicaz que toma notas en reuniones. Recuerda que la fecha de hoy es {fecha_hora_actual} en caso de no tener fecha de inicio asume que empieza en este momento, lee detalladamente la reunion y para cada tarea asignada en la reunión devuelve un diccionario JSON con el formato: {{'id': '{1}', 'tipo': 'tarea','accion': 'valor','nombre_proyecto': 'valor', 'nombre_tarea':'valor', 'nombre_persona': 'valor', 'estado' : 'valor', 'fecha_inicio': 'YYYY-MM-DD', 'fecha_fin': 'YYYY-MM-DD', 'prioridad': 'valor', 'resumen': 'valor'}}, accion indica si se desea eliminar o crear, prioridad solo puede tomar valores baja media y alta, el nombre de la persona debe ser el nombre de la persona a la que se le asigno la tarea. Para cada proyecto debes devolver un json con el siguiente formato{{'id': '{1}','tipo':'proyecto', 'accion':'valor', 'nombre_proyecto': 'valor','estado':'valor',  'fecha_inicio': 'YYYY-MM-DD', 'fecha_fin': 'YYYY-MM-DD', 'prioridad': 'valor', 'resumen': 'valor'}} si se desea hacer un nuevo sprint devuelve un diccionario json con el formato: {{'id': '{1}', tipo : sprint, nombre : valor, fecha_inicio : YYYY-MM-DD, fecha_fin : YYYY-MM-DD}} si alguno de los valores no viene en el texto, trata de inferirlo solo con la informacion del texto, si no se puede dejalo vacío. es importante que no inventes ningun dato. únicamente devuelve el JSON, con comillas dobles, sin comentarios ni explicación ni acentos. Los valores que puede tomar en estado son unicamente: En curso, Atraso, Planificación, En pausa, Hecho y Cancelado"
+            "content": (
+            f"Eres un asistente eficiente y preciso para tomar notas en reuniones. La fecha de hoy es {fecha_hora_actual}. "
+            "Analiza cuidadosamente el contenido de la reunión y genera JSONs en función de la información proporcionada. "
+            "Sigue estas reglas: \n\n"
+            "1. Para cada tarea asignada, devuelve un JSON con este formato:\n"
+            "{'tipo': 'tarea', 'accion': 'crear/eliminar', 'nombre_proyecto': 'valor', 'nombre_tarea': 'valor', "
+            "'nombre_persona': 'valor', 'estado': 'valor', 'fecha_inicio': 'YYYY-MM-DD', 'fecha_fin': 'YYYY-MM-DD', "
+            "'prioridad': 'baja/media/alta', 'resumen': 'valor'}\n\n"
+            "2. Para cada proyecto mencionado, devuelve un JSON con este formato:\n"
+            "{'tipo': 'proyecto', 'accion': 'crear/eliminar', 'nombre_proyecto': 'valor', 'estado': 'valor', "
+            "'fecha_inicio': 'YYYY-MM-DD', 'fecha_fin': 'YYYY-MM-DD', 'prioridad': 'baja/media/alta', 'resumen': 'valor'}\n\n"
+            "3. Si se menciona un nuevo sprint, devuelve un JSON con este formato:\n"
+            "{'tipo': 'sprint', 'accion':'''nombre': 'valor', 'fecha_inicio': 'YYYY-MM-DD', 'fecha_fin': 'YYYY-MM-DD'}\n\n"
+            "Reglas adicionales:\n"
+            "-accion indica si se desea crear, consultar o modificar\n"
+            "-prioridad solo puede tomar los siguientes valores: baja, media y alta\n"
+            "-el nombre de la persona en caso de tipo tarea debe ser el nombre de la persona a la que se le asigno la tarea\n"
+            "-los valores que puede tomar en estado son unicamente: En curso, Atraso, Planificación, En pausa, Hecho y Cancelado.-\n"
+            "- Si no se menciona explícitamente un valor, infiérelo solo si es razonable hacerlo. De lo contrario, déjalo vacío.\n"
+            "- No inventes datos.\n"
+            "- Devuelve únicamente los JSONs,  con comillas dobles, sin comentarios ni explicación ni acentos."),
             },
             
             {
@@ -224,8 +255,6 @@ def generarJsonMinuta(content):
     # Listas para almacenar los datos completos y los incompletos
     completos = []
     incompletos = []
-    incompletos.append(id)
-    
 
     # Clasificar los datos
     for dato in datos:
