@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from notion import ComandosNotion
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from fastapi.requests import Request
 from llm import generarJsonComando, generarJsonMinuta
 from fastapi.staticfiles import StaticFiles
@@ -50,7 +50,11 @@ def minutatxt(texto_minuta:str):
 def obtenerIncompletos():
     try:
         db = get_db()
-        return taskEntity(db.minutas.find_one({"tipo":"proyecto"}))
+        task = taskEntity(db.minutas.find_one({"tipo":"proyecto"}))
+        for i in task: 
+            if task[i]=="":
+                Response.set_cookie(key = "key", value = task[i])
+        return templates.TemplateResponse("minuta.html")
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
 
