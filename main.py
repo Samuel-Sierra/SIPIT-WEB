@@ -56,6 +56,22 @@ def minutatxt(texto_minuta:str):
     except Exception as e:
         return f"Error en minutatxt {e}"
     
+@app.post('/minuta_resumen/')
+def minuta_resumen(texto_minuta:str):
+
+    try:
+        #n = generarJsonMinuta (texto_minuta)
+        resumen_minuta = generarResumenMinuta (texto_minuta)
+        db = get_db()
+        db.minutasResumen.insert_one(resumen_minuta)
+        
+        content={"respuesta":"Se recibió la minuta con éxito"+", se generó el resumen"}
+        return JSONResponse(content=content, status_code=202)
+
+    
+    except Exception as e:
+        return f"Error en minutatxt {e}"
+    
     
 @app.get('/obtenerProyectosIncompletos/')
 def obtenerProyectosIncompletos(request: Request):

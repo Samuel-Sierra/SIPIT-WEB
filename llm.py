@@ -258,12 +258,12 @@ def generarJsonMinuta(content):
                 incompletos.append(dato)
         status = 2
 
-        if completos !=[] :
-            respuesta, n = switch_minuta(completos)
-            if (respuesta.status_code==200):
-                status = 2
-            else:
-                status = 2
+        #if completos !=[] :
+            #respuesta, n = switch_minuta(completos)
+            #if (respuesta.status_code==200):
+            #    status = 2
+            #else:
+            #    status = 2
             
         if incompletos !=[] :
             for x in incompletos:
