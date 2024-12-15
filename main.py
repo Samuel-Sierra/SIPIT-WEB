@@ -162,30 +162,32 @@ def acompletar(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...
 def acompletar(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), nombre_tarea: str = Form(...),
             nombre_persona: str = Form(...), estado: str = Form(...), fecha_inicio: str = Form(...), fecha_fin: str = Form(...), prioridad: str = Form(...), 
             resumen: str = Form(...)):
-    datos = {
-        "tipo": tipo,
-        "accion": accion,
-        "nombre_proyecto": nombre_proyecto,
-        "nombre_tarea": nombre_tarea,
-        "nombre_persona": nombre_persona,
-        "estado": estado,
-        "fecha_inicio": fecha_inicio,
-        "fecha_fin": fecha_fin,
-        "prioridad": prioridad,
-        "resumen": resumen,
-    }
-    respuesta, n = switch_comandos(datos)
+    try:
+        datos = {
+            "tipo": tipo,
+            "accion": accion,
+            "nombre_proyecto": nombre_proyecto,
+            "nombre_tarea": nombre_tarea,
+            "nombre_persona": nombre_persona,
+            "estado": estado,
+            "fecha_inicio": fecha_inicio,
+            "fecha_fin": fecha_fin,
+            "prioridad": prioridad,
+            "resumen": resumen,
+        }
+        respuesta, n = switch_comandos(datos)
 
-    db = get_db()
+        db = get_db()
 
-    db.minutas.find_one_and_delete({"_id": ObjectId(id)})
-    if respuesta.status_code == 200:
-        content={"respuesta":n}
-        return JSONResponse(content=content, status_code=200)
-    else:
-        content={"respuesta":n}
-        return JSONResponse(content=content, status_code=respuesta.status_code)
-
+        db.minutas.find_one_and_delete({"_id": ObjectId(id)})
+        if respuesta.status_code == 200:
+            content={"respuesta":n}
+            return JSONResponse(content=content, status_code=200)
+        else:
+            content={"respuesta":n}
+            return JSONResponse(content=content, status_code=respuesta.status_code)
+    except Exception as e:
+        return f"Excepción al realizar la solicitud: {e}"
 
 if __name__ == "__main__":
     import uvicorn
