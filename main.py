@@ -36,7 +36,7 @@ def comandos(texto:str):
 
 
 @app.post('/minutatxt/')
-def minutatxt(texto_minuta:str):
+def minutatxt(texto_minuta:tr):
 
     respuesta, n = generarJsonMinuta (texto_minuta)
     if respuesta.status_code == 200:
@@ -48,9 +48,11 @@ def minutatxt(texto_minuta:str):
     
 @app.get('/obtenerIncompletos/')
 def obtenerIncompletos():
-    db = get_db()
-    return taskEntity(db.minutas.find())
-
+    try:
+        db = get_db()
+        return taskEntity(db.minutas.find())
+    except Exception as e:
+        return f"Excepción al realizar la solicitud: {e}"
 
 if __name__ == "__main__":
     import uvicorn
