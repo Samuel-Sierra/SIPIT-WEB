@@ -6,7 +6,7 @@ from llm import generarJsonComando, generarJsonMinuta, generarResumenMinuta
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import os
-from schemas import tasksEntity, taskEntity
+from schemas import projectEntity, projectsEntity
 from config.db import get_db
 
 
@@ -55,14 +55,17 @@ def obtenerIncompletos(request: Request):
         db = get_db()
         #resumen_minuta = db.minutasResumen.find()
         resumen_minuta = "cuak"
-        task = taskEntity(db.minutas.find_one({"tipo":"proyecto"}))
+        tasks = projectsEntity(db.minutas.find_one({"tipo":"proyecto"}))
         names = []
         data = []
-        for i in task: 
-            names.append(i)
-            data.append(task[i])
-        combined = zip(names,data)
-        respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combined": combined, "res_min": resumen_minuta})
+        combineds = []
+        for task in tasks:
+            for i in task: 
+                names.append(i)
+                data.append(task[i])
+            combined = zip(names,data)
+        combineds.append(combined)
+        respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combineds": combineds, "res_min": resumen_minuta})
         return respuesta
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"

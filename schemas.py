@@ -1,4 +1,4 @@
-def taskEntity(item) -> dict:
+def projectEntity(item) -> dict:
     return{
         "tipo":item["tipo"],
         "accion":item["accion"],
@@ -10,5 +10,5 @@ def taskEntity(item) -> dict:
         "resumen":item["resumen"]
     }
 
-def tasksEntity(entity) -> list:
-    [taskEntity(item) for item in entity]
+def projectsEntity(entity) -> list:
+    [projectEntity(item) for item in entity]

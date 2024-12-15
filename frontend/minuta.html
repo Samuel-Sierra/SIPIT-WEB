@@ -103,14 +103,16 @@
     </article>
     <article class="project-detail">
         <h1>Mensajes desde FastAPI:</h1>
+        {% for combined in combineds %}
         <form action="/acompletar/" method="POST">
             {% for name, dat in combined %}
                 <label>
                     {{ name }}
                     <input type="text" name="{{ name }}" value="{{ dat }}">
-                </label>
+                </label><br>
             {% endfor %}
         </form>
+        {% endfor %}
     
     </article>
 </main>
