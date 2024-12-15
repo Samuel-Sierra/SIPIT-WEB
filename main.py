@@ -50,8 +50,9 @@ def minutatxt(texto_minuta:str):
 def obtenerIncompletos():
     try:
         db = get_db()
+        request = Request()
         task = taskEntity(db.minutas.find_one({"tipo":"proyecto"}))
-        respuesta = templates.TemplateResponse("minuta.html")
+        respuesta = templates.TemplateResponse("minuta.html",{"request": request})
         for i in task: 
             if task[i]=="":
                 respuesta.set_cookie(key = "key", value = task[i])
