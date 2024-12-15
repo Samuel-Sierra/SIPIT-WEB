@@ -42,16 +42,16 @@ def comandos(texto:str):
 def minutatxt(texto_minuta:str):
 
     try:
-        respuesta, n = generarJsonMinuta (texto_minuta)
-        resumen_minuta = generarResumenMinuta (texto_minuta)
-        db = get_db()
-        db.minutasResumen.insert_one(resumen_minuta)
-        if respuesta.status_code == 200:
-            content={"respuesta":"Se recibió la minuta con éxito"+n}
-            return JSONResponse(content=content, status_code=200)
+        n = generarJsonMinuta (texto_minuta)
+        #resumen_minuta = generarResumenMinuta (texto_minuta)
+        #db = get_db()
+        #db.minutasResumen.insert_one(resumen_minuta)
+        if n == 2:
+            content={"respuesta":"Se recibió la minuta con éxito"+", hay comandos incompletos, checar pagina"}
+            return JSONResponse(content=content, status_code=202)
         else:
-            content={"respuesta":"Se recibió la minuta con éxito"+n}
-            return JSONResponse(content=content, status_code=respuesta.status_code)
+            content={"respuesta":"Se recibió la minuta con éxito"+" comandos realizados con exito"}
+            return JSONResponse(content=content, status_code=200)
     
     except Exception as e:
         return f"Error en minutatxt {e}"

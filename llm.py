@@ -255,22 +255,22 @@ def generarJsonMinuta(content):
                 completos.append(dato)
             else:
                 incompletos.append(dato)
-                
-        content={"respuesta":"Se recibió la minuta con éxito"}
-            
-        respuesta = JSONResponse(content=content, status_code=404)
-        n=""
+        status = -1
 
         if completos !=[] :
             respuesta, n = switch_comandos(completos)
+            if (respuesta.status_code==200):
+                status = 1
+            else:
+                status = 0
             
         if incompletos !=[] :
             for x in incompletos:
                 db = get_db()
                 db.minutas.insert_one(x)
-            n = "hay datos incompletos, checar la pagina"
+            status = 2
 
-        return respuesta, n 
+        return status
 
     except Exception as e:
         return f"Error en jsonminuta {e}"
