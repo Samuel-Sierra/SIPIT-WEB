@@ -60,9 +60,6 @@ def obtenerIncompletos(request: Request):
         return respuesta
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
-    my_string = "Hola, esta es una cadena enviada desde FastAPI"
-    # Renderizar la plantilla HTML con el string
-    return templates.TemplateResponse("index.html", {"request": request, "message": my_string})
 
 if __name__ == "__main__":
     import uvicorn
