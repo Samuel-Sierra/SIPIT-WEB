@@ -23,7 +23,7 @@ cn = ComandosNotion()
 
 @app.get('/')
 def home(request: Request):
-    todo = obtenerTodo
+    todo = obtenerTodo()
     return todo
     return templates.TemplateResponse("index.html", {"request": request})
 
