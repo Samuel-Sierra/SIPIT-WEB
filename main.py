@@ -6,7 +6,7 @@ from llm import generarJsonComando, generarJsonMinuta, generarResumenMinuta, swi
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import os
-from schemas import projectEntity, projectsEntity, taskEntity, tasksEntity
+from schemas import projectEntity, projectsEntity, taskEntity, tasksEntity, resumenEntity, resumenesEntity
 from config.db import get_db
 from bson import ObjectId
 
@@ -78,7 +78,7 @@ def minuta_resumen(texto_minuta:str):
 def obtenerProyectosIncompletos(request: Request):
     try:
         db = get_db()
-        resumen_minuta = db.minutasResumen.find("resumen")
+        resumen_minuta = db.minutasResumen.find()
         num_pro = db.minutas.count_documents({"tipo": "proyecto"})
         combined= []
         combineds= []

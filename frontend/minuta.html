@@ -72,7 +72,11 @@
     <article class="projects">
         <header class="welcome-banner">
             <h1>Hola de nuevo</h1>
-            <p>{{res_min}}</p>
+            {% for res in res_min %}
+                {% for r in res %}
+                    <p>{{res[r]}}</p>
+                {% endfor %}
+            {% endfor %}
         </header>
         <section class="section" id="projects">
             <div class="section-title">

@@ -7,7 +7,7 @@ def projectEntity(item) -> dict:
         "estado":item["estado"],
         "fecha_inicio":item["fecha_inicio"],
         "fecha_fin":item["fecha_fin"],
-        "prioridad":item["prioridad"],
+        "prioridad":item["prioridad"]
     }
 
 def projectsEntity(entity) -> list:
@@ -31,3 +31,12 @@ def taskEntity(item) -> dict:
 
 def tasksEntity(entity) -> list:
     [taskEntity(item) for item in entity]
+
+def resumenEntity(item) ->dict:
+    return{
+        "id": str(item["_id"]),
+        "resumen": item["resumen"]
+    }
+
+def resumenesEntity(entity) -> list:
+    [resumenEntity(item for item in entity)]
