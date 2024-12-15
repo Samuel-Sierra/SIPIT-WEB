@@ -59,6 +59,7 @@ def obtenerIncompletos(request: Request):
         names = []
         data = []
         combineds = []
+        
         for task in tasks:
             for i in task: 
                 names.append(i)
@@ -68,7 +69,7 @@ def obtenerIncompletos(request: Request):
         respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combineds": combineds, "res_min": resumen_minuta})
         return respuesta
     except Exception as e:
-        return f"Excepción al realizar la solicitud: {e}"
+        return f"Excepción al realizar la solicitud: {e}, {tasks.__sizeof__}"
     
 @app.post('/acompletar/')
 def acompletar(nombre_proyecto: str = Form(...), msg: str = Form(...)):
