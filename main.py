@@ -78,7 +78,7 @@ def minuta_resumen(texto_minuta:str):
 def obtenerProyectosIncompletos(request: Request):
     try:
         db = get_db()
-        resumen_minuta = db.minutasResumen.find()
+        resumen_minuta = db.minutasResumen.find("resumen")
         num_pro = db.minutas.count_documents({"tipo": "proyecto"})
         combined= []
         combineds= []
