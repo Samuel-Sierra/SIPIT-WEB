@@ -255,8 +255,10 @@ def generarJsonMinuta(content):
                 completos.append(dato)
             else:
                 incompletos.append(dato)
-
-        respuesta=""
+                
+        content={"respuesta":"Se recibió la minuta con éxito"}
+            
+        respuesta = JSONResponse(content=content, status_code=404)
         n=""
 
         if completos !=[] :

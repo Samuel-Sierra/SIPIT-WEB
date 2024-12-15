@@ -40,7 +40,7 @@ def comandos(texto:str):
 
 @app.post('/minutatxt/')
 def minutatxt(texto_minuta:str):
-    return texto_minuta
+
     try:
         respuesta, n = generarJsonMinuta (texto_minuta)
         resumen_minuta = generarResumenMinuta (texto_minuta)
