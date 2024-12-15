@@ -1,11 +1,13 @@
 from fastapi import FastAPI
 from notion import ComandosNotion
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse
 from fastapi.requests import Request
 from llm import generarJsonComando, generarJsonMinuta
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import os
+from schemas import taskEntity
+from config.db import get_db
 
 
 app = FastAPI()
@@ -34,20 +36,21 @@ def comandos(texto:str):
 
 
 @app.post('/minutatxt/')
-def minuta(texto_minuta:str):
-    content={"respuesta":"Se recibió la minuta con éxito"+texto_minuta}
-    respuesta, n= generarJsonMinuta (content)
+def minutatxt(texto_minuta:str):
 
-    if n[0]==-1 :
-
-        if respuesta.status_code == 200:
-            return JSONResponse(content=content, status_code=200)
-        else:
-            return JSONResponse(content=content, status_code=respuesta.status_code)
+    respuesta, n = generarJsonMinuta (texto_minuta)
+    if respuesta.status_code == 200:
+        content={"respuesta":"Se recibió la minuta con éxito"+n}
+        return JSONResponse(content=content, status_code=200)
     else:
-        return JSONResponse(content=n, status_code=200)
-
+        content={"respuesta":"Se recibió la minuta con éxito"+n}
+        return JSONResponse(content=content, status_code=respuesta.status_code)
     
+@app.get('/obtenerIncompletos/')
+def obtenerIncompletos():
+    db = get_db()
+    return taskEntity(db.minutas.find())
+
 
 if __name__ == "__main__":
     import uvicorn
