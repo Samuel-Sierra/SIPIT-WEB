@@ -47,10 +47,9 @@ def minutatxt(texto_minuta:str):
         return JSONResponse(content=content, status_code=respuesta.status_code)
     
 @app.get('/obtenerIncompletos/')
-def obtenerIncompletos():
+def obtenerIncompletos(request: Request):
     try:
         db = get_db()
-        request = Request()
         task = taskEntity(db.minutas.find_one({"tipo":"proyecto"}))
         respuesta = templates.TemplateResponse("minuta.html",{"request": request})
         for i in task: 
