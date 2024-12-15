@@ -6,7 +6,7 @@ from llm import generarJsonComando, generarJsonMinuta
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import os
-from schemas import tasksEntity
+from schemas import tasksEntity, taskEntity
 from config.db import get_db
 
 
@@ -50,7 +50,7 @@ def minutatxt(texto_minuta:str):
 def obtenerIncompletos():
     try:
         db = get_db()
-        return db.minutas.find()
+        return taskEntity(db.minutas.find_one({"tipo":"proyecto"}))
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
 
