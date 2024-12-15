@@ -83,8 +83,6 @@ def obtenerProyectosIncompletos(request: Request):
             combineds.append(combined)
             respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "combineds": combineds, "res_min": resumen_minuta})
         
-        
-        
         return respuesta
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
@@ -132,7 +130,7 @@ def obtenerTareasIncompletos(request: Request):
 
 @app.post('/acompletar/')
 def acompletar(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), estado: str = Form(...),
-               fecha_inicio: str = Form(...), fecha_fin: str = Form(...), prioridad: str = Form(...), resumen: str = Form(...)):
+               fecha_inicio: str = Form(...), fecha_fin: str = Form(...), prioridad: str = Form(...)):
     datos = {
         "tipo": tipo,
         "accion": accion,
@@ -141,15 +139,12 @@ def acompletar(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...
         "fecha_inicio": fecha_inicio,
         "fecha_fin": fecha_fin,
         "prioridad": prioridad,
-        "resumen": resumen,
     }
     respuesta, n = switch_comandos(datos)
-
 
     db = get_db()
 
     db.minutas.find_one_and_delete({"_id": ObjectId(id)})
-
 
     if respuesta.status_code == 200:
         content={"respuesta":n}

@@ -8,7 +8,6 @@ def projectEntity(item) -> dict:
         "fecha_inicio":item["fecha_inicio"],
         "fecha_fin":item["fecha_fin"],
         "prioridad":item["prioridad"],
-        "resumen":item["resumen"]
     }
 
 def projectsEntity(entity) -> list:
