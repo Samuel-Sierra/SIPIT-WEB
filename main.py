@@ -54,7 +54,7 @@ def obtenerIncompletos(request: Request):
         respuesta = templates.TemplateResponse("minuta.html",{"request": request})
         for i in task: 
             if task[i]=="":
-                respuesta.set_cookie(key = "key", value = task[i])
+                respuesta.set_cookie(key = i, value = task[i])
         return respuesta
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
