@@ -36,7 +36,7 @@ def comandos(texto:str):
 
 
 @app.post('/minutatxt/')
-def minutatxt(texto_minuta:tr):
+def minutatxt(texto_minuta:str):
 
     respuesta, n = generarJsonMinuta (texto_minuta)
     if respuesta.status_code == 200:
