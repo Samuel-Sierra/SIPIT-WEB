@@ -51,10 +51,11 @@ def obtenerIncompletos():
     try:
         db = get_db()
         task = taskEntity(db.minutas.find_one({"tipo":"proyecto"}))
+        respuesta = templates.TemplateResponse("minuta.html")
         for i in task: 
             if task[i]=="":
-                Response.set_cookie(key = "key", value = task[i])
-        return templates.TemplateResponse("minuta.html")
+                respuesta.set_cookie(key = "key", value = task[i])
+        return respuesta
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
 
