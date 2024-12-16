@@ -352,6 +352,7 @@ class ComandosNotion:
             "nombre_proyecto": aux.get("Nombre del Proyecto", {}).get("relation", [{}])[0].get("id", "") if aux.get("Nombre del Proyecto", {}).get("relation", []) else "",
             "nombre_sprint": aux.get("Sprint", {}).get("relation", [{}])[0].get("id", "") if aux.get("Sprint", {}).get("relation", []) else ""  ,
             "resumen": aux.get("Descripción", {}).get("rich_text", [{}])[0].get("plain_text", "") if aux.get("Descripción", {}).get("rich_text", []) else ""  ,
+            "nombre_persona": aux.get("Persona asignada", {}).get("select", {}).get("name", ""),
         }
         return proyecto
     
