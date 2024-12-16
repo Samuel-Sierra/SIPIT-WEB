@@ -129,6 +129,7 @@ def obtenerTareasIncompletos(request: Request):
         num_task = db.minutas.count_documents({"tipo": "tarea"})
         combined= []
         combineds= []
+        return num_task
 
         if (num_task == 1):
             tasks = taskEntity(db.minutas.find_one({"tipo":"tarea"}))
