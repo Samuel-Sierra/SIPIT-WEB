@@ -111,7 +111,7 @@ def obtenerProyectosIncompletos(request: Request):
             for task in tasks:
                 for i in task:
                     names.append(i)
-                    data.append(tasks[i])
+                    data.append(task[i])
                 combined = zip(names,data)
             combineds.append(combined)
             respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "combineds": combineds, "res_min": resumen_minuta, "tipo":"proyecto"})
@@ -150,7 +150,7 @@ def obtenerTareasIncompletos(request: Request):
             for task in tasks:
                 for i in task:
                     names.append(i)
-                    data.append(tasks[i])
+                    data.append(task[i])
                 combined = zip(names,data)
             combineds.append(combined)
             respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "combineds": combineds, "res_min": resumen_minuta, "tipo":"tarea"})
