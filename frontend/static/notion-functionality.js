@@ -56,7 +56,7 @@ function create_project_list(data) {
 
     data.forEach((item) => {
         if (item.tipo === 'tarea') {
-            let project = Proyectos.find(proj => proj.nombre === item.nombre_proyecto) || Proyectos[0];
+            let project = Proyectos.find(proj => proj.id === item.nombre_proyecto) || Proyectos[0];
             let taskId = `${project.id}-Task-${project.tareas.length}`;
             let newTask = new Tarea(taskId, item.nombre_tarea, item.nombre_proyecto, item.nombre_persona, item.fecha_inicio, item.fecha_fin, item.prioridad, item.estado);
             project.tareas.push(newTask);
