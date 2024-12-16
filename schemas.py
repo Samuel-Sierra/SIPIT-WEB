@@ -30,7 +30,7 @@ def taskEntity(item) -> dict:
     }
 
 def tasksEntity(entity) -> list:
-    [taskEntity(item) for item in entity]
+    return [taskEntity(item) for item in entity]
 
 def resumenEntity(item) ->dict:
     return{
