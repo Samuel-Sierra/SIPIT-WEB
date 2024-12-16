@@ -27,7 +27,7 @@ class Tarea {
 active_project_id = "Project-0";
 
 // Arreglo de proyectos, con el proyecto para guardar las tareas sin proyecto en la primer posición
-Proyectos = [
+let Proyectos = [
     new Proyecto("Project-0", "Tareas sin proyecto", "Proyecto para guardar tareas sin un nombre de proyecto", "2024-12-07", "2024-12-08")
 ];
 Personas = [];
