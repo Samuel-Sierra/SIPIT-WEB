@@ -143,7 +143,7 @@ def obtenerTareasIncompletos(request: Request):
 
         elif (num_task>1):
             
-            tasks = tasksEntity(db.minutas.find({"tipo":"tarea"}))
+            tasks = db.minutas.find({"tipo":"tarea"})
             return tasks
             names = []
             data = []
