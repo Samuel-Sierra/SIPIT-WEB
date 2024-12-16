@@ -176,7 +176,6 @@ def generarJsonComando(content):
 
     datos = json.loads(texto)
 
-
     if all(datos[key] != "" for key in datos):  # Verificar si no hay campos vacíos
 
         respuesta, n = switch_comandos(datos)
