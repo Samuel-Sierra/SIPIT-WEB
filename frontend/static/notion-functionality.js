@@ -50,6 +50,7 @@ function create_project_list(data) {
             }
         }
     });
+    console.log(Proyectos)
 
     data.forEach((item) => {
         if (item.tipo === 'tarea') {
