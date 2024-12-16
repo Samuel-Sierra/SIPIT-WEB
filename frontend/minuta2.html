@@ -108,7 +108,8 @@
     <article class="project-detail">
         <h1>Mensajes desde FastAPI:</h1>
         {% for combined in combineds %}
-        <form action="/acompletar{{tipo}}/" method="POST">
+        {% cont = 0%}
+        <form action="/acompletar{{tipo}}/" method="POST" name="{{cont}}">
             {% for name, dat in combined %}
                 <label>
                     {{ name }}
@@ -117,6 +118,7 @@
             {% endfor %}
             <input type="submit" value="Aceptar">
         </form>
+        {%cont = cont+1%}
         {% endfor %}
         
     
