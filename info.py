@@ -49,6 +49,7 @@ def obtenerTodo():
         datos_previos = datos_previos.get("results")[0]
         n = datos_previos.get("properties")
         a = cn.extraer_datos_tareas(n)
+        a["tipo"] = "tarea"
         todo.append(a)
 
 # Obtener todos los nombres de las minutas
