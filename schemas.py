@@ -11,7 +11,7 @@ def projectEntity(item) -> dict:
     }
 
 def projectsEntity(entity) -> list:
-    [projectEntity(item) for item in entity]
+    return [projectEntity(item) for item in entity]
 
 def taskEntity(item) -> dict:
     return{
