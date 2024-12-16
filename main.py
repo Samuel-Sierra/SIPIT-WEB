@@ -34,6 +34,7 @@ def home(request: Request):
 
 @app.post('/comandos/')
 def comandos(texto:str):
+    return texto
     try:
         respuesta, n = generarJsonComando(texto)
 
