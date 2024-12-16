@@ -105,7 +105,7 @@
         <h1>Mensajes desde FastAPI:</h1>
         {% for combined in combineds %}
         <form action="/acompletar{{tipo}}/" method="POST">
-            {% for name, dat in combined.items() %}
+            {% for name, dat in combined %}
                 <label>
                     {{ name }}
                     <input type="text" name="{{ name }}" value="{{ dat }}">
