@@ -1,10 +1,12 @@
 class Proyecto {
-    constructor(id, nombre, resumen, fecha_inicio, fecha_fin) {
+    constructor(id, nombre, resumen, fecha_inicio, fecha_fin, estado, prioridad) {
         this.id = id; // ID del proyecto, relacionada a su posición en el arreglo de proyectos
         this.nombre = nombre;
         this.resumen = resumen;
         this.fecha_inicio = fecha_inicio;
         this.fecha_fin = fecha_fin;
+        this.estado = estado;
+        this.prioridad = prioridad;
         this.tareas = [];
         this.personas = [];
     }
@@ -43,9 +45,9 @@ function create_project_list(data) {
         if (item.tipo === 'proyecto') {
             let projectExists = Proyectos.some(proj => proj.nombre === item.nombre_proyecto);
             if (!projectExists) {
-                let projectId = item.id;
+                let projectId = item.id_proyecto;
                 let projectName = item.nombre_proyecto || `${projectId} Proyecto sin nombre`;
-                let newProject = new Proyecto(projectId, projectName, item.resumen, item.fecha_inicio, item.fecha_fin);
+                let newProject = new Proyecto(projectId, projectName, item.resumen, item.fecha_inicio, item.fecha_fin, item.estado, item.prioridad);
                 Proyectos.push(newProject);
             }
         }

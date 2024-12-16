@@ -17,7 +17,9 @@ def obtenerTodo():
         n = datos_previos.get("properties")
         
         a = cn.extraer_datos_proyecto(n)
+        
         a["id_proyecto"] = id_proyecto
+        a["tipo"] = "proyecto"
         todo.append(a)
 
     # Obtener todos los nombres de los sprints
