@@ -103,10 +103,9 @@
     </article>
     <article class="project-detail">
         <h1>Mensajes desde FastAPI:</h1>
-        {% for x in combineds %}
-        {% combined = combineds[x]%}
+        {% for combined in combineds %}
         <form action="/acompletar{{tipo}}/" method="POST">
-            {% for name, dat in combined %}
+            {% for name, dat in combined.items() %}
                 <label>
                     {{ name }}
                     <input type="text" name="{{ name }}" value="{{ dat }}">
