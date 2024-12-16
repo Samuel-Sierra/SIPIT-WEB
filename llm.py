@@ -173,6 +173,7 @@ def generarJsonComando(content):
     texto = resultado
 
     # Convertir el texto a una lista de diccionarios
+    return texto
 
     datos = json.loads(texto)
 

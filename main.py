@@ -35,8 +35,8 @@ def home(request: Request):
 @app.post('/comandos/')
 def comandos(texto:str):
     try:
-        #respuesta, n = generarJsonComando(texto)
-        content={"respuesta":texto}
+        respuesta= generarJsonComando(texto)
+        content={"respuesta":respuesta}
         return JSONResponse(content=content, status_code=200)
         if respuesta.status_code == 200:
             content={"respuesta":n}
