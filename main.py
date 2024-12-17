@@ -35,7 +35,7 @@ def home(request: Request):
 @app.post('/comandos/')
 def comandos(texto:str):
     try:
-        
+
         respuesta, n = generarJsonComando(texto)
         
         if respuesta.status_code == 200:
@@ -147,13 +147,13 @@ def obtenerTareasIncompletos(request: Request):
 
             names = []
             data = []
-            for task in tasks:
-                for i in task:
-                    names.append(i)
-                    data.append(task[i])
-                combined = zip(names,data)
-            combineds.append(combined)
-            respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "combineds": combineds, "res_min": resumen_minuta, "tipo":"tarea"})
+            #for task in tasks:
+            #    for i in task:
+            #        names.append(i)
+            #        data.append(task[i])
+            #    combined = zip(names,data)
+            #combineds.append(combined)
+            respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "tasks": tasks, "res_min": resumen_minuta, "tipo":"tarea"})
         
         
         
