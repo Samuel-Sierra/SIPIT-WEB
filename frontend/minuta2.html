@@ -110,10 +110,10 @@
         {% for task in tasks %}
         
         <form action="/acompletar{{tipo}}/" method="POST">
-            {% for i in task %}
+            {% for key, value in task.items() %}
                 <label>
-                    {{ name[i] }}
-                    <input type="text" name="{{ name[i] }}" value="{{ dat[i] }}">
+                    {{ key }}
+                    <input type="text" name="{{ key }}" value="{{ value }}">
                 </label><br>
             {% endfor %}
             <input type="submit" value="Aceptar">
