@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Form
 from notion import ComandosNotion
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse, Response, RedirectResponse
 from fastapi.requests import Request
 from llm import generarJsonComando, generarJsonMinuta, generarResumenMinuta, switch_comandos
 from fastapi.staticfiles import StaticFiles
@@ -94,7 +94,6 @@ def obtenerProyectosIncompletos(request: Request):
             task = projectEntity(db.minutas.find_one({"tipo":"proyecto"}))
             respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combined": task, "res_min": resumen_minuta, "tipo":"proyecto"})
             
-
         elif (num_pro>1):
             
             tasks = projectsEntity(db.minutas.find({"tipo":"proyecto"}))
@@ -144,12 +143,7 @@ def acompletar(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...
 
     db.minutas.find_one_and_delete({"_id": ObjectId(id)})
 
-    if respuesta.status_code == 200:
-        content={"respuesta":n}
-        return JSONResponse(content=content, status_code=200)
-    else:
-        content={"respuesta":n}
-        return JSONResponse(content=content, status_code=respuesta.status_code)
+    return RedirectResponse(url="/obtenerProyectosIncompletos/", status_code=303)
 
 @app.post('/acompletartarea/')
 def acompletar(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), nombre_tarea: str = Form(...),
@@ -170,17 +164,11 @@ def acompletar(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...
             "resumen": resumen,
         }
         respuesta, n = switch_comandos(datos)
-        return datos
 
         db = get_db()
 
         db.minutas.find_one_and_delete({"_id": ObjectId(id)})
-        if respuesta.status_code == 200:
-            content={"respuesta":n}
-            return JSONResponse(content=content, status_code=200)
-        else:
-            content={"respuesta":n}
-            return JSONResponse(content=content, status_code=respuesta.status_code)
+        return RedirectResponse(url="/obtenerTareasIncompletos/", status_code=303)
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
     
