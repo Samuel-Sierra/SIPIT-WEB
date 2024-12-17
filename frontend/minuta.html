@@ -109,16 +109,13 @@
         <h1>Mensajes desde FastAPI:</h1>
         
         <form action="/acompletar{{tipo}}/" method="POST">
-            {% for name, dat in combined %}
+
+            {% for key, value in combined.items() %}
                 <label>
-                    {{ name }}
-                    <input type="text" name="{{ name }}" value="{{ dat }}" >
+                    {{ key }}
+                    <input type="text" name="{{ key }}" value="{{ value }}" >
                 </label><br>
             {% endfor %}
-            <label>
-                Sprint
-                <input type="text" name="nombre_sprint">
-            </label><br>
             <input type="submit" value="Aceptar">
         </form>
         

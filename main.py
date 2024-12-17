@@ -89,32 +89,16 @@ def obtenerProyectosIncompletos(request: Request):
         db = get_db()
         resumen_minuta = db.minutasResumen.find()
         num_pro = db.minutas.count_documents({"tipo": "proyecto"})
-        combined= []
-        combineds= []
 
         if (num_pro == 1):
-            tasks = projectEntity(db.minutas.find_one({"tipo":"proyecto"}))
-            names = []
-            data = []
-            for i in tasks: 
-                names.append(i)
-                data.append(tasks[i])
-            combined = zip(names,data)
-            respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combined": combined, "res_min": resumen_minuta, "tipo":"proyecto"})
+            task = projectEntity(db.minutas.find_one({"tipo":"proyecto"}))
+            respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combined": task, "res_min": resumen_minuta, "tipo":"proyecto"})
             
 
         elif (num_pro>1):
             
             tasks = projectsEntity(db.minutas.find({"tipo":"proyecto"}))
-            names = []
-            data = []
-            for task in tasks:
-                for i in task:
-                    names.append(i)
-                    data.append(task[i])
-                combined = zip(names,data)
-            combineds.append(combined)
-            respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "combineds": combineds, "res_min": resumen_minuta, "tipo":"proyecto"})
+            respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "combineds": tasks, "res_min": resumen_minuta, "tipo":"proyecto"})
         
         return respuesta
     except Exception as e:
@@ -127,35 +111,15 @@ def obtenerTareasIncompletos(request: Request):
         db = get_db()
         resumen_minuta = db.minutasResumen.find()
         num_task = db.minutas.count_documents({"tipo": "tarea"})
-        combined= []
-        combineds= []
 
         if (num_task == 1):
-            tasks = taskEntity(db.minutas.find_one({"tipo":"tarea"}))
-            names = []
-            data = []
-            for i in tasks: 
-                names.append(i)
-                data.append(tasks[i])
-            combined = zip(names,data)
-            respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combined": combined, "res_min": resumen_minuta, "tipo":"tarea"})
+            task = taskEntity(db.minutas.find_one({"tipo":"tarea"}))
+            respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combined": task, "res_min": resumen_minuta, "tipo":"tarea"})
             
-
         elif (num_task>1):
             
             tasks = tasksEntity(db.minutas.find({"tipo":"tarea"}))
-
-            names = []
-            data = []
-            #for task in tasks:
-            #    for i in task:
-            #        names.append(i)
-            #        data.append(task[i])
-            #    combined = zip(names,data)
-            #combineds.append(combined)
-            respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "tasks": tasks, "res_min": resumen_minuta, "tipo":"tarea"})
-        
-        
+            respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "combineds": tasks, "res_min": resumen_minuta, "tipo":"tarea"}) 
         
         return respuesta
     except Exception as e:

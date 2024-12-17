@@ -107,7 +107,7 @@
     </article>
     <article class="project-detail">
         <h1>Mensajes desde FastAPI:</h1>
-        {% for task in tasks %}
+        {% for task in combineds %}
         
         <form action="/acompletar{{tipo}}/" method="POST">
             {% for key, value in task.items() %}
