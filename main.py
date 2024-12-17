@@ -35,9 +35,8 @@ def home(request: Request):
 @app.post('/comandos/')
 def comandos(texto:str):
     try:
-        respuesta= generarJsonComando(texto)
-        content={"respuesta":respuesta}
-        return JSONResponse(content=content, status_code=200)
+        respuesta, n = generarJsonComando(texto)
+        
         if respuesta.status_code == 200:
             content={"respuesta":n}
             return JSONResponse(content=content, status_code=200)
@@ -219,6 +218,7 @@ def acompletar(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...
             return JSONResponse(content=content, status_code=respuesta.status_code)
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
+    
 
 if __name__ == "__main__":
     import uvicorn

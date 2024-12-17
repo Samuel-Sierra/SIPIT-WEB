@@ -189,6 +189,7 @@ function edit_task(task_id) {
 
     let popupContent = `
         <div class="popup-content">
+        <form action = "editarTarea" method = post
             <label>Nombre: <input type="text" id="edit-task-name" value="${taskData.nombre}"></label>
             <label>Persona: 
                 <select id="edit-task-persona">
