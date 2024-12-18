@@ -72,11 +72,9 @@ def switch_minuta(data):
             else:
                 print(f"Tipo desconocido: {tipo}")
         n = "El comando "+accion +tipo 
-    if (respuesta.status_code==200):
-        n = n + " se concreto correctamente"
-    else: 
-        n = n + " no se concreto"
+
     return respuesta, n
+
 def switch_comandos(data):
 
     respuesta=[]
@@ -95,6 +93,11 @@ def switch_comandos(data):
             respuesta = cn.crear_minuta(item)
         else:
             print(f"Tipo desconocido: {tipo}")
+        n = "El comando "+accion +tipo 
+        if (respuesta.status_code==200):
+            n = n + " se concreto correctamente"
+        else: 
+            n = n + " no se concreto"
 
     elif accion == "consultar":
         tipo = item.get("tipo")
@@ -126,6 +129,12 @@ def switch_comandos(data):
         else:
             print(f"Tipo desconocido: {tipo}")
             
+        n = "El comando "+accion +tipo 
+        if (respuesta.status_code==200):
+            n = n + " se concreto correctamente"
+        else: 
+            n = n + " no se concreto"
+            
     elif accion == "eliminar":
         tipo = item.get("tipo")
         if tipo == "tarea":
@@ -138,11 +147,7 @@ def switch_comandos(data):
             cn.eliminar_minuta(item.get("nombre"))
         else:
             print(f"Tipo desconocido: {tipo}")
-    n = "El comando "+accion +tipo 
-    if (respuesta.status_code==200):
-        n = n + " se concreto correctamente"
-    else: 
-        n = n + " no se concreto"
+    
     return respuesta, n
 
 def generarJsonComando(content):
@@ -253,12 +258,8 @@ def generarJsonMinuta(content):
                 incompletos.append(dato)
         status = 2
 
-        #if completos !=[] :
-            #respuesta, n = switch_minuta(completos)
-            #if (respuesta.status_code==200):
-            #    status = 2
-            #else:
-            #    status = 2
+        if completos !=[] :
+            respuesta, n = switch_minuta(completos)
             
         if incompletos !=[] :
             for x in incompletos:
