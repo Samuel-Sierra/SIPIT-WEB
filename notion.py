@@ -1,6 +1,28 @@
 import json
 import requests
+import re
 from openai import OpenAI
+
+#diccionario
+mapa_ordinal = {
+    "1er": "primer",
+    "2do": "segundo",
+    "3er": "tercero",
+    "4to": "cuarto",
+    "5to": "quinto",
+    "6to": "sexto",
+    "7mo": "séptimo",
+    "8vo": "octavo",
+    "9no": "noveno",
+    "10mo": "décimo",
+}
+# Este es el patron que se va a utilizar para buscar los numeros ordinales y los cambie a primer segundo tercero etc
+pattern = re.compile(r"\b(\d{1,2})(er|do|ro|to|mo|vo|no)\b")
+
+def reemplazar_original(match):
+    ordinal = match.group(0)
+    return mapa_ordinal.get(ordinal, ordinal)
+
 
 class ComandosNotion:
     def __init__(self):
