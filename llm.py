@@ -109,6 +109,7 @@ def switch_comandos(data):
         elif tipo == "proyecto":
             nombre = item.get("nombre_proyecto")
             data = {"nombre": nombre, "tipo": "proyecto"}
+            print(data)
             n = cn.consultar_proyecto(data, True)
 
         elif tipo == "sprint":
