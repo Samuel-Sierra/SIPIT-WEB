@@ -37,17 +37,17 @@ def obtenerTodo():
         # Obtener todos los nombres de las tareas
         nombres_tareas = cn.obtener_nombres("tarea")
         print("Tareas:", nombres_tareas)
-        for name in nombres_tareas:
-            item = {
-                "tipo": "tarea",
-                "accion": "consultar",
-                "nombre": name
-            }
-            datos_previos = cn.consultar_tarea(item, False)
-            datos_previos = datos_previos.get("results")[0]
-            n = datos_previos.get("properties")
-            a = cn.extraer_datos_tareas(n)
-            todo.append(a)
+    for name in nombres_tareas:
+        item = {
+            "tipo": "tarea",
+            "accion": "consultar",
+            "nombre": name
+        }
+        datos_previos = cn.consultar_tarea(item, False)
+        datos_previos = datos_previos.get("results")[0]
+        n = datos_previos.get("properties")
+        a = cn.extraer_datos_tareas(n)
+        todo.append(a)
 
 # Obtener todos los nombres de las minutas
     #nombres_minutas = cn.obtener_nombres("minuta")
