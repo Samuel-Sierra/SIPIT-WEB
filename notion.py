@@ -180,7 +180,7 @@ class ComandosNotion:
     def consultar_proyecto(self, data, flag):
         # Validar si 'nombre' está presente en 'data'
         if "nombre_proyecto" not in data:
-            print("Error: Falta el parámetro 'nombre' en los datos proporcionados.")
+            print("Error: Falta el parámetro 'nombre_proyecto' en los datos proporcionados.")
             return None
 
         nombre_proyecto = data["nombre_proyecto"]

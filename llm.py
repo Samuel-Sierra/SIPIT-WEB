@@ -180,7 +180,7 @@ def generarJsonComando(content):
     # Convertir el texto a una lista de diccionarios
 
     datos = json.loads(texto)
-    return datos, ""
+
 
     if all(datos[key] != "" for key in datos):  # Verificar si no hay campos vacíos
 
