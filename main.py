@@ -28,7 +28,7 @@ def home(request: Request):
     try:
         todo = obtenerTodo()
         todo_json = json.dumps(todo, ensure_ascii=False)
-        return todo_json
+        
         return templates.TemplateResponse("index.html", {"request": request, "todo": todo_json})
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"

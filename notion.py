@@ -1,5 +1,6 @@
 import json
 import requests
+import re
 from openai import OpenAI
 
 class ComandosNotion:
@@ -35,15 +36,16 @@ class ComandosNotion:
                 "title": [{"text": {"content": data["nombre_tarea"]}}]
             },
             "Estado": {
-                "status": {"name": data.get("estado", "Sin empezar")}
+                "status": {"name": data["estado"]}
             },
-            "Responsable": {
-                "select": {"name":data.get("titular", "")}
-            },
+            # Hay que cambiar la columna de tipo People a texto, o en su defecto a texto para ingresar el name de cada persona
+            #"Asignado a": {
+            #    "rich_text": [{"text": {"content": data["nombre_persona"]}}]
+            #},
             "Fecha": {
                 "date": {
-                    "start": data.get("fecha_inicio", ""),
-                    "end": data.get("fecha_fin", "")
+                    "start": data["fecha_inicio"],
+                    "end": data["fecha_fin"]
                 }
             },
             "Prioridad": {
@@ -71,9 +73,10 @@ class ComandosNotion:
             "Estado": {
                 "status": {"name": data["estado"]}
             },
-            "Responsable": {
-                "select": {"name":data.get("titular", "")}
-            },
+            # Hay que cambiar la columna de tipo People a texto, o en su defecto a texto para ingresar el name de cada persona
+            #"Titular": {
+            #    "rich_text": [{"text": {"content": data["nombre_persona"]}}]
+            #},
             "Fechas": {
                 "date": {
                     "start": data["fecha_inicio"],
@@ -119,7 +122,7 @@ class ComandosNotion:
                 "date": {"start": data["fecha_inicio"]}
             },
             "Participantes": {
-                "multi_select": [{"name": nombre.strip()} for nombre in data["participantes"].split(",")]
+                "rich_text": [{"text": {"content": data["participantes"]}}]
             },
             "Resumen": {
                 "rich_text": [{"text": {"content": data["resumen"]}}]
@@ -163,7 +166,6 @@ class ComandosNotion:
             # Realizar la solicitud a la API
             respuesta = requests.post(url_pregunta, headers=cabecera, data=json.dumps(busqueda))
             if respuesta.status_code == 200:
-                print("Datos obtenidos con éxito")
                 return respuesta.json()
             else:
                 print(f"Error {respuesta.status_code}: {respuesta.text}")
@@ -294,57 +296,73 @@ class ComandosNotion:
             return None
 
         if resultado and "results" in resultado and len(resultado["results"]) > 0:
-            print(resultado["results"][0]["id"])
             return resultado["results"][0]["id"]  # Retorna el ID del primer resultado encontrado
         else:
             print(f"No se encontró ningún {tipo} con el nombre '{nombre}'.")
             return None
+    def extraer_datos_proyecto(self,json_completo):
+        # Extraer datos del JSON
+        proyecto = {
+            "nombre_proyecto": json_completo.get("Nombre del proyecto", {}).get("title", [{}])[0].get("plain_text", ""),
+            "estado": json_completo.get("Estado", {}).get("status", {}).get("name", ""),
+            "titular": json_completo.get("Titular", {}).get("people", [{}])[0].get("name", ""),
+            "fecha_inicio": json_completo.get("Fechas", {}).get("date", {}).get("start", ""),
+            "fecha_fin": json_completo.get("Fechas", {}).get("date", {}).get("end", ""),
+            "prioridad": json_completo.get("Prioridad", {}).get("select", {}).get("name", "")
+        }
+        return proyecto
 
     def modificar_proyecto(self, data):
-        datos_previos = self.consultar_proyecto({"nombre": data["nombre_proyecto"], "tipo": "proyecto"}, False)
+        datos_previos = self.consultar_proyecto({"nombre": data["nombre_proyecto"], "tipo": "proyecto"},False)
         if not datos_previos:
             return None
-        
         id_proyecto = datos_previos["results"][0]["id"]
         datos_previos = datos_previos.get("results")[0]
         aux = datos_previos.get("properties")
-        
-        # Extraer datos previos
         datos_ant = self.extraer_datos_proyecto(aux)
         modificar = data
         properties = {}
-        
-        # Modificar el nombre del proyecto si ha cambiado
         if "nombre_nuevo" in modificar:
             if datos_ant["nombre_proyecto"] != modificar["nombre_nuevo"]:
                 properties["Nombre del proyecto"] = {"title": [{"text": {"content": modificar["nombre_nuevo"]}}]}
-        
-        # Modificar el estado si ha cambiado
         if "estado" in modificar:
             if datos_ant["estado"] != modificar["estado"]:
                 properties["Estado"] = {"status": {"name": modificar["estado"]}}
-        
-        # Modificar las fechas
         if "fecha_inicio" in modificar and "fecha_fin" in modificar:
             properties["Fechas"] = {"date": {"start": modificar.get("fecha_inicio"), "end": modificar.get("fecha_fin")}}
         elif "fecha_inicio" in modificar:
             properties["Fechas"] = {"date": {"start": modificar.get("fecha_inicio"), "end": datos_ant.get("fecha_fin")}}
         elif "fecha_fin" in modificar:
             properties["Fechas"] = {"date": {"start": datos_ant.get("fecha_inicio"), "end": modificar.get("fecha_fin")}}
-        
-        # Modificar la prioridad si ha cambiado
         if "prioridad" in modificar:
             properties["Prioridad"] = {"select": {"name": modificar["prioridad"]}}
-        
-        # Modificar el responsable si ha cambiado
-        if "titular" in modificar:
-            if datos_ant["titular"] != modificar["titular"]:
-                properties["Responsable"] = {"select": {"name": modificar["titular"]}}
 
-        # Hacer la solicitud PATCH a la API de Notion
         response = requests.patch(f"{self.NOTION_API_URL}/{id_proyecto}", headers=self.HEADERS, json={"properties": properties})
-        
         return response
+    
+    def extraer_datos_tareas(self,aux):
+        # Extraer datos del JSON
+        def obtener_valor(diccionario, *claves):
+            """Función auxiliar para obtener valores anidados de forma segura."""
+            for clave in claves:
+                if isinstance(diccionario, dict):
+                    diccionario = diccionario.get(clave)
+                else:
+                    return ""
+            return diccionario if diccionario else ""
+
+        return {
+            
+            "nombre_tarea": obtener_valor(aux, "Nombre de la tarea", "title", 0, "plain_text"),
+            "estado": obtener_valor(aux, "Estado", "status", "name"),
+            "fecha_inicio": obtener_valor(aux, "Fecha", "date", "start"),
+            "fecha_fin": obtener_valor(aux, "Fecha", "date", "end"),
+            "prioridad": obtener_valor(aux, "Prioridad", "select", "name"),
+             "nombre_proyecto": aux.get("Nombre del Proyecto", {}).get("relation", [{}])[0].get("id", "") if aux.get("Nombre del Proyecto", {}).get("relation", []) else "",
+            "nombre_sprint": aux.get("Sprint", {}).get("relation", [{}])[0].get("id", "") if aux.get("Sprint", {}).get("relation", []) else ""  ,
+            "resumen": obtener_valor(aux, "Descripción", "rich_text", 0, "plain_text"),
+            "titular": obtener_valor(aux, "Responsable", "select", "name"),
+        }
     
     def modificar_tarea(self, data):
         datos_previos = self.consultar_tarea({"nombre": data["nombre_tarea"], "tipo": "tarea"}, False)
@@ -353,7 +371,16 @@ class ComandosNotion:
         id_tarea = datos_previos["results"][0]["id"]
         datos_previos = datos_previos.get("results")[0]
         aux = datos_previos.get("properties")
-        datos_ant = self.extraer_datos_tareas(aux)
+        datos_ant = {
+            "nombre_tarea": aux.get("Nombre de la tarea", {}).get("title", [{}])[0].get("plain_text", ""),
+            "estado": aux.get("Estado", {}).get("status", {}).get("name", ""),
+            "fecha_inicio": aux.get("Fecha", {}).get("date", {}).get("start", ""),
+            "fecha_fin": aux.get("Fecha", {}).get("date", {}).get("end", ""),
+            "prioridad": aux.get("Prioridad", {}).get("select", {}).get("name", ""),
+            "nombre_proyecto": aux.get("Nombre del Proyecto", {}).get("relation", [{}])[0].get("id", ""),
+            "nombre_sprint": aux.get("Sprint", {}).get("relation", [{}])[0].get("id", ""),
+            "resumen": aux.get("Descripción", {}).get("rich_text", [{}])[0].get("plain_text", "")
+        }
 
         properties = {}
         if "nombre_nuevo" in data and datos_ant["nombre_tarea"] != data["nombre_nuevo"]:
@@ -375,11 +402,17 @@ class ComandosNotion:
             properties["Sprint"] ={"relation": [{"id": sprint_id}]}
         if "resumen" in data and datos_ant["resumen"] != data["resumen"]:
             properties["Descripción"] = {"rich_text": [{"text": {"content": data["resumen"]}}]}
-        if "titular" in data:
-            if datos_ant["titular"] != data["titular"]:
-                properties["Responsable"] = {"select": {"name": data["titular"]}}
+
         response = requests.patch(f"{self.NOTION_API_URL}/{id_tarea}", headers=self.HEADERS, json={"properties": properties})
         return response
+    
+    def extraer_datos_sprint(self,aux):
+        return {
+            "nombre": aux.get("Nombre del Sprint", {}).get("title", [{}])[0].get("plain_text", ""),
+            "estado": aux.get("Estado de Sprint", {}).get("status", {}).get("name", ""),
+            "fecha_inicio": aux.get("Fechas", {}).get("date", {}).get("start", ""),
+            "fecha_fin": aux.get("Fechas", {}).get("date", {}).get("end", "")
+        }
 
     def modificar_sprint(self, data):
         datos_previos = self.consultar_sprint({"nombre": data["nombre"], "tipo": "sprint"}, False)
@@ -408,6 +441,18 @@ class ComandosNotion:
 
         response = requests.patch(f"{self.NOTION_API_URL}/{id_sprint}", headers=self.HEADERS, json={"properties": properties})
         return response
+    
+    def extraer_datos_minuta(self,aux):
+        return  {
+            "nombre": aux.get("Nombre", {}).get("title", [{}])[0].get("plain_text", ""),
+            "objetivo": aux.get("Objetivo", {}).get("rich_text", [{}])[0].get("plain_text", ""),
+            "fecha_inicio": aux.get("Fecha", {}).get("date", {}).get("start", ""),
+            "participantes": aux.get("Participantes", {}).get("rich_text", [{}])[0].get("plain_text", ""),
+            "resumen": aux.get("Resumen", {}).get("rich_text", [{}])[0].get("plain_text", ""),
+            "nombre_sprint": aux.get("Sprint", {}).get("relation", [{}])[0].get("id", ""),
+            "nombre_proyecto": aux.get("Proyecto", {}).get("relation", [{}])[0].get("id", "")
+        }
+
     def modificar_minuta(self, data):
         datos_previos = self.consultar_minuta({"nombre": data["nombre"], "tipo": "minuta"}, False)
         if not datos_previos:
@@ -433,7 +478,7 @@ class ComandosNotion:
         if "fecha_inicio" in data and datos_ant["fecha_inicio"] != data["fecha_inicio"]:
             properties["Fecha"] = {"date": {"start": data["fecha_inicio"]}}
         if "participantes" in data and datos_ant["participantes"] != data["participantes"]:
-            properties["Participantes"] = {"multi_select": [{"name": nombre.strip()} for nombre in data["participantes"].split(",")]}
+            properties["Participantes"] = {"rich_text": [{"text": {"content": data["participantes"]}}]}
         if "resumen" in data and datos_ant["resumen"] != data["resumen"]:
             properties["Resumen"] = {"rich_text": [{"text": {"content": data["resumen"]}}]}
         if "nombre_sprint" in data and datos_ant["nombre_sprint"] != data["nombre_sprint"]:
@@ -445,87 +490,6 @@ class ComandosNotion:
 
         response = requests.patch(f"{self.NOTION_API_URL}/{id_minuta}", headers=self.HEADERS, json={"properties": properties})
         return response
-    def extraer_datos_minuta(self, aux):
-        def obtener_valor(diccionario, *claves):
-            """Función auxiliar para obtener valores anidados de forma segura."""
-            for clave in claves:
-                if isinstance(diccionario, dict):
-                    diccionario = diccionario.get(clave)
-                else:
-                    return ""
-            return diccionario if diccionario else ""
-
-        participantes = [
-            item.get("name", "") for item in aux.get("Participantes", {}).get("multi_select", [])
-        ]
-        participantes_str = ", ".join(participantes)
-        return {
-            "nombre": obtener_valor(aux, "Nombre", "title", 0, "plain_text"),
-            "objetivo": obtener_valor(aux, "Objetivo", "rich_text", 0, "plain_text"),
-            "fecha_inicio": obtener_valor(aux, "Fecha", "date", "start"),
-            "participantes": participantes_str,
-            "resumen": obtener_valor(aux, "Resumen", "rich_text", 0, "plain_text"),
-            "nombre_sprint": obtener_valor(aux, "Sprint", "relation", 0, "id"),
-            "nombre_proyecto": obtener_valor(aux, "Proyecto", "relation", 0, "id"),
-        }
-
-    def extraer_datos_sprint(self, aux):
-        def obtener_valor(diccionario, *claves):
-            """Función auxiliar para obtener valores anidados de forma segura."""
-            for clave in claves:
-                if isinstance(diccionario, dict):
-                    diccionario = diccionario.get(clave)
-                else:
-                    return ""
-            return diccionario if diccionario else ""
-
-        return {
-            "nombre": obtener_valor(aux, "Nombre del Sprint", "title", 0, "plain_text"),
-            "estado": obtener_valor(aux, "Estado de Sprint", "status", "name"),
-            "fecha_inicio": obtener_valor(aux, "Fechas", "date", "start"),
-            "fecha_fin": obtener_valor(aux, "Fechas", "date", "end"),
-        }
-
-    def extraer_datos_tareas(self, aux):
-        def obtener_valor(diccionario, *claves):
-            """Función auxiliar para obtener valores anidados de forma segura."""
-            for clave in claves:
-                if isinstance(diccionario, dict):
-                    diccionario = diccionario.get(clave)
-                else:
-                    return ""
-            return diccionario if diccionario else ""
-
-        return {
-            "nombre_tarea": obtener_valor(aux, "Nombre de la tarea", "title", 0, "plain_text"),
-            "estado": obtener_valor(aux, "Estado", "status", "name"),
-            "fecha_inicio": obtener_valor(aux, "Fecha", "date", "start"),
-            "fecha_fin": obtener_valor(aux, "Fecha", "date", "end"),
-            "prioridad": obtener_valor(aux, "Prioridad", "select", "name"),
-            "nombre_proyecto": obtener_valor(aux, "Nombre del Proyecto", "relation", 0, "id"),
-            "nombre_sprint": obtener_valor(aux, "Sprint", "relation", 0, "id"),
-            "resumen": obtener_valor(aux, "Descripción", "rich_text", 0, "plain_text"),
-            "titular": obtener_valor(aux, "Responsable", "select", "name"),
-        }
-
-    def extraer_datos_proyecto(self, json_completo):
-        def obtener_valor(diccionario, *claves):
-            """Función auxiliar para obtener valores anidados de forma segura."""
-            for clave in claves:
-                if isinstance(diccionario, dict):
-                    diccionario = diccionario.get(clave)
-                else:
-                    return ""
-            return diccionario if diccionario else ""
-
-        return {
-            "nombre_proyecto": obtener_valor(json_completo, "Nombre del proyecto", "title", 0, "plain_text"),
-            "estado": obtener_valor(json_completo, "Estado", "status", "name"),
-            "titular": obtener_valor(json_completo, "Responsable", "select", "name"),
-            "fecha_inicio": obtener_valor(json_completo, "Fechas", "date", "start"),
-            "fecha_fin": obtener_valor(json_completo, "Fechas", "date", "end"),
-            "prioridad": obtener_valor(json_completo, "Prioridad", "select", "name"),
-        }
 
     def eliminar_minuta(self, nombre_minuta):
         id_minuta = self.obtener_id_por_nombre(nombre_minuta, "minuta")
@@ -638,7 +602,6 @@ class ComandosNotion:
             # Realizar la solicitud a la API
             respuesta = requests.post(url_pregunta, headers=cabecera, data=json.dumps(busqueda))
             if respuesta.status_code == 200:
-                print("Datos obtenidos con éxito")
                 return respuesta.json()
             else:
                 print(f"Error {respuesta.status_code}: {respuesta.text}")
@@ -713,149 +676,3 @@ class ComandosNotion:
             return nombres
         else:
             return "No se encontraron datos."
-
-        
-    # Ejemplo de uso
-    #texto = """SIPIT, crea una tarea con nombre "probando", que tenga fecha de inicio "01-11-2024" y con una fecha de conclusión "15-11-2024",
-    #con un nivel de prioridad "Alta", con la descripción "Revisar y ajustar los puntos críticos del proyecto", la persona asignada es Sam, y el estado es En curso."""
-    #CrearTarea(texto)
-
-def main(data):
-    cn = ComandosNotion()
-    for item in data:
-        accion=item.get("accion")
-        if accion =="crear":
-            tipo = item.get("tipo")
-            print(accion)
-            if tipo == "tarea":
-                cn.crear_tarea(item)
-            elif tipo == "proyecto":
-                cn.crear_proyecto(item)
-            elif tipo == "sprint":
-                cn.crear_sprint(item)
-            elif tipo == "minuta":
-                cn.crear_minuta(item)
-            else:
-                print(f"Tipo desconocido: {tipo}")
-        elif accion == "verTodo":
-            tipo = item.get("tipo")
-            if tipo == "proyecto":
-                # Obtener todos los nombres de los proyectos
-                nombres_proyectos = cn.obtener_nombres("proyecto")
-                print("Proyectos:", nombres_proyectos)
-                for name in nombres_proyectos:
-                    item = {
-                        "tipo": "proyecto",
-                        "accion": "consultar",
-                        "nombre": name
-                    }
-                    datos_previos = cn.consultar_proyecto(item, False)
-                    datos_previos = datos_previos.get("results")[0]
-                    n = datos_previos.get("properties")
-                    a = cn.extraer_datos_proyecto(n)
-                    print(a)
-            elif tipo == "sprint":
-                # Obtener todos los nombres de los sprints
-                nombres_sprints = cn.obtener_nombres("sprint")
-                print("Sprints:", nombres_sprints)
-                for name in nombres_sprints:
-                    item = {
-                        "tipo": "sprint",
-                        "accion": "consultar",
-                        "nombre": name
-                    }
-                    datos_previos = cn.consultar_sprint(item, False)
-                    datos_previos = datos_previos.get("results")[0]
-                    n = datos_previos.get("properties")
-                    a = cn.extraer_datos_sprint(n)
-                    print(a)
-            elif tipo == "tarea":
-                # Obtener todos los nombres de las tareas
-                nombres_tareas = cn.obtener_nombres("tarea")
-                print("Tareas:", nombres_tareas)
-                for name in nombres_tareas:
-                    item = {
-                        "tipo": "tarea",
-                        "accion": "consultar",
-                        "nombre": name
-                    }
-                    datos_previos = cn.consultar_tarea(item, False)
-                    datos_previos = datos_previos.get("results")[0]
-                    n = datos_previos.get("properties")
-                    a = cn.extraer_datos_tareas(n)
-                    print(a)
-            elif tipo == "minuta":
-            # Obtener todos los nombres de las minutas
-                nombres_minutas = cn.obtener_nombres("minuta")
-                print("Minutas:", nombres_minutas)
-                for name in nombres_minutas:
-                    item = {
-                        "tipo": "minuta",
-                        "accion": "consultar",
-                        "nombre": name
-                    }
-                    datos_previos = cn.consultar_minuta(item, False)
-                    datos_previos = datos_previos.get("results")[0]
-                    n = datos_previos.get("properties")
-                    a = cn.extraer_datos_minuta(n)
-                    print(a)
-        elif accion == "consultar":
-            tipo = item.get("tipo")
-            if tipo == "tarea":
-                n=cn.consultar_tarea(item, True)
-                print(n)
-            elif tipo == "proyecto":
-                datos_previos = cn.consultar_proyecto(item, False)
-                datos_previos = datos_previos.get("results")[0]
-                n = datos_previos.get("properties")
-                
-                a = cn.extraer_datos_proyecto(n)
-                print(a)
-            elif tipo == "sprint":
-                n = cn.consultar_sprint(item, True)
-                print(n)
-            elif tipo == "minuta":
-                n = cn.consultar_minuta(item, True)
-                print(n)
-
-            else:
-                print(f"Tipo desconocido: {tipo}")
-
-        elif accion == "actualizar":
-            tipo = item.get("tipo")
-            if tipo == "tarea":
-                cn.modificar_tarea(item)
-            elif tipo == "proyecto":
-                cn.modificar_proyecto(item)
-            elif tipo == "sprint":
-                cn.modificar_sprint(item)
-                print("si?")
-            elif tipo == "minuta":
-                cn.modificar_minuta(item)
-            else:
-                print(f"Tipo desconocido: {tipo}")
-                
-        elif accion == "eliminar":
-            tipo = item.get("tipo")
-            if tipo == "tarea":
-                cn.eliminar_tarea(item.get("nombre"))
-            elif tipo == "proyecto":
-                cn.eliminar_proyecto(item.get("nombre"))
-            elif tipo == "sprint":
-                cn.eliminar_sprint(item.get("nombre"))
-            elif tipo == "minuta":
-                cn.eliminar_minuta(item.get("nombre"))
-            else:
-                print(f"Tipo desconocido: {tipo}")
-
-if __name__ == "__main__":
-    # JSON de ejemplo
-    data = [
-        
-        {
-        "tipo": "proyecto",
-        "accion": "consultar",
-        "nombre": "YUJU"
-    }
-    ]
-    main(data)
