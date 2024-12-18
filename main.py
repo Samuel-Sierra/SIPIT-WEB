@@ -33,9 +33,7 @@ def home(request: Request):
         return f"Excepción al realizar la solicitud: {e}"
     
 
-@app.post('/comandos/')
-def comandos(texto:str):
-    
+def reemplazar_original(match):
     mapa_ordinal = {
         "1er": "primer",
         "2do": "segundo",
@@ -48,15 +46,22 @@ def comandos(texto:str):
         "9no": "noveno",
         "10mo": "décimo",
     }
-    # Este es el patron que se va a utilizar para buscar los numeros ordinales y los cambie a primer segundo tercero etc
+
+    ordinal = match.group(0)
+    return mapa_ordinal.get(ordinal, ordinal)
+
+def validar(texto):
     pattern = re.compile(r"\b(\d{1,2})(er|do|ro|to|mo|vo|no)\b")
 
-    def reemplazar_original(match):
-        ordinal = match.group(0)
-        return mapa_ordinal.get(ordinal, ordinal)
+    texto_remplazado =pattern.sub(reemplazar_original, texto)
+
+
+
+@app.post('/comandos/')
+def comandos(texto:str):
 
     #Aplicacion del reemplazo
-    texto_reemplazado = pattern.sub(reemplazar_original, texto)
+    texto_reemplazado = validar(texto)
 
     try:
 
