@@ -23,6 +23,9 @@ def reemplazar_original(match):
     ordinal = match.group(0)
     return mapa_ordinal.get(ordinal, ordinal)
 
+#Aplicacion del reemplazo
+texto_reemplazado = pattern.sub(reemplazar_original, texto)
+
 
 class ComandosNotion:
     def __init__(self):
