@@ -102,17 +102,23 @@ def switch_comandos(data):
     elif accion == "consultar":
         tipo = item.get("tipo")
         if tipo == "tarea":
-            n=cn.consultar_tarea(item, True)
+            nombre = item.get("nombre_tarea")
+            data = {"nombre": nombre, "tipo": "tarea"}
+            n=cn.consultar_tarea(data, True)
             
         elif tipo == "proyecto":
-            n = cn.consultar_proyecto(item, True)
-            print(n)
+            nombre = item.get("nombre_proyecto")
+            data = {"nombre": nombre, "tipo": "proyecto"}
+            n = cn.consultar_proyecto(data, True)
+
         elif tipo == "sprint":
-            n = cn.consultar_sprint(item, True)
-            print(n)
+            nombre = item.get("nombre")
+            data = {"nombre": nombre, "tipo": "sprint"}
+            n = cn.consultar_sprint(data, True)
+
         elif tipo == "minuta":
             n = cn.consultar_minuta(item, True)
-            print(n)
+
         else:
             print(f"Tipo desconocido: {tipo}")
 

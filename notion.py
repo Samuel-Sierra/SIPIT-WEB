@@ -179,14 +179,14 @@ class ComandosNotion:
 
     def consultar_proyecto(self, data, flag):
         # Validar si 'nombre' está presente en 'data'
-        if "nombre_proyecto" not in data:
-            print("Error: Falta el parámetro 'nombre_proyecto' en los datos proporcionados.")
+        if "nombre" not in data:
+            print("Error: Falta el parámetro 'nombre' en los datos proporcionados.")
             return None
 
-        nombre_proyecto = data["nombre_proyecto"]
+        nombre_proyecto = data["nombre"]
         url = "https://api.notion.com/v1/databases/1232595bac6f81659e03db547d901cb9/query"
         tipo=data["tipo"]
-        resultado = self.consultar_datos_notion(url, self.HEADERS, nombre_proyecto,tipo, page_size=10)
+        resultado = self.consultar_datos_notion(url, self.HEADERS, nom  bre_proyecto,tipo, page_size=10)
         if len(resultado.get("results")) == 0:
             return "No se encontrarón resultados"
         else:
