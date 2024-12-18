@@ -104,17 +104,19 @@ def switch_comandos(data):
         if tipo == "tarea":
             nombre = item.get("nombre_tarea")
             data = {"nombre": nombre, "tipo": "tarea"}
+            respuesta=JSONResponse(content="", status_code=200)
             n=cn.consultar_tarea(data, True)
             
         elif tipo == "proyecto":
             nombre = item.get("nombre_proyecto")
             data = {"nombre": nombre, "tipo": "proyecto"}
-            print(data)
+            respuesta=JSONResponse(content="", status_code=200)
             n = cn.consultar_proyecto(data, True)
 
         elif tipo == "sprint":
             nombre = item.get("nombre")
             data = {"nombre": nombre, "tipo": "sprint"}
+            respuesta=JSONResponse(content="", status_code=200)
             n = cn.consultar_sprint(data, True)
 
         elif tipo == "minuta":
@@ -190,11 +192,15 @@ def generarJsonComando(content):
 
 
     if all(datos[key] != "" for key in datos):  # Verificar si no hay campos vacíos
-
+        
         respuesta, n = switch_comandos(datos)
         return respuesta, n 
     else:
-        return JSONResponse(content="", status_code=206), "datos incompletos"
+        if datos.get("accion") == "consultar":
+            respuesta, n = switch_comandos(datos)
+            return respuesta, n
+        else:
+            return JSONResponse(content="", status_code=206), "datos incompletos"
 
 def generarJsonMinuta(content):
 
