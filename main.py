@@ -54,7 +54,7 @@ def validar(texto):
     pattern = re.compile(r"\b(\d{1,2})(er|do|ro|to|mo|vo|no)\b")
 
     texto_remplazado =pattern.sub(reemplazar_original, texto)
-
+    return texto_remplazado
 
 
 @app.post('/comandos/')
@@ -127,7 +127,8 @@ def obtenerProyectosIncompletos(request: Request):
             
             tasks = projectsEntity(db.minutas.find({"tipo":"proyecto"}))
             respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "combineds": tasks, "res_min": resumen_minuta, "tipo":"proyecto"})
-        
+        elif (num_pro==0):
+            return RedirectResponse(url="/", status_code=303)
         return respuesta
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
@@ -149,6 +150,9 @@ def obtenerTareasIncompletos(request: Request):
             tasks = tasksEntity(db.minutas.find({"tipo":"tarea"}))
             respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "combineds": tasks, "res_min": resumen_minuta, "tipo":"tarea"}) 
         
+        elif (num_task==0):
+            return RedirectResponse(url="/", status_code=303)
+
         return respuesta
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
