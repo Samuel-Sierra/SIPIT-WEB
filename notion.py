@@ -186,7 +186,7 @@ class ComandosNotion:
         nombre_proyecto = data["nombre"]
         url = "https://api.notion.com/v1/databases/1232595bac6f81659e03db547d901cb9/query"
         tipo=data["tipo"]
-        resultado = self.consultar_datos_notion(url, self.HEADERS, nom  bre_proyecto,tipo, page_size=10)
+        resultado = self.consultar_datos_notion(url, self.HEADERS, nombre_proyecto,tipo, page_size=10)
         if len(resultado.get("results")) == 0:
             return "No se encontrarón resultados"
         else:
