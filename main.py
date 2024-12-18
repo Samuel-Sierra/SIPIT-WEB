@@ -63,12 +63,13 @@ def comandos(texto:str):
 
     #Aplicacion del reemplazo
     texto_reemplazado = validar(texto)
-    return texto_reemplazado
+    
 
     try:
 
         respuesta, n = generarJsonComando(texto_reemplazado)
         
+        return respuesta
         if respuesta.status_code == 200:
             content={"respuesta":n}
             return JSONResponse(content=content, status_code=200)
