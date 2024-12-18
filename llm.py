@@ -128,7 +128,7 @@ def switch_comandos(data):
             respuesta = cn.modificar_minuta(item)
         else:
             print(f"Tipo desconocido: {tipo}")
-            
+
         n = "El comando "+accion +tipo 
         if (respuesta.status_code==200):
             n = n + " se concreto correctamente"
@@ -207,7 +207,7 @@ def generarJsonMinuta(content):
                 "{'tipo': 'proyecto', 'accion': 'crear/eliminar', 'nombre_proyecto': 'valor', 'estado': 'valor', "
                 "'fecha_inicio': 'YYYY-MM-DD', 'fecha_fin': 'YYYY-MM-DD', 'prioridad': 'baja/media/alta', 'resumen': 'valor'}\n\n"
                 "3. Si se menciona un nuevo sprint, devuelve un JSON con este formato:\n"
-                "{'tipo': 'sprint', 'accion':'''nombre': 'valor', 'fecha_inicio': 'YYYY-MM-DD', 'fecha_fin': 'YYYY-MM-DD'}\n\n"
+                "{'tipo': 'sprint', 'accion':'nombre': 'valor', 'fecha_inicio': 'YYYY-MM-DD', 'fecha_fin': 'YYYY-MM-DD'}\n\n"
                 "Reglas adicionales:\n"
                 "-accion indica si se desea crear, consultar o modificar\n"
                 "-prioridad solo puede tomar los siguientes valores: baja, media y alta\n"
@@ -268,6 +268,9 @@ def generarJsonMinuta(content):
             status = 2
         else:
             status = 1
+
+        if incompletos == [] and completos == []:
+            return -2
 
         return status
 

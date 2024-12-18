@@ -6,7 +6,7 @@ from llm import generarJsonComando, generarJsonMinuta, generarResumenMinuta, swi
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import os
-from schemas import projectEntity, projectsEntity, taskEntity, tasksEntity, resumenEntity, resumenesEntity
+from schemas import projectEntity, projectsEntity, taskEntity, tasksEntity, resumenEntity, resumenesEntity, minutaEntity, minutasEntity, sprintEntity, sprintsEntity
 from config.db import get_db
 from bson import ObjectId
 from info import obtenerTodo
@@ -81,11 +81,15 @@ def minutatxt(texto_minuta:str):
 
     try:
         n = generarJsonMinuta (texto_minuta)
+
         #resumen_minuta = generarResumenMinuta (texto_minuta)
         #db = get_db()
         #db.minutasResumen.insert_one(resumen_minuta)
         if n == 2:
             content={"respuesta":"Se recibió la minuta con éxito"+", hay comandos incompletos, checar pagina"}
+            return JSONResponse(content=content, status_code=200)
+        elif n == -2:
+            content={"respuesta":"el texto no tenia nada que ver con una reunion"}
             return JSONResponse(content=content, status_code=200)
         else:
             content={"respuesta":"Se recibió la minuta con éxito"+" no hay comandos"}
@@ -156,10 +160,48 @@ def obtenerTareasIncompletos(request: Request):
         return respuesta
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
+    
+@app.get('/obtenerSprintsIncompletos/')
+def obtenerSprintsIncompletos(request: Request):
+    try:
+        db = get_db()
+        resumen_minuta = db.minutasResumen.find()
+        num_pro = db.minutas.count_documents({"tipo": "sprint"})
+
+        if (num_pro == 1):
+            task = sprintEntity(db.minutas.find_one({"tipo":"sprint"}))
+            respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combined": task, "res_min": resumen_minuta, "tipo":"sprint"})
+        elif (num_pro>1):
+            tasks = sprintsEntity(db.minutas.find({"tipo":"sprint"}))
+            respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "combineds": tasks, "res_min": resumen_minuta, "tipo":"sprint"})
+        elif (num_pro==0):
+            return RedirectResponse(url="/", status_code=303)
+        return respuesta
+    except Exception as e:
+        return f"Excepción al realizar la solicitud: {e}"
+    
+@app.get('/obtenerMinutasIncompletos/')
+def obtenerMinutasIncompletos(request: Request):
+    try:
+        db = get_db()
+        resumen_minuta = db.minutasResumen.find()
+        num_pro = db.minutas.count_documents({"tipo": "minuta"})
+
+        if (num_pro == 1):
+            task = minutaEntity(db.minutas.find_one({"tipo":"minuta"}))
+            respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combined": task, "res_min": resumen_minuta, "tipo":"minuta"})
+        elif (num_pro>1):
+            tasks = minutasEntity(db.minutas.find({"tipo":"minuta"}))
+            respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "combineds": tasks, "res_min": resumen_minuta, "tipo":"minuta"})
+        elif (num_pro==0):
+            return RedirectResponse(url="/", status_code=303)
+        return respuesta
+    except Exception as e:
+        return f"Excepción al realizar la solicitud: {e}"
 
 
 @app.post('/acompletarproyecto/')
-def acompletar(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), estado: str = Form(...),
+def acompletarproyecto(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), estado: str = Form(...),
                fecha_inicio: str = Form(...), fecha_fin: str = Form(...), prioridad: str = Form(...)):
     datos = {
         "tipo": tipo,
@@ -179,7 +221,7 @@ def acompletar(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...
     return RedirectResponse(url="/obtenerProyectosIncompletos/", status_code=303)
 
 @app.post('/acompletartarea/')
-def acompletar(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), nombre_tarea: str = Form(...),
+def acompletartarea(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), nombre_tarea: str = Form(...),
             nombre_persona: str = Form(...), nombre_sprint:str = Form(...), estado: str = Form(...), fecha_inicio: str = Form(...), fecha_fin: str = Form(...), prioridad: str = Form(...), 
             resumen: str = Form(...)):
     try:
@@ -202,6 +244,54 @@ def acompletar(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...
 
         db.minutas.find_one_and_delete({"_id": ObjectId(id)})
         return RedirectResponse(url="/obtenerTareasIncompletos/", status_code=303)
+    except Exception as e:
+        return f"Excepción al realizar la solicitud: {e}"
+    
+@app.post('/acompletarsprint/')
+def acompletartarea(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...), nombre: str = Form(...), estado: str = Form(...),
+    fecha_inicio: str = Form(...), fecha_fin: str = Form(...)):
+
+    try:
+        datos = {
+            "tipo":tipo,
+            "accion":accion,
+            "nombre":nombre,
+            "estado":estado,
+            "fecha_inicio":fecha_inicio,
+            "fecha_fin":fecha_fin,
+        }
+        respuesta, n = switch_comandos(datos)
+
+        db = get_db()
+
+        db.minutas.find_one_and_delete({"_id": ObjectId(id)})
+        return RedirectResponse(url="/obtenerSprintsIncompletos/", status_code=303)
+    except Exception as e:
+        return f"Excepción al realizar la solicitud: {e}"
+    
+@app.post('/acompletarminuta/')
+def acompletartarea(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), nombre: str = Form(...),
+    nombre_sprint:str = Form(...), objetivo: str = Form(...), fecha_inicio: str = Form(...), participantes: str = Form(...),
+    resumen: str = Form(...)):
+
+    try:
+        datos = {
+            "tipo": tipo,
+            "accion": accion,
+            "nombre_proyecto": nombre_proyecto,
+            "nombre": nombre,
+            "nombre_sprint": nombre_sprint,
+            "objetivo": objetivo,
+            "fecha_inicio": fecha_inicio,
+            "participantes": participantes,
+            "resumen": resumen,
+        }
+        respuesta, n = switch_comandos(datos)
+
+        db = get_db()
+
+        db.minutas.find_one_and_delete({"_id": ObjectId(id)})
+        return RedirectResponse(url="/obtenerMinutasIncompletos/", status_code=303)
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
     
