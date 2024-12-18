@@ -61,14 +61,14 @@ function create_project_list(data) {
             let newTask = new Tarea(taskId, item.nombre_tarea, item.nombre_proyecto, item.nombre_persona, item.fecha_inicio, item.fecha_fin, item.prioridad, item.estado);
             project.tareas.push(newTask);
 
-            let personas = item.nombre_persona.split(' y ');
-            personas.forEach(persona => {
-                if (!project.personas.includes(persona)) {
-                    project.personas.push(persona);
-                } else if (!Proyectos[0].personas.includes(persona)) {
-                    Proyectos[0].personas.push(persona);
-                }
-            });
+            //let personas = item.nombre_persona.split(' y ');
+            //personas.forEach(persona => {
+            //    if (!project.personas.includes(persona)) {
+            //        project.personas.push(persona);
+            //    } else if (!Proyectos[0].personas.includes(persona)) {
+            //        Proyectos[0].personas.push(persona);
+            //    }
+            //});
         }
     });
 }
