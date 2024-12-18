@@ -63,6 +63,7 @@ def comandos(texto:str):
 
     #Aplicacion del reemplazo
     texto_reemplazado = validar(texto)
+    return texto_reemplazado
 
     try:
 
