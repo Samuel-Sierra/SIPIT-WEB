@@ -25,9 +25,10 @@ cn = ComandosNotion()
 
 @app.get('/')
 def home(request: Request):
-    
-    return templates.TemplateResponse("index.html", {"request": request})
-
+    try: 
+        return templates.TemplateResponse("index.html", {"request": request})
+    except Exception as e:
+        return f"Excepción al realizar la solicitud: {e}"  
 
 @app.get('/proyectos/')
 def proyectos(request: Request):
