@@ -41,7 +41,7 @@ def proyectos(request: Request):
         return f"Excepción al realizar la solicitud: {e}"    
     
 @app.get('/sprints/')
-def proyectos(request: Request):
+def sprints(request: Request):
     try:
         todo = obtenerTodo()
         todo_json = json.dumps(todo, ensure_ascii=False)
