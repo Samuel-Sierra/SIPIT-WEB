@@ -52,7 +52,7 @@ function create_project_list(data) {
         if (item.tipo === 'tarea') {
             let project = Proyectos.find(proj => proj.id === item.nombre_sprint) || Proyectos[0];
             let taskId = `${project.id}-Task`;
-            let newTask = new Tarea(taskId, item.nombre_tarea, item.nombre_proyecto, item.titular, item.fecha_inicio, item.fecha_fin, item.prioridad, item.estado);
+            let newTask = new Tarea(taskId, item.nombre_tarea, item.nombre_sprint, item.titular, item.fecha_inicio, item.fecha_fin, item.prioridad, item.estado);
             project.tareas.push(newTask);
 
             let persona = item.titular;
