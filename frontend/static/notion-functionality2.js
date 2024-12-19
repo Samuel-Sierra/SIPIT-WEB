@@ -5,6 +5,7 @@ class Proyecto {
         this.fecha_inicio = fecha_inicio;
         this.fecha_fin = fecha_fin;
         this.estado = estado;
+        this.tareas = [];
     }
 }
 
