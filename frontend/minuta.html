@@ -8,7 +8,21 @@
   <link rel="stylesheet" href="/static/style.css">
   <script src="/static/incompletos.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@simondmc/popup-js@1.4.3/popup.min.js"></script>
-  <a href="https://www.flaticon.com/free-icons/edit" title="edit icons">Edit icons created by alkhalifi design - Flaticon</a>
+  <div
+  class="sqs-block-button-container sqs-block-button-container--center"
+  data-animation-role="button"
+  data-alignment="center"
+  data-button-size="medium"
+  data-button-type="primary"
+  >
+  <a
+    href="index.html"
+    class="sqs-block-button-element--medium sqs-button-element--primary sqs-block-button-element"
+    
+  >
+    Regresar
+  </a>
+  </div>
 </head>
 <body>
 
@@ -98,7 +112,7 @@
             </svg></a>
     </article>
     <article class="project-detail">
-        <h1>Mensajes desde FastAPI:</h1>
+        <h1>Comandos incompletos</h1>
         
         <form action="/acompletar{{tipo}}/" method="POST">
 
