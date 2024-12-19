@@ -58,17 +58,17 @@ function create_project_list(data) {
         if (item.tipo === 'tarea') {
             let project = Proyectos.find(proj => proj.id === item.nombre_proyecto) || Proyectos[0];
             let taskId = `${project.id}-Task-${project.tareas.length}`;
-            let newTask = new Tarea(taskId, item.nombre_tarea, item.nombre_proyecto, item.nombre_persona, item.fecha_inicio, item.fecha_fin, item.prioridad, item.estado);
+            let newTask = new Tarea(taskId, item.nombre_tarea, item.nombre_proyecto, item.titular, item.fecha_inicio, item.fecha_fin, item.prioridad, item.estado);
             project.tareas.push(newTask);
 
-            //let personas = item.nombre_persona.split(' y ');
-            //personas.forEach(persona => {
-            //    if (!project.personas.includes(persona)) {
-            //        project.personas.push(persona);
-            //    } else if (!Proyectos[0].personas.includes(persona)) {
-            //        Proyectos[0].personas.push(persona);
-            //    }
-            //});
+            let personas = item.titular;
+            personas.forEach(persona => {
+                if (!project.personas.includes(persona)) {
+                    project.personas.push(persona);
+                } else if (!Proyectos[0].personas.includes(persona)) {
+                    Proyectos[0].personas.push(persona);
+                }
+            });
         }
     });
 }

@@ -52,6 +52,7 @@ def obtenerTodo():
         a["nombre_tarea"] = name
         a["tipo"] = "tarea"
         todo.append(a)
+        print(a)
 
 # Obtener todos los nombres de las minutas
   #  nombres_minutas = cn.obtener_nombres("minuta")
