@@ -25,14 +25,19 @@ cn = ComandosNotion()
 
 @app.get('/')
 def home(request: Request):
+    
+    return templates.TemplateResponse("index.html", {"request": request})
+
+
+@app.get('/proyectos/')
+def proyectos(request: Request):
     try:
         todo = obtenerTodo()
         todo_json = json.dumps(todo, ensure_ascii=False)
         
-        return templates.TemplateResponse("index.html", {"request": request, "todo": todo_json})
+        return templates.TemplateResponse("proyectos.html", {"request": request, "todo": todo_json})
     except Exception as e:
-        return f"Excepción al realizar la solicitud: {e}"
-    
+        return f"Excepción al realizar la solicitud: {e}"    
 
 def reemplazar_original(match):
     mapa_ordinal = {
