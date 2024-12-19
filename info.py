@@ -23,21 +23,21 @@ def obtenerTodo():
         todo.append(a)
 
 
-    nombres_sprints = cn.obtener_nombres("sprint")
-    for name in nombres_sprints:
-        item = {
-            "tipo": "sprint",
-            "accion": "consultar",
-            "nombre": name
-        }
-        id_sprint= cn.obtener_id_por_nombre(name,"sprint")
-        datos_previos = cn.consultar_sprint(item, False)
-        datos_previos = datos_previos.get("results")[0]
-        n = datos_previos.get("properties")
-        a = cn.extraer_datos_sprint(n)
-        a["id_sprint"] = id_sprint
-        a["tipo"] = "proyecto"
-        todo.append(a)
+    #nombres_sprints = cn.obtener_nombres("sprint")
+    #for name in nombres_sprints:
+    #    item = {
+    #        "tipo": "sprint",
+    #        "accion": "consultar",
+    #        "nombre": name
+    #    }
+    #    id_sprint= cn.obtener_id_por_nombre(name,"sprint")
+    #    datos_previos = cn.consultar_sprint(item, False)
+    #    datos_previos = datos_previos.get("results")[0]
+    #    n = datos_previos.get("properties")
+    #    a = cn.extraer_datos_sprint(n)
+    #    a["id_sprint"] = id_sprint
+    #    a["tipo"] = "proyecto"
+    #    todo.append(a)
 
     # Obtener todos los nombres de las tareas
     nombres_tareas = cn.obtener_nombres("tarea")
