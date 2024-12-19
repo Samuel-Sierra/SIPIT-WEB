@@ -6,6 +6,7 @@ class Proyecto {
         this.fecha_fin = fecha_fin;
         this.estado = estado;
         this.tareas = [];
+        this.personas = [];
     }
 }
 
