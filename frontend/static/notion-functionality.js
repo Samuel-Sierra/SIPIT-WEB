@@ -189,7 +189,7 @@ function edit_task(task_id) {
 
     let popupContent = `
         <div class="popup-content">
-        <form action = "editarTarea" method = post
+        <form action = "/EditarTarea/" method = post>
             <label>Nombre: <input type="text" id="edit-task-name" value="${taskData.nombre}"></label>
             <label>Persona: 
                 <select id="edit-task-persona">
@@ -219,8 +219,12 @@ function edit_task(task_id) {
                 </select>
             </label>
             <button id="save-task-btn">Guardar</button>
+        </form>
+        <form action = "/EliminarTarea/" method = post>
+        <input type='hidden' value = '${taskData.nombre_tarea}' name = 'nombre_tarea'/>
             <button id="delete-task-btn">Eliminar</button>
             <button id="cancel-task-btn">Cancelar</button>
+        </form>
         </div>
     `;
 

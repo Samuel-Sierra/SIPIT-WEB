@@ -313,6 +313,93 @@ def acompletartarea(id:str = Form(...), tipo: str = Form(...), accion: str = For
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
     
+@app.post("/EditarTarea/")
+def EditarTarea(id: str = Form(...), nombre_tarea: str = Form(...), estado: str = Form(...), prioridad: str = Form(...), 
+                resumen: str = Form(...), fecha_fin: str = Form(...), fecha_inicio: str = Form(...), nombre_proyecto: str = Form(...), nombre_sprint: str = Form(...)):
+    datos = {
+        "id": id,
+        "nombre_tarea": nombre_tarea,
+        "estado": estado,
+        "prioridad": prioridad,
+        "resumen": resumen,
+        "fecha_inicio":fecha_inicio,
+        "fecha_fin": fecha_fin,
+        "nombre_proyecto": nombre_proyecto,
+        "nombre_sprint": nombre_sprint
+    }
+    respuesta = cn.modificar_tarea(datos)
+    return RedirectResponse(url="/", status_code=303)
+
+# --- Endpoint Eliminar Tarea ---
+@app.post("/EliminarTarea/")
+def eliminarTarea(nombre_tarea: str = Form(...)):
+    datos = {"nombre_tarea": nombre_tarea}
+    respuesta = cn.eliminar_tarea(datos)
+    return RedirectResponse(url="/", status_code=303)
+
+# --- Endpoint Consultar Tarea ---
+@app.post("/ConsultarTarea/")
+def consultarTarea(id: str = Form(...)):
+    datos = {"id": id}
+    respuesta = cn.consultar_tarea(datos)
+    return respuesta
+
+# --- Endpoint Consultar Tareas ---
+@app.post("/ConsultarTareas/")
+def consultarTareas(estado: str = Form(...), prioridad: str = Form(...), nombre_proyecto: str = Form(...)):
+    datos = {
+        "estado": estado,
+        "prioridad": prioridad,
+        "nombre_proyecto": nombre_proyecto
+    }
+    respuesta = cn.consultar_tareas(datos)
+    return respuesta
+
+# --- Endpoint Crear Proyecto ---
+@app.post("/CrearProyecto/")
+def crearProyecto(id: str = Form(...), nombre_proyecto: str = Form(...), fecha_inicio: str = Form(...), 
+                    fecha_fin: str = Form(...), prioridad: str = Form(...), lider: str = Form(...)):
+    datos = {
+        "id": id,
+        "nombre_proyecto": nombre_proyecto,
+        "fecha_inicio": fecha_inicio,
+        "fecha_fin": fecha_fin,
+        "prioridad": prioridad,
+        "lider": lider
+    }
+    respuesta = cn.crear_proyecto(datos)
+    return RedirectResponse(url="/index.html/", status_code=303)
+
+# --- Endpoint Editar Proyecto ---
+@app.post("/EditarProyecto/")
+def editarProyecto(id: str = Form(...), nombre_proyecto: str = Form(...), fecha_fin: str = Form(...), 
+                    prioridad: str = Form(...), progreso: str = Form(...)):
+    datos = {
+        "id": id,
+        "nombre_proyecto": nombre_proyecto,
+        "fecha_fin": fecha_fin,
+        "prioridad": prioridad,
+        "progreso": progreso
+    }
+    respuesta = cn.editar_proyecto(datos)
+    return RedirectResponse(url="/index.html/", status_code=303)
+
+# --- Endpoint Eliminar Proyecto ---
+@app.post("/EliminarProyecto/")
+def eliminarProyecto(nombre_proyecto: str = Form(...)):
+    datos = {"nombre_proyecto": nombre_proyecto}
+    respuesta = cn.eliminar_proyecto(datos)
+    return RedirectResponse(url="/index.html/", status_code=303)
+
+
+
+# --- Endpoint Consultar Proyecto ---
+@app.post("/ConsultarProyecto/")
+def consultarProyecto(id: str = Form(...)):
+    datos = {"id": id}
+    respuesta = cn.consultar_proyecto(datos)
+    return respuesta
+
 
 if __name__ == "__main__":
     import uvicorn

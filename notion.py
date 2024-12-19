@@ -406,7 +406,7 @@ class ComandosNotion:
         response = requests.patch(f"{self.NOTION_API_URL}/{id_tarea}", headers=self.HEADERS, json={"properties": properties})
         return response
     
-    def extraer_datos_sprint(self,aux):
+    def     _datos_sprint(self,aux):
         return {
             "nombre": aux.get("Nombre del Sprint", {}).get("title", [{}])[0].get("plain_text", ""),
             "estado": aux.get("Estado de Sprint", {}).get("status", {}).get("name", ""),
