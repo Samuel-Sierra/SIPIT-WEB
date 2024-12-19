@@ -39,7 +39,7 @@ function create_project_list(data) {
     data.forEach((item, index) => {
 
         if (item.tipo === 'proyecto') {
-            let projectExists = Proyectos.some(proj => proj.nombre === item.nombre_proyecto);
+            let projectExists = Proyectos.some(proj => proj.nombre === item.nombre);
             if (!projectExists) {
                 let projectId = item.id_proyecto;
                 let projectName = item.nombre || `${projectId} Proyecto sin nombre`;
