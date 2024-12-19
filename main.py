@@ -39,6 +39,16 @@ def proyectos(request: Request):
         return templates.TemplateResponse("proyectos.html", {"request": request, "todo": todo_json})
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"    
+    
+@app.get('/sprints/')
+def proyectos(request: Request):
+    try:
+        todo = obtenerTodo()
+        todo_json = json.dumps(todo, ensure_ascii=False)
+        
+        return templates.TemplateResponse("sprint.html", {"request": request, "todo": todo_json})
+    except Exception as e:
+        return f"Excepción al realizar la solicitud: {e}"    
 
 def reemplazar_original(match):
     mapa_ordinal = {

@@ -24,7 +24,6 @@ def obtenerTodo():
 
 
     nombres_sprints = cn.obtener_nombres("sprint")
-    print("Sprints:", nombres_sprints)
     for name in nombres_sprints:
         item = {
             "tipo": "sprint",
