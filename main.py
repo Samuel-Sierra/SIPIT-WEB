@@ -38,6 +38,10 @@ def home(request: Request):
         return templates.TemplateResponse("index.html", {"request": request})
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"  
+    
+@app.get('/index/')
+def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get('/proyectos/')
 def proyectos(request: Request):
@@ -84,13 +88,14 @@ def comandos(texto:str):
 
     #Aplicacion del reemplazo
     texto_reemplazado = validar(texto)
-
+    content={"respuesta":texto}
+    return JSONResponse(content=content, status_code=200)
     try:
 
         respuesta, n = generarJsonComando(texto_reemplazado)
         
         if respuesta.status_code == 200:
-            content={"respuesta":n}
+            content={"respuesta":texto}
             return JSONResponse(content=content, status_code=200)
         else:
             content={"respuesta":n}
@@ -318,11 +323,12 @@ def acompletartarea(id:str = Form(...), tipo: str = Form(...), accion: str = For
         return f"Excepción al realizar la solicitud: {e}"
     
 @app.post("/EditarTarea/")
-def EditarTarea(id: str = Form(...), nombre_tarea: str = Form(...), estado: str = Form(...), prioridad: str = Form(...), 
+def EditarTarea(id: str = Form(...), nombre_tarea: str = Form(...), estado: str = Form(...), prioridad: str = Form(...), nombre_persona: str = Form(...),
                 resumen: str = Form(...), fecha_fin: str = Form(...), fecha_inicio: str = Form(...), nombre_proyecto: str = Form(...), nombre_sprint: str = Form(...)):
     datos = {
         "id": id,
         "nombre_tarea": nombre_tarea,
+        "nombre_persona": nombre_persona,
         "estado": estado,
         "prioridad": prioridad,
         "resumen": resumen,

@@ -14,27 +14,13 @@
     console.log("Datos cargados:", Datos_incompletos);
 </script>
 
-<div
-class="sqs-block-button-container sqs-block-button-container--center"
-data-animation-role="button"
-data-alignment="center"
-data-button-size="medium"
-data-button-type="primary"
->
-<a
-  href="/"
-  class="sqs-block-button-element--medium sqs-button-element--primary sqs-block-button-element"
-  
->
-  Regresar
-</a>
-</div>
+
 </head>
 <body>
 
 <!-- Template para cada elemento de tareas -->
 <template id="tem-task-item">
-    <li class="task-list__item" id="task3" onclick="change_status(this.id)">
+    <li class="task-list__item" id="task3" >
         <input type="checkbox" name="task3" class="form-check-input">
         <div class="task-name-div">
             <div class="form-check">
@@ -42,9 +28,9 @@ data-button-type="primary"
             </div>
         </div>
         <div class="task-spans" >
-            <span class="tag tag-status tag-info">In Progress</span>
+            <span class="tag tag-status">In Progress</span>
             <span class="tag tag-priority ">High</span>
-            <span class="tag tag-edit tag-info">Edit</span>
+            <span class="tag tag-edit tag-info">Eliminar</span>
         </div>
     </li>
 </template>
@@ -88,7 +74,7 @@ data-button-type="primary"
     <article class="projects">
         <header class="welcome-banner">
             <h1>Hola de nuevo</h1>
-            <p>Puedes ver los proyectos creados junto a sus Sprints.</p>
+            <p>Puedes ver los proyectos creados junto a sus Sprints. </p>
         </header>
         <section class="section" id="projects">
             <div class="section-title">
@@ -99,7 +85,7 @@ data-button-type="primary"
                 
             </ul>
         </section>
-        <a href="#" class="menu"><svg t="1586009334810" class="icon" viewBox="0 0 1024 1024" version="1.1"
+        <a href="/" class="menu"><svg t="1586009334810" class="icon" viewBox="0 0 1024 1024" version="1.1"
                 xmlns="http://www.w3.org/2000/svg" p-id="3816" width="18" height="18">
                 <path d="M199.68 300.032m-49.152 0a4.8 4.8 0 1 0 98.304 0 4.8 4.8 0 1 0-98.304 0Z" p-id="3817">
                 </path>
@@ -143,8 +129,5 @@ data-button-type="primary"
     </script>
 </body>
 
-<script>
-
-</script>
 
 </html>

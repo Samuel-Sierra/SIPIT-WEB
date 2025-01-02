@@ -211,9 +211,6 @@ body {
   margin-top: 0;
   color: var(--info-color-darkest);
 }
-.project-detail .section .section-title .more svg {
-  fill: var(--secondary-color-darker);
-}
 
 .project-header {
   display: flex;

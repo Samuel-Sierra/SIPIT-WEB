@@ -39,9 +39,9 @@ class ComandosNotion:
                 "status": {"name": data["estado"]}
             },
             # Hay que cambiar la columna de tipo People a texto, o en su defecto a texto para ingresar el name de cada persona
-            #"Asignado a": {
-            #    "rich_text": [{"text": {"content": data["nombre_persona"]}}]
-            #},
+            "Responsable": {
+                "select": {"name": data["nombre_persona"]}
+            },
             "Fecha": {
                 "date": {
                     "start": data["fecha_inicio"],
@@ -373,6 +373,9 @@ class ComandosNotion:
         }
 
         properties = {}
+        sprint_id = self.obtener_id_por_nombre(data["nombre_sprint"], "sprint")
+        proyecto_id = self.obtener_id_por_nombre(data["nombre_proyecto"], "proyecto")
+
         if "nombre_nuevo" in data and datos_ant["nombre_tarea"] != data["nombre_nuevo"]:
             properties["Nombre de la tarea"] = {"title": [{"text": {"content": data["nombre_nuevo"]}}]}
         if "estado" in data and datos_ant["estado"] != data["estado"]:

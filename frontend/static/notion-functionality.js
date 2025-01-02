@@ -56,24 +56,22 @@ function create_project_list(data) {
         if (item.tipo === 'tarea') {
             
             let project = Proyectos.find(proj => proj.id === item.id_proyecto) || Proyectos[0];
-            alert(project)
-            console.log(project)
+
             let taskId = `${project.id}-Task-${project.tareas.length}`;
             let newTask = new Tarea(taskId, item.nombre_tarea, item.id_proyecto, item.nombre_persona, item.fecha_inicio, item.fecha_fin, item.prioridad, item.estado, item.resumen);
             project.tareas.push(newTask);
-            let cuak = 0
             
-
             let persona = item.nombre_persona;
-            console.log(newTask)
-            if (!project.personas.includes(persona)) {
+
+            if (!project.personas.includes(persona) && project.id===item.id_proyecto) {
                 project.personas.push(persona);
-            } else if (!Proyectos[0].personas.includes(persona)) {
+            } else if (!Proyectos[0].personas.includes(persona) && item.id_proyecto==="") {
                 Proyectos[0].personas.push(persona);
             }
         
         }
     });
+    Proyectos[0].personas.pop();
 }
 
 function show_project_tasks(project_id) {
@@ -90,6 +88,7 @@ function show_project_tasks(project_id) {
 
 
     let personas = [...new Set(project.personas)];
+
     personas.forEach(persona => {
         let sectionTemplate = document.getElementById('tem-task-section');
         let sectionItem = sectionTemplate.content.cloneNode(true);
@@ -112,20 +111,24 @@ function show_project_tasks(project_id) {
                 task.id = tarea.id;
                 checkbox.id = tarea.id;
                 checkbox.name = tarea.id;
+                checkbox.disabled = true;
                 label.setAttribute('for', tarea.id);
                 label.textContent = tarea.nombre;
-                status.textContent = tarea.estado;
-                priority.textContent = tarea.prioridad;
-
-                if (tarea.prioridad === 'alta') {
-                    priority.classList.add('tag-danger');
-                } else if (tarea.prioridad === 'media') {
-                    priority.classList.add('tag-info');
-                }
-
+                status.textContent = "Consultar";
+                
+                priority.textContent = "Editar";
+                priority.classList.add('tag-info');
+                editButton.classList.add('tag-danger');
+                
                 editButton.id = `edit-${tarea.id}`;
                 editButton.addEventListener('click', () => edit_task(tarea.id));
+
+                status.addEventListener('click', () => edit_task(tarea.id));
+                priority.addEventListener('click', () => edit_task(tarea.id));
+
                 taskList.appendChild(taskItem);
+
+                
             }
         });
 
@@ -147,14 +150,27 @@ function show_project_tasks(project_id) {
             let task = taskItem.querySelector('.task-list__item');
             let checkbox = task.querySelector('.form-check-input');
             let label = task.querySelector('.form-check-label');
-            let status = task.querySelector('.tag');
+            let status = task.querySelector('.tag-status');
+            let priority = task.querySelector('.tag-priority');
+            let editButton = task.querySelector('.tag-edit');
 
             task.id = tarea.id;
             checkbox.id = tarea.id;
             checkbox.name = tarea.id;
+            checkbox.disabled = true;
             label.setAttribute('for', tarea.id);
             label.textContent = tarea.nombre;
-            status.textContent = tarea.estado;
+            status.textContent = "Consultar";
+            
+            priority.textContent = "Editar";
+            priority.classList.add('tag-info');
+            editButton.classList.add('tag-danger');
+            
+            editButton.id = `edit-${tarea.id}`;
+            editButton.addEventListener('click', () => edit_task(tarea.id));
+
+            status.addEventListener('click', () => edit_task(tarea.id));
+            priority.addEventListener('click', () => edit_task(tarea.id));
             unassignedTaskList.appendChild(taskItem);
         });
     } else {
@@ -192,34 +208,30 @@ function edit_task(task_id) {
 
     let popupContent = `
         <div class="popup-content">
-        <form action = "/EditarTarea/" method = post>
-            <label>Nombre: <input type="text" id="edit-task-name" value="${taskData.nombre}"></label>
-            <label>Persona: 
-                <select id="edit-task-persona">
-                    ${Personas.map(persona => `<option value="${persona}" ${taskData.persona.includes(persona) ? 'selected' : ''}>${persona}</option>`).join('')}
-                </select>
-                <button class="icon" id="edit-persona-btn"><img class="icon" src="static/edit.png" alt="edit"></button>
+        <form action = "/EditarTarea/" method = "POST">
+            <label>Nombre: <input type="text" name="nombre_tarea" value="${taskData.nombre}"></label>
+            <label>Persona: <input type="text" name="nombre_persona" value="${taskData.persona}">
+                <button class="icon" id="edit-persona-btn"><img class="icon" src="/static/edit.png" alt="edit"></button>
             </label>
-            <label>Proyecto: 
-                <select id="edit-task-proyecto">
+            <label>Proyecto: <select name="nombre_proyecto">
                     ${Proyectos.map(proj => `<option value="${proj.id}" ${proj.id === taskData.id.split('-')[0] ? 'selected' : ''}>${proj.nombre}</option>`).join('')}
                 </select>
-                <button class="icon" id="edit-proyecto-btn"><img class="icon" src="static/edit.png" alt="edit"></button>
             </label>
-            <label>Fecha Inicio: <input type="date" id="edit-task-inicio" value="${taskData.inicio}"></label>
-            <label>Fecha Fin: <input type="date" id="edit-task-fin" value="${taskData.termino}"></label>
-            <label>Prioridad: 
-                <select id="edit-task-prioridad">
+            <label>Fecha Inicio: <input type="text" name="fecha_inicio" value="${taskData.inicio}"></label>
+            <label>Fecha Fin: <input type="text" name="fecha_fin" value="${taskData.termino}"></label>
+            <label>Prioridad: <select name="prioridad">
                     <option value="alta" ${taskData.prioridad === 'alta' ? 'selected' : ''}>Alta</option>
                     <option value="media" ${taskData.prioridad === 'media' ? 'selected' : ''}>Media</option>
                     <option value="baja" ${taskData.prioridad === 'baja' ? 'selected' : ''}>Baja</option>
                 </select>
             </label>
-            <label>Estado: 
-                <select id="edit-task-estado">
-                    <option value="pendiente" ${taskData.estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
-                    <option value="completado" ${taskData.estado === 'completado' ? 'selected' : ''}>Completado</option>
+            <label>Estado: <select name="estado">
+                    <option value="en curso" ${taskData.estado === 'en curso' ? 'selected' : ''}>En curso</option>
+                    <option value="hecho" ${taskData.estado === 'hecho' ? 'selected' : ''}>Hecho</option>
+                    <option value="sin empezar" ${taskData.estado === 'sin empezar' ? 'selected' : ''}>Hecho</option>
                 </select>
+            </label>
+            <label>Resumen: <input type="text" name="resumen" value="${taskData.resumen}"></label>
             </label>
             <button id="save-task-btn">Guardar</button>
         </form>
@@ -344,21 +356,6 @@ function set_active(project_block) {
     show_project_tasks(active_project_id);
 }
 
-function change_status(task_id) {
-    var task = document.getElementById(task_id);
-    var checkbox = task.querySelector('.form-check-input');
-    var status = task.querySelector('.tag-status');
-
-    if (checkbox.checked) {
-        status.textContent = "completado";
-        status.classList.remove('tag-info');
-        status.classList.add('tag-success');
-    } else {
-        status.textContent = "pendiente";
-        status.classList.remove('tag-success');
-        status.classList.add('tag-info');
-    }
-}
 
 function edit_task_details(task_id) {
     //TODO: Implementar la edición de tareas
