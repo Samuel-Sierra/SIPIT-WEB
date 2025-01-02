@@ -300,15 +300,15 @@ class ComandosNotion:
         else:
             print(f"No se encontró ningún {tipo} con el nombre '{nombre}'.")
             return None
+        
     def extraer_datos_proyecto(self,json_completo):
         # Extraer datos del JSON
         proyecto = {
-            "nombre_proyecto": json_completo.get("Nombre del proyecto", {}).get("title", [{}])[0].get("plain_text", ""),
-            "estado": json_completo.get("Estado", {}).get("status", {}).get("name", ""),
-            "titular": json_completo.get("Titular", {}).get("people", [{}])[0].get("name", ""),
-            "fecha_inicio": json_completo.get("Fechas", {}).get("date", {}).get("start", ""),
-            "fecha_fin": json_completo.get("Fechas", {}).get("date", {}).get("end", ""),
-            "prioridad": json_completo.get("Prioridad", {}).get("select", {}).get("name", "")
+            "estado": json_completo.get("Estado", {}).get("status", {}).get("name", "") if json_completo.get("Estado", {}).get("status", []) else "",
+            "responsable": json_completo.get("Responsable", {}).get("select", {}).get("name", "") if json_completo.get("Responsable", {}).get("select", []) else "",
+            "fecha_inicio": json_completo.get("Fechas", {}).get("date", {}).get("start", "") if json_completo.get("Fechas", {}).get("date", []) else "",
+            "fecha_fin": json_completo.get("Fechas", {}).get("date", {}).get("end", "") if json_completo.get("Fechas", {}).get("date", []) else "",
+            "prioridad": json_completo.get("Prioridad", {}).get("select", {}).get("name", "") if json_completo.get("Prioridad", {}).get("select", []) else ""
         }
         return proyecto
 
@@ -342,27 +342,17 @@ class ComandosNotion:
     
     def extraer_datos_tareas(self,aux):
         # Extraer datos del JSON
-        def obtener_valor(diccionario, *claves):
-            """Función auxiliar para obtener valores anidados de forma segura."""
-            for clave in claves:
-                if isinstance(diccionario, dict):
-                    diccionario = diccionario.get(clave)
-                else:
-                    return ""
-            return diccionario if diccionario else ""
-
-        return {
-            
-            "nombre_tarea": obtener_valor(aux, "Nombre de la tarea", "title", 0, "plain_text"),
-            "estado": obtener_valor(aux, "Estado", "status", "name"),
-            "fecha_inicio": obtener_valor(aux, "Fecha", "date", "start"),
-            "fecha_fin": obtener_valor(aux, "Fecha", "date", "end"),
-            "prioridad": obtener_valor(aux, "Prioridad", "select", "name"),
-             "nombre_proyecto": aux.get("Nombre del Proyecto", {}).get("relation", [{}])[0].get("id", "") if aux.get("Nombre del Proyecto", {}).get("relation", []) else "",
-            "nombre_sprint": aux.get("Sprint", {}).get("relation", [{}])[0].get("id", "") if aux.get("Sprint", {}).get("relation", []) else ""  ,
-            "resumen": obtener_valor(aux, "Descripción", "rich_text", 0, "plain_text"),
-            "titular": obtener_valor(aux, "Responsable", "select", "name"),
+        proyecto = {
+            "estado": aux.get("Estado", {}).get("status", {}).get("name", "") if aux.get("Estado", {}).get("status", []) else "",
+            "fecha_inicio": aux.get("Fecha", {}).get("date", {}).get("start", "") if aux.get("Fecha", {}).get("date", []) else "",
+            "fecha_fin": aux.get("Fecha", {}).get("date", {}).get("end", "") if aux.get("Fecha", {}).get("date", []) else "",
+            "prioridad": aux.get("Prioridad", {}).get("select", {}).get("name", "") if aux.get("Prioridad", {}).get("select", []) else "",
+            "id_proyecto": aux.get("Nombre del Proyecto", {}).get("relation", [{}])[0].get("id", "") if aux.get("Nombre del Proyecto", {}).get("relation", []) else "",
+            "id_sprint": aux.get("Sprint", {}).get("relation", [{}])[0].get("id", "") if aux.get("Sprint", {}).get("relation", []) else ""  ,
+            "resumen": aux.get("Descripción", {}).get("rich_text", [{}])[0].get("plain_text", "") if aux.get("Descripción", {}).get("rich_text", []) else ""  ,
+            "nombre_persona": aux.get("Responsable", {}).get("select", {}).get("name", "") if aux.get("Responsable", {}).get("select", []) else ""
         }
+        return proyecto
     
     def modificar_tarea(self, data):
         datos_previos = self.consultar_tarea({"nombre": data["nombre_tarea"], "tipo": "tarea"}, False)
@@ -406,13 +396,13 @@ class ComandosNotion:
         response = requests.patch(f"{self.NOTION_API_URL}/{id_tarea}", headers=self.HEADERS, json={"properties": properties})
         return response
     
-    def     _datos_sprint(self,aux):
+    def extraer_datos_sprint(self,aux):
         return {
-            "nombre": aux.get("Nombre del Sprint", {}).get("title", [{}])[0].get("plain_text", ""),
-            "estado": aux.get("Estado de Sprint", {}).get("status", {}).get("name", ""),
-            "fecha_inicio": aux.get("Fechas", {}).get("date", {}).get("start", ""),
-            "fecha_fin": aux.get("Fechas", {}).get("date", {}).get("end", "")
+            "estado": aux.get("Estado de Sprint", {}).get("status", {}).get("name", "") if aux.get("Estado de Sprint", {}).get("status", []) else "",
+            "fecha_inicio": aux.get("Fechas", {}).get("date", {}).get("start", "") if aux.get("Fechas", {}).get("date", []) else "",
+            "fecha_fin": aux.get("Fechas", {}).get("date", {}).get("end", "") if aux.get("Fechas", {}).get("date", []) else ""
         }
+
 
     def modificar_sprint(self, data):
         datos_previos = self.consultar_sprint({"nombre": data["nombre"], "tipo": "sprint"}, False)

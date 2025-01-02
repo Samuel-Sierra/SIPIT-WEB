@@ -22,10 +22,19 @@ app.mount("/static", StaticFiles(directory=folder), name="static")
 # Set up the templates directory
 templates = Jinja2Templates(directory="frontend")
 cn = ComandosNotion()
+todo_json = ""
+cont =0
 
 @app.get('/')
 def home(request: Request):
     try: 
+        todo = obtenerTodo()
+
+        global todo_json
+        global cont
+        if cont == 0:
+            todo_json = json.dumps(todo, ensure_ascii=False)
+            cont = cont + 1
         return templates.TemplateResponse("index.html", {"request": request})
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"  
@@ -33,10 +42,7 @@ def home(request: Request):
 @app.get('/proyectos/')
 def proyectos(request: Request):
     try:
-        todo = obtenerTodo()
-
-        todo_json = json.dumps(todo, ensure_ascii=False)
-
+        global todo_json
         return templates.TemplateResponse("proyectos.html", {"request": request, "todo": todo_json})
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"    
@@ -44,9 +50,7 @@ def proyectos(request: Request):
 @app.get('/sprints/')
 def sprints(request: Request):
     try:
-        todo = obtenerTodo()
-        todo_json = json.dumps(todo, ensure_ascii=False)
-        
+        global todo_json
         return templates.TemplateResponse("sprint.html", {"request": request, "todo": todo_json})
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"    
@@ -80,7 +84,6 @@ def comandos(texto:str):
 
     #Aplicacion del reemplazo
     texto_reemplazado = validar(texto)
-    
 
     try:
 

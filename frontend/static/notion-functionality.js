@@ -1,5 +1,5 @@
 class Proyecto {
-    constructor(id, nombre, resumen, fecha_inicio, fecha_fin, estado, prioridad) {
+    constructor(id, nombre, resumen, fecha_inicio, fecha_fin, estado, prioridad, responsable) {
         this.id = id; // ID del proyecto, relacionada a su posición en el arreglo de proyectos
         this.nombre = nombre;
         this.resumen = resumen;
@@ -8,12 +8,13 @@ class Proyecto {
         this.estado = estado;
         this.prioridad = prioridad;
         this.tareas = [];
+        this.responsable = responsable;
         this.personas = [];
     }
 }
 
 class Tarea {
-    constructor(id, nombre, proyecto, persona, inicio, termino, prioridad, estado) {
+    constructor(id, nombre, proyecto, persona, inicio, termino, prioridad, estado, resumen) {
         this.id = id; // ID de la tarea, combinación de la ID del proyecto y la posición de la tarea en el arreglo de tareas
         this.nombre = nombre;
         this.proyecto = proyecto; // La ID del proyecto al que pertenecen
@@ -22,6 +23,7 @@ class Tarea {
         this.termino = termino;
         this.prioridad = prioridad;
         this.estado = estado;
+        this.resumen = resumen;
     }
 }
 
@@ -30,13 +32,10 @@ active_project_id = "Project-0";
 
 // Arreglo de proyectos, con el proyecto para guardar las tareas sin proyecto en la primer posición
 let Proyectos = [
-    new Proyecto("Project-0", "Tareas sin proyecto", "Proyecto para guardar tareas sin un nombre de proyecto", "2024-12-07", "2024-12-08")
+    new Proyecto("Project-0", "Tareas sin proyecto", "Proyecto para guardar tareas sin un nombre de proyecto", "2024-12-07", "2024-12-08", "alta", "Karina")
 ];
 Personas = [];
-
 num_proyectos_sin_nombre = 0;
-
-
 
 function create_project_list(data) {
     
@@ -47,22 +46,26 @@ function create_project_list(data) {
             if (!projectExists) {
                 let projectId = item.id_proyecto;
                 let projectName = item.nombre_proyecto || `${projectId} Proyecto sin nombre`;
-                let newProject = new Proyecto(projectId, projectName, item.resumen, item.fecha_inicio, item.fecha_fin, item.estado, item.prioridad);
+                let newProject = new Proyecto(projectId, projectName, item.resumen, item.fecha_inicio, item.fecha_fin, item.estado, item.prioridad, item.responsable);
                 Proyectos.push(newProject);
             }
         }
     });
-    console.log(Proyectos)
 
     data.forEach((item) => {
         if (item.tipo === 'tarea') {
-            let project = Proyectos.find(proj => proj.id === item.nombre_proyecto) || Proyectos[0];
-            let taskId = `${project.id}-Task-${project.tareas.length}`;
-            let newTask = new Tarea(taskId, item.nombre_tarea, item.nombre_proyecto, item.titular, item.fecha_inicio, item.fecha_fin, item.prioridad, item.estado);
-            project.tareas.push(newTask);
-
-            let persona = item.titular;
             
+            let project = Proyectos.find(proj => proj.id === item.id_proyecto) || Proyectos[0];
+            alert(project)
+            console.log(project)
+            let taskId = `${project.id}-Task-${project.tareas.length}`;
+            let newTask = new Tarea(taskId, item.nombre_tarea, item.id_proyecto, item.nombre_persona, item.fecha_inicio, item.fecha_fin, item.prioridad, item.estado, item.resumen);
+            project.tareas.push(newTask);
+            let cuak = 0
+            
+
+            let persona = item.nombre_persona;
+            console.log(newTask)
             if (!project.personas.includes(persona)) {
                 project.personas.push(persona);
             } else if (!Proyectos[0].personas.includes(persona)) {

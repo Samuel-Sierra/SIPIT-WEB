@@ -4,11 +4,13 @@ import json
 from notion import ComandosNotion
 from fastapi.responses import JSONResponse
 from config.db import get_db
+import os
 
 cn = ComandosNotion()
 
 fecha_hora_actual = datetime.now()
 client = OpenAI()
+
 
 def switch_minuta(data):
 
