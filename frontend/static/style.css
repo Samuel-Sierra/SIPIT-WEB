@@ -1,7 +1,8 @@
 @import url("https://fonts.googleapis.com/css?family=Roboto:400,400i,700");
+
 body {
   min-height: 100vh;
-  font-size: 14px;
+  font-size: 1.1rem;
   font-family: Roboto, sans-serif;
 }
 
@@ -21,9 +22,176 @@ body {
   --light-blue-color: rgb(213, 222, 234);
 }
 
+.popup-content {
+  background: linear-gradient(to bottom, rgba(94, 159, 241, 0.2), rgba(54, 217, 216, 0.2));
+  font-size: 15px;
+  max-width: 90%; /* Ocupa hasta el 90% del ancho del contenedor */
+  margin: auto;
+  padding: 1rem; /* Espaciado interno */
+  background-color: #f9f9f9;
+  border: 0.1rem solid #ccc;
+  border-radius: 1rem; /* Bordes redondeados */
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+  font-family: Roboto, sans-serif;
+  color: #333;
+}
+
+.popup-content label{
+  font-size: 13px;
+}
+
+.popup-title {
+  font-size: 20px !important;
+}
+
+.popup-content input[type="text"], 
+.popup-content select {
+  padding: 8px;
+  border: 1px solid var(--secondary-color-lighter);
+  border-radius: 10px;
+  font-size: 13px;
+  font-family: Roboto, sans-serif;
+  outline: none;
+  width: 80%; /* Mantén los campos angostos */
+  margin: auto; /* Centra los elementos */
+}
+
+.popup-content textarea {
+  padding: 8px;
+  border: 1px solid var(--secondary-color-lighter);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: Roboto, sans-serif;
+  outline: none;
+  resize: none;
+  height: 60px; /* Altura inicial */
+  width: 90%; /* Más ancho que los inputs y selects */
+  transition: height 0.3s ease;
+}
+
+.popup-content textarea.expanded {
+  height: 150px; /* Altura expandida */
+}
+
+
+.popup-content .expand-btn {
+  margin-top: 5px;
+  font-size: 12px;
+  background: var(--primary-color);
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.popup-content .expand-btn:hover {
+  background: var(--success-color-darker);
+}
+
+.popup-content input[type="text"], 
+.popup-content input[type="date"], 
+.popup-content select {
+  padding: 8px;
+  border: 1px solid var(--secondary-color-lighter);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: Roboto, sans-serif;
+  outline: none;
+  width: 80%; /* Mantén el ancho ajustado */
+  margin: auto; /* Centra los elementos horizontalmente */
+  text-align: center; /* Centra el texto dentro del cuadro */
+  text-align-last: center; /* Centra las opciones del select */
+}
+
+.popup-content textarea {
+  padding: 8px;
+  border: 1px solid var(--secondary-color-lighter);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: Roboto, sans-serif;
+  outline: none;
+  resize: none;
+  height: 60px; /* Altura inicial */
+  width: 90%; /* Más ancho que los inputs y selects */
+  transition: height 0.3s ease;
+  text-align: center; /* Centra el texto dentro del área */
+}
+
+.popup-content textarea.expanded {
+  height: 150px; /* Altura expandida */
+}
+
+
+.popup-content2 h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: rgb(38, 42, 65);
+    font-size: 1.5rem; /* Tamaño relativo al tamaño base */
+}
+
+.popup-content2 p {
+    margin: 0.5em 0; /* Espaciado superior e inferior */
+    font-size: 1rem; /* Tamaño de texto estándar */
+    line-height: 1.6;
+    color: rgb(38, 42, 65);
+}
+
+.popup-content .pop-btn-submit{
+  padding: 10px;
+  width: 90%; /* Botón amplio */
+  margin: 10px auto 0; /* Centra los botones */
+  display: block;
+  border-radius: 10px;
+  background-color: var(--primary-color);
+  color: white;
+  font-size: 14px;
+}
+.popup-content .pop-btn-submit:hover{
+
+  background-color:  rgb(38, 42, 65);
+
+}
+
+
+.popup-content2 p strong {
+    font-weight: bold;
+}
+
+button {
+  padding: 7px;
+  width: 70%; /* Botón amplio */
+  display: inline-block;
+  border-radius: 10px;
+  background-color: var(--primary-color);
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.regresar-task-btn-cla {
+    display:flexbox;
+    width: 100%; /* Botón ocupa todo el ancho disponible */
+    padding: 0.75em; /* Espaciado interno */
+    margin-top: 1rem;
+    background-color: rgb(38, 42, 65);
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.regresar-task-btn-cla:hover {
+    background-color: #0056b3;
+}
+
+
 .dashboard {
   position: relative;
-  width: 1378px;
+  width: 100%;
   display: grid;
   grid-template-columns: repeat(2, auto);
   color: white;
@@ -32,21 +200,23 @@ body {
 }
 
 .projects {
-  padding: 134px 162px;
+  padding: 20% 20%;
 }
 
 .welcome-banner h1 {
   margin: 0;
-  font-size: 28px;
+  font-size: 2rem;
 }
+
 .welcome-banner p {
-  margin: 24px 0 0 0;
+  font-size: 0.7rem;
   color: var(--mute-text-color);
 }
 
 .search-bar {
   margin-top: 36px;
 }
+
 .search-bar .form-control {
   --placeholder-color: white;
   width: 100%;
@@ -56,6 +226,7 @@ body {
   border-color: transparent;
   border-radius: 15px;
 }
+
 .search-bar .btn {
   display: flex;
   justify-content: center;
@@ -70,9 +241,11 @@ body {
 .section .section-title {
   margin-bottom: 30px;
 }
+
 .section .section-title .title {
   font-weight: bold;
 }
+
 .section .section-title .project-count {
   color: var(--mute-text-color);
 }
@@ -82,6 +255,7 @@ body {
 }
 
 .project-list {
+  font-size: 0.8rem;
   display: grid;
   gap: 64px 40px;
   grid-template-columns: repeat(3, 1fr);
@@ -90,11 +264,13 @@ body {
   margin: 0;
   list-style-type: none;
 }
+
 .project-list__item {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 .project-list__item .project-block {
   --badge-color: white;
   position: relative;
@@ -106,6 +282,7 @@ body {
   background: var(--project-color, rgba(255, 255, 255, 0.1));
   border-radius: 15px;
 }
+
 .project-list__item .project-block[data-badge]::after {
   box-sizing: border-box;
   min-width: auto;
@@ -114,16 +291,20 @@ body {
   border-radius: 50%;
   box-shadow: 0 0 0 2px var(--info-color-darkest);
 }
+
 .project-list__item .project-abbr {
   font-size: 18px;
   font-weight: bold;
 }
+
 .project-list__item .project-name {
   margin-top: 30px;
 }
+
 .project-list__item.active .project-block {
   box-sizing: border-box;
 }
+
 .project-list__item.active .project-block::before {
   position: absolute;
   content: "";
@@ -135,6 +316,7 @@ body {
   background: var(--project-color);
   border-radius: 20px;
 }
+
 .project-list__item.active .project-block::after {
   position: absolute;
   content: attr(data-abbr);
@@ -185,28 +367,50 @@ body {
   height: 36px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
+  text-decoration: none;
+  color: aliceblue;
 }
-.menu svg {
+
+.menu i {
   fill: white;
 }
 
 .project-detail {
-  margin: 8px;
-  padding: 64px 76px;
+  width: 100%;
+  margin: 10%;
+
   color: black;
   background: white;
   border-radius: 15px;
+  flex: 1; /* Se expande para ocupar el espacio disponible */
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Si el contenido es demasiado grande, aparecerá un scroll */
+  padding: 35px;
+  box-sizing: border-box;
+  min-width: 300px; /* Asegura un tamaño mínimo para móviles */
+  max-width: 600px; /* Limita el ancho en pantallas grandes */
+  height: 90%; /* Se asegura de que ocupe el alto disponible */
 }
+
+.project-detail p{
+  font-size: 0.8rem;
+}
+
 .project-detail .section {
   margin-top: 72px;
+  font-size: 0.8rem;
 }
+
 .project-detail .section .section-title {
+  font-size: 0.8rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
   border-bottom: 1px solid var(--secondary-color-lighter);
 }
+
 .project-detail .section .section-title h3 {
   margin-top: 0;
   color: var(--info-color-darkest);
@@ -221,8 +425,10 @@ body {
   margin-top: 0;
   color: var(--info-color-darkest);
 }
+
 .project-intro p {
   line-height: 1.5;
+  font-size: 0.5rem;
   color: var(--mute-text-color);
 }
 
@@ -232,21 +438,26 @@ body {
   margin: 0;
   list-style-type: none;
 }
+
 .avatar-list__item img {
   width: 36px;
   height: 36px;
   border: 2px solid white;
   border-radius: 50%;
 }
+
 .avatar-list__item:not(:last-child) {
   margin-right: -6px;
 }
+
 .avatar-list__item:nth-child(1) {
   z-index: 3;
 }
+
 .avatar-list__item:nth-child(2) {
   z-index: 2;
 }
+
 .avatar-list__item .add-user {
   position: relative;
   top: 6%;
@@ -263,20 +474,24 @@ body {
   margin: 0;
   list-style-type: none;
 }
+
 .task-list__item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   white-space: nowrap;
 }
+
 .task-list__item .form-check-input {
   width: 24px;
   height: 24px;
   border-radius: 50%;
 }
+
 .task-list__item .form-check-input ~ .form-check-label {
-  margin-left: 18px;
+  margin-left: 10px;
 }
+
 .task-list__item .form-check-input::before {
   top: 1px;
   width: 24px;
@@ -286,6 +501,7 @@ body {
   align-items: center;
   line-height: 1;
 }
+
 .task-list__item .tag {
   box-sizing: border-box;
   width: 92px;
@@ -314,6 +530,7 @@ body {
   border-radius: 15px;
   box-shadow: 0 1.4px 2.8px rgba(137, 79, 198, 0.041), 0 3.3px 6.7px rgba(137, 79, 198, 0.102), 0 6.3px 12.5px rgba(137, 79, 198, 0.15), 0 11.2px 22.3px rgba(137, 79, 198, 0.198), 0 20.9px 41.8px rgba(137, 79, 198, 0.259), 0 50px 100px rgba(137, 79, 198, 0.4);
 }
+
 .add-task svg {
   width: 18px;
   height: 15px;
@@ -321,9 +538,10 @@ body {
 }
 
 .task-name-div {
-  max-width: 45%; 
+  max-width: 45%;
   width: 45%;
 }
+
 .task-name {
   text-overflow: ellipsis;
   overflow: hidden;
@@ -339,4 +557,66 @@ body {
   height: 24px;
   fill: var(--info-color-darkest);
   border-style: none;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .project-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px 20px;
+  }
+
+  .welcome-banner h1 {
+    font-size: 24px;
+  }
+
+  .welcome-banner p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .project-list {
+    grid-template-columns: 1fr;
+  }
+
+  .welcome-banner h1 {
+    font-size: 20px;
+  }
+
+  .welcome-banner p {
+    font-size: 12px;
+  }
+
+  .search-bar {
+    margin-top: 20px;
+  }
+
+  .add-task {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard {
+    width: 100%;
+  }
+
+  .project-list {
+    grid-template-columns: 1fr;
+  }
+
+
+
+  .add-task {
+    width: 40px;
+    height: 40px;
+    bottom: 16px;
+    right: 16px;
+  }
 }

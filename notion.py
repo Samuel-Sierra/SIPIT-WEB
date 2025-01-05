@@ -73,10 +73,9 @@ class ComandosNotion:
             "Estado": {
                 "status": {"name": data["estado"]}
             },
-            # Hay que cambiar la columna de tipo People a texto, o en su defecto a texto para ingresar el name de cada persona
-            #"Titular": {
-            #    "rich_text": [{"text": {"content": data["nombre_persona"]}}]
-            #},
+            "Responsable": {
+                "select": {"name": data["nombre_persona"]}
+            },
             "Fechas": {
                 "date": {
                     "start": data["fecha_inicio"],
@@ -328,6 +327,9 @@ class ComandosNotion:
         if "estado" in modificar:
             if datos_ant["estado"] != modificar["estado"]:
                 properties["Estado"] = {"status": {"name": modificar["estado"]}}
+        if "nombre_persona" in modificar:
+            if datos_ant["respnsable"] != modificar["nombre_persona"]:
+                properties["Responsable"] = {"select": {"name": modificar.get("nombre_persona")}}
         if "fecha_inicio" in modificar and "fecha_fin" in modificar:
             properties["Fechas"] = {"date": {"start": modificar.get("fecha_inicio"), "end": modificar.get("fecha_fin")}}
         elif "fecha_inicio" in modificar:
@@ -387,11 +389,9 @@ class ComandosNotion:
             }}
         if "prioridad" in data and datos_ant["prioridad"] != data["prioridad"]:
             properties["Prioridad"] = {"select": {"name": data["prioridad"]}}
-        if "nombre_proyecto" in data and datos_ant["nombre_proyecto"] != data["nombre_proyecto"]:
-            proyecto_id = self.obtener_id_por_nombre(data["nombre_proyecto"], "proyecto")
+        if "nombre_proyecto" in data and datos_ant["nombre_proyecto"] != proyecto_id:
             properties["Nombre del Proyecto"] ={"relation": [{"id": proyecto_id}]}
-        if "nombre_sprint" in data and datos_ant["nombre_sprint"] != data["nombre_sprint"]:
-            sprint_id = self.obtener_id_por_nombre(data["nombre_sprint"], "sprint")
+        if "nombre_sprint" in data and datos_ant["nombre_sprint"] != sprint_id:
             properties["Sprint"] ={"relation": [{"id": sprint_id}]}
         if "resumen" in data and datos_ant["resumen"] != data["resumen"]:
             properties["Descripción"] = {"rich_text": [{"text": {"content": data["resumen"]}}]}

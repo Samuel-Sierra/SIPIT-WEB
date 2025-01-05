@@ -28,11 +28,11 @@ cont =0
 @app.get('/')
 def home(request: Request):
     try: 
-        todo = obtenerTodo()
-
+        
         global todo_json
         global cont
         if cont == 0:
+            todo = obtenerTodo()
             todo_json = json.dumps(todo, ensure_ascii=False)
             cont = cont + 1
         return templates.TemplateResponse("index.html", {"request": request})
@@ -50,7 +50,7 @@ def proyectos(request: Request):
         return templates.TemplateResponse("proyectos.html", {"request": request, "todo": todo_json})
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"    
-    
+  
 @app.get('/sprints/')
 def sprints(request: Request):
     try:
@@ -61,16 +61,16 @@ def sprints(request: Request):
 
 def reemplazar_original(match):
     mapa_ordinal = {
-        "1er": "primer",
-        "2do": "segundo",
-        "3er": "tercero",
-        "4to": "cuarto",
-        "5to": "quinto",
-        "6to": "sexto",
-        "7mo": "séptimo",
-        "8vo": "octavo",
-        "9no": "noveno",
-        "10mo": "décimo",
+        "1.er": "primer",
+        "2.do": "segundo",
+        "3.er": "tercero",
+        "4.to": "cuarto",
+        "5.to": "quinto",
+        "6.to": "sexto",
+        "7.mo": "séptimo",
+        "8.vo": "octavo",
+        "9.no": "noveno",
+        "10.mo": "décimo",
     }
 
     ordinal = match.group(0)
@@ -206,25 +206,6 @@ def obtenerSprintsIncompletos(request: Request):
         return respuesta
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
-    
-@app.get('/obtenerMinutasIncompletos/')
-def obtenerMinutasIncompletos(request: Request):
-    try:
-        db = get_db()
-        resumen_minuta = db.minutasResumen.find()
-        num_pro = db.minutas.count_documents({"tipo": "minuta"})
-
-        if (num_pro == 1):
-            task = minutaEntity(db.minutas.find_one({"tipo":"minuta"}))
-            respuesta = templates.TemplateResponse("minuta.html",{"request": request, "combined": task, "res_min": resumen_minuta, "tipo":"minuta"})
-        elif (num_pro>1):
-            tasks = minutasEntity(db.minutas.find({"tipo":"minuta"}))
-            respuesta = templates.TemplateResponse("minuta2.html",{"request": request, "combineds": tasks, "res_min": resumen_minuta, "tipo":"minuta"})
-        elif (num_pro==0):
-            return RedirectResponse(url="/", status_code=303)
-        return respuesta
-    except Exception as e:
-        return f"Excepción al realizar la solicitud: {e}"
 
 
 @app.post('/acompletarproyecto/')
@@ -296,37 +277,11 @@ def acompletartarea(id:str = Form(...), tipo: str = Form(...), accion: str = For
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
     
-@app.post('/acompletarminuta/')
-def acompletartarea(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), nombre: str = Form(...),
-    nombre_sprint:str = Form(...), objetivo: str = Form(...), fecha_inicio: str = Form(...), participantes: str = Form(...),
-    resumen: str = Form(...)):
 
-    try:
-        datos = {
-            "tipo": tipo,
-            "accion": accion,
-            "nombre_proyecto": nombre_proyecto,
-            "nombre": nombre,
-            "nombre_sprint": nombre_sprint,
-            "objetivo": objetivo,
-            "fecha_inicio": fecha_inicio,
-            "participantes": participantes,
-            "resumen": resumen,
-        }
-        respuesta, n = switch_comandos(datos)
-
-        db = get_db()
-
-        db.minutas.find_one_and_delete({"_id": ObjectId(id)})
-        return RedirectResponse(url="/obtenerMinutasIncompletos/", status_code=303)
-    except Exception as e:
-        return f"Excepción al realizar la solicitud: {e}"
-    
-@app.post("/EditarTarea/")
-def EditarTarea(id: str = Form(...), nombre_tarea: str = Form(...), estado: str = Form(...), prioridad: str = Form(...), nombre_persona: str = Form(...),
+@app.post("/CrearTarea/")
+def CrearTarea(nombre_tarea: str = Form(...), estado: str = Form(...), prioridad: str = Form(...), nombre_persona: str = Form(...),
                 resumen: str = Form(...), fecha_fin: str = Form(...), fecha_inicio: str = Form(...), nombre_proyecto: str = Form(...), nombre_sprint: str = Form(...)):
     datos = {
-        "id": id,
         "nombre_tarea": nombre_tarea,
         "nombre_persona": nombre_persona,
         "estado": estado,
@@ -337,67 +292,89 @@ def EditarTarea(id: str = Form(...), nombre_tarea: str = Form(...), estado: str 
         "nombre_proyecto": nombre_proyecto,
         "nombre_sprint": nombre_sprint
     }
+
+    respuesta = cn.crear_tarea(datos)
+    if respuesta.status_code==200:
+        return RedirectResponse(url="/", status_code=303)
+
+@app.post("/EditarTarea/")
+def EditarTarea(nombre_tarea: str = Form(...), estado: str = Form(...), prioridad: str = Form(...), nombre_persona: str = Form(...),
+                resumen: str = Form(...), fecha_fin: str = Form(...), fecha_inicio: str = Form(...), nombre_proyecto: str = Form(...), nombre_sprint: str = Form(...)):
+    datos = {
+        "nombre_tarea": nombre_tarea,
+        "nombre_persona": nombre_persona,
+        "estado": estado,
+        "prioridad": prioridad,
+        "resumen": resumen,
+        "fecha_inicio":fecha_inicio,
+        "fecha_fin": fecha_fin,
+        "nombre_proyecto": nombre_proyecto,
+        "nombre_sprint": nombre_sprint
+    }
+    return datos
     respuesta = cn.modificar_tarea(datos)
     return RedirectResponse(url="/", status_code=303)
 
 # --- Endpoint Eliminar Tarea ---
-@app.post("/EliminarTarea/")
-def eliminarTarea(nombre_tarea: str = Form(...)):
+@app.get("/EliminarTarea/")
+def EliminarTarea(nombre_tarea:str):
     datos = {"nombre_tarea": nombre_tarea}
+    return datos
     respuesta = cn.eliminar_tarea(datos)
     return RedirectResponse(url="/", status_code=303)
 
-# --- Endpoint Consultar Tarea ---
-@app.post("/ConsultarTarea/")
-def consultarTarea(id: str = Form(...)):
-    datos = {"id": id}
-    respuesta = cn.consultar_tarea(datos)
-    return respuesta
-
-# --- Endpoint Consultar Tareas ---
-@app.post("/ConsultarTareas/")
-def consultarTareas(estado: str = Form(...), prioridad: str = Form(...), nombre_proyecto: str = Form(...)):
-    datos = {
-        "estado": estado,
-        "prioridad": prioridad,
-        "nombre_proyecto": nombre_proyecto
-    }
-    respuesta = cn.consultar_tareas(datos)
-    return respuesta
-
 # --- Endpoint Crear Proyecto ---
 @app.post("/CrearProyecto/")
-def crearProyecto(id: str = Form(...), nombre_proyecto: str = Form(...), fecha_inicio: str = Form(...), 
-                    fecha_fin: str = Form(...), prioridad: str = Form(...), lider: str = Form(...)):
-    datos = {
-        "id": id,
-        "nombre_proyecto": nombre_proyecto,
-        "fecha_inicio": fecha_inicio,
-        "fecha_fin": fecha_fin,
-        "prioridad": prioridad,
-        "lider": lider
-    }
+def CrearProyecto(request: Request, nombre_proyecto: str = Form(...), fecha_inicio: str = Form(...), estado: str = Form(...),
+    fecha_fin: str = Form(...), prioridad: str = Form(...), nombre_persona: str = Form(...)):
+    try:
+        datos = {
+            "nombre_proyecto": nombre_proyecto,
+            "fecha_inicio": fecha_inicio,
+            "fecha_fin": fecha_fin,
+            "prioridad": prioridad,
+            "nombre_persona": nombre_persona,
+            "estado": estado
+        }
+
+        respuesta = cn.crear_proyecto(datos)
+
+        if respuesta.status_code==200:
+            
+            todo = obtenerTodo()
+            todo_json = json.dumps(todo, ensure_ascii=False)
+            return templates.TemplateResponse("proyectos.html", {"request": request, "todo": todo_json, "a":True})
+        else:
+            content={"respuesta":respuesta.status_code}
+            return JSONResponse(content=content, status_code=respuesta.status_code)
+            return templates.TemplateResponse("proyectos.html", {"request": request, "todo": todo_json, "a":False})
+    except:
+        datos = {"ab":"no le ande moviendo"}
+        return datos
     respuesta = cn.crear_proyecto(datos)
     return RedirectResponse(url="/index.html/", status_code=303)
 
 # --- Endpoint Editar Proyecto ---
 @app.post("/EditarProyecto/")
-def editarProyecto(id: str = Form(...), nombre_proyecto: str = Form(...), fecha_fin: str = Form(...), 
-                    prioridad: str = Form(...), progreso: str = Form(...)):
+def editarProyecto(id: str = Form(...), nombre_proyecto: str = Form(...), fecha_fin: str = Form(...),fecha_inicio: str = Form(...), nombre_persona:str = Form(...), 
+                    prioridad: str = Form(...), estado: str = Form(...)):
     datos = {
-        "id": id,
         "nombre_proyecto": nombre_proyecto,
+        "nombre_persona" : nombre_persona,
+        "fecha_inicio" : fecha_inicio,
         "fecha_fin": fecha_fin,
         "prioridad": prioridad,
-        "progreso": progreso
+        "estado": estado
     }
-    respuesta = cn.editar_proyecto(datos)
+    return datos
+    respuesta = cn.modificar_proyecto(datos)
     return RedirectResponse(url="/index.html/", status_code=303)
 
 # --- Endpoint Eliminar Proyecto ---
-@app.post("/EliminarProyecto/")
-def eliminarProyecto(nombre_proyecto: str = Form(...)):
+@app.get("/EliminarProyecto/")
+def eliminarProyecto(nombre_proyecto:str):
     datos = {"nombre_proyecto": nombre_proyecto}
+    return datos
     respuesta = cn.eliminar_proyecto(datos)
     return RedirectResponse(url="/index.html/", status_code=303)
 

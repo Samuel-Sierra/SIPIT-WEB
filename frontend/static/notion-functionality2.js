@@ -1,5 +1,35 @@
 class Proyecto {
-    constructor(id, nombre, resumen, fecha_inicio, fecha_fin, estado, prioridad) {
+    constructor(id, nombre, resumen, fecha_inicio, fecha_fin, estado, prioridad, responsable) {
+        this.id = id; // ID del proyecto, relacionada a su posición en el arreglo de proyectos
+        this.nombre = nombre;
+        this.resumen = resumen;
+        this.fecha_inicio = fecha_inicio;
+        this.fecha_fin = fecha_fin;
+        this.estado = estado;
+        this.prioridad = prioridad;
+        this.tareas = [];
+        this.responsable = responsable;
+        this.personas = [];
+    }
+}
+
+class Tarea {
+    constructor(id, nombre, proyecto, persona, inicio, termino, prioridad, estado, resumen, sprint) {
+        this.id = id; // ID de la tarea, combinación de la ID del proyecto y la posición de la tarea en el arreglo de tareas
+        this.nombre = nombre;
+        this.proyecto = proyecto; // La ID del proyecto al que pertenecen
+        this.persona = persona;
+        this.sprint = sprint;
+        this.inicio = inicio;
+        this.termino = termino;
+        this.prioridad = prioridad;
+        this.estado = estado;
+        this.resumen = resumen;
+    }
+}
+
+class Sprint {
+    constructor(id, nombre, fecha_inicio, fecha_fin, estado) {
         this.id = id; // ID del proyecto, relacionada a su posición en el arreglo de proyectos
         this.nombre = nombre;
         this.fecha_inicio = fecha_inicio;
@@ -9,29 +39,17 @@ class Proyecto {
         this.personas = [];
     }
 }
-
-class Tarea {
-    constructor(id, nombre, proyecto, persona, inicio, termino, prioridad, estado) {
-        this.id = id; // ID de la tarea, combinación de la ID del proyecto y la posición de la tarea en el arreglo de tareas
-        this.nombre = nombre;
-        this.proyecto = proyecto; // La ID del proyecto al que pertenecen
-        this.persona = persona;
-        this.inicio = inicio;
-        this.termino = termino;
-        this.prioridad = prioridad;
-        this.estado = estado;
-    }
-}
-
-
 active_project_id = "Project-0";
 
 // Arreglo de proyectos, con el proyecto para guardar las tareas sin proyecto en la primer posición
 let Proyectos = [
-    new Proyecto("Project-0", "Tareas sin proyecto", "2024-12-07", "2024-12-08","Current")
+    new Proyecto("Project-0", "Tareas sin proyecto", "Proyecto para guardar tareas sin un nombre de proyecto", "2024-12-07", "2024-12-08", "alta", "Karina")
+];
+
+let Sprints = [
+    new Sprint("Project-0", "Tareas sin sprints", "2024-12-07", "2024-12-08","Current")
 ];
 Personas = [];
-
 num_proyectos_sin_nombre = 0;
 
 function create_project_list(data) {
@@ -39,50 +57,86 @@ function create_project_list(data) {
     data.forEach((item, index) => {
 
         if (item.tipo === 'proyecto') {
-            let projectExists = Proyectos.some(proj => proj.nombre === item.nombre);
+            let projectExists = Proyectos.some(proj => proj.nombre === item.nombre_proyecto);
             if (!projectExists) {
                 let projectId = item.id_proyecto;
-                let projectName = item.nombre || `${projectId} Proyecto sin nombre`;
-                let newProject = new Proyecto(projectId, projectName, item.fecha_inicio, item.fecha_fin, item.estado);
+                let projectName = item.nombre_proyecto || `${projectId} Proyecto sin nombre`;
+                let newProject = new Proyecto(projectId, projectName, "nohay", item.fecha_inicio, item.fecha_fin, item.estado, item.prioridad, item.responsable);
                 Proyectos.push(newProject);
             }
         }
+        if (item.tipo === 'sprint'){
+            let sprintExists = Sprints.some(spri => spri.nombre === item.nombre_sprint);
+            if(!sprintExists){
+                let sprintId = item.id_sprint;
+                let sprintName = item.nombre_sprint || `${projectId} Sprint sin nombre`
+                let newSprint = new Sprint(sprintId, sprintName, item.fecha_inicio, item.fecha_fin, item.estado);
+                Sprints.push(newSprint);
+            }
+        }
     });
-    console.log(Proyectos)
 
     data.forEach((item) => {
         if (item.tipo === 'tarea') {
-            let project = Proyectos.find(proj => proj.id === item.nombre_sprint) || Proyectos[0];
-            let taskId = `${project.id}-Task-${project.tareas.length}`;
-            let newTask = new Tarea(taskId, item.nombre_tarea, item.nombre_sprint, item.titular, item.fecha_inicio, item.fecha_fin, item.prioridad, item.estado);
-            project.tareas.push(newTask);
-
-            let persona = item.titular;
             
-            if (!project.personas.includes(persona)) {
+            let project = Proyectos.find(proj => proj.id === item.id_proyecto) || Proyectos[0];
+            let sprint = Sprints.find(spri => spri.id === item.id_sprint) || Sprints[0];
+
+            let taskId = `${project.id}-Task-${project.tareas.length}`;
+            let newTask = new Tarea(taskId, item.nombre_tarea, item.id_proyecto, item.nombre_persona, item.fecha_inicio, item.fecha_fin, item.prioridad, item.estado, item.resumen, item.id_sprint);
+            sprint.tareas.push(newTask);
+            project.tareas.push(newTask);
+            
+            let persona = item.nombre_persona;
+
+            if (!project.personas.includes(persona) && project.id===item.id_proyecto) {
                 project.personas.push(persona);
-            } else if (!Proyectos[0].personas.includes(persona)) {
+            } else if (!Proyectos[0].personas.includes(persona) && item.id_proyecto==="") {
                 Proyectos[0].personas.push(persona);
+            }
+
+            if (!sprint.personas.includes(persona) && sprint.id===item.id_sprint) {
+                sprint.personas.push(persona);
+            } else if (!Sprints[0].personas.includes(persona) && item.id_sprint==="") {
+                Sprints[0].personas.push(persona);
             }
         
         }
     });
+
+    Proyectos[0].personas.pop();
+    Sprints[0].personas.pop();
 }
 
 function show_project_tasks(project_id) {
-    let project = Proyectos.find(proj => proj.id === project_id);
+    let project = Sprints.find(proj => proj.id === project_id);
     let project_detail = document.querySelector('.project-detail');
     let header = document.createElement('h1');
     header.textContent = project.nombre;
-    let summary = document.createElement('p');
-    summary.textContent = project.resumen;
-
-    project_detail.innerHTML = '';
-    project_detail.appendChild(header);
-    project_detail.appendChild(summary);
-
-
+    
+    if (project.id == "Project-0"){
+        let summary = document.createElement('p');
+        summary.textContent = "Sprint para guardar tareas sin sprint relacionado";
+        project_detail.innerHTML = '';
+        project_detail.appendChild(header);
+        project_detail.appendChild(summary);
+    }else{
+        let summary = document.createElement('p');
+        summary.textContent = "Responsable: "+project.responsable;
+        let summary2 = document.createElement('p');
+        summary2.textContent = "Estado: "+project.estado;
+        let summary4 = document.createElement('p');
+        summary4.textContent = "Fecha: "+project.fecha_inicio+" - "+project.fecha_fin;
+        project_detail.innerHTML = '';
+        project_detail.appendChild(header);
+        project_detail.appendChild(summary);
+        project_detail.appendChild(summary2);
+        project_detail.appendChild(summary4);
+        
+    }
+    
     let personas = [...new Set(project.personas)];
+
     personas.forEach(persona => {
         let sectionTemplate = document.getElementById('tem-task-section');
         let sectionItem = sectionTemplate.content.cloneNode(true);
@@ -105,20 +159,24 @@ function show_project_tasks(project_id) {
                 task.id = tarea.id;
                 checkbox.id = tarea.id;
                 checkbox.name = tarea.id;
+                checkbox.disabled = true;
                 label.setAttribute('for', tarea.id);
                 label.textContent = tarea.nombre;
-                status.textContent = tarea.estado;
-                priority.textContent = tarea.prioridad;
-
-                if (tarea.prioridad === 'alta') {
-                    priority.classList.add('tag-danger');
-                } else if (tarea.prioridad === 'media') {
-                    priority.classList.add('tag-info');
-                }
-
+                status.textContent = "Consultar";
+                
+                priority.textContent = "Editar";
+                priority.classList.add('tag-info');
+                editButton.classList.add('tag-danger');
+                
                 editButton.id = `edit-${tarea.id}`;
-                editButton.addEventListener('click', () => edit_task(tarea.id));
+                editButton.addEventListener('click', () => delete_task(tarea.nombre));
+
+                status.addEventListener('click', () => read_task(tarea.id));
+                priority.addEventListener('click', () => edit_task(tarea.id));
+
                 taskList.appendChild(taskItem);
+
+                
             }
         });
 
@@ -140,14 +198,27 @@ function show_project_tasks(project_id) {
             let task = taskItem.querySelector('.task-list__item');
             let checkbox = task.querySelector('.form-check-input');
             let label = task.querySelector('.form-check-label');
-            let status = task.querySelector('.tag');
+            let status = task.querySelector('.tag-status');
+            let priority = task.querySelector('.tag-priority');
+            let editButton = task.querySelector('.tag-edit');
 
             task.id = tarea.id;
             checkbox.id = tarea.id;
             checkbox.name = tarea.id;
+            checkbox.disabled = true;
             label.setAttribute('for', tarea.id);
             label.textContent = tarea.nombre;
-            status.textContent = tarea.estado;
+            status.textContent = "Consultar";
+            
+            priority.textContent = "Editar";
+            priority.classList.add('tag-info');
+            editButton.classList.add('tag-danger');
+            
+            editButton.id = `edit-${tarea.id}`;
+            editButton.addEventListener('click', () => delete_task(tarea.id));
+
+            status.addEventListener('click', () => read_task(tarea.id));
+            priority.addEventListener('click', () => edit_task(tarea.id));
             unassignedTaskList.appendChild(taskItem);
         });
     } else {
@@ -159,12 +230,12 @@ function show_project_tasks(project_id) {
 
 function show_project_blocks() {
     
-    Proyectos.forEach((project, index) => {
+    Sprints.forEach((project, index) => {
         let template = document.getElementById('tem-project-list-item');
         let projectItem = template.content.cloneNode(true);
         let projectBlock = projectItem.querySelector('.project-list__item');
         projectBlock.id = project.id;
-        projectBlock.querySelector('.project-name').textContent = project.nombre;
+        projectBlock.querySelector('.project-name').textContent =project.nombre;
         projectBlock.classList.add(get_random_gradient());
         // projectBlock.querySelector('.project-summary').textContent = item.resumen;
         // projectBlock.querySelector('.project-dates').textContent = `${item.fecha_inicio} - ${item.fecha_fin}`;
@@ -185,44 +256,47 @@ function edit_task(task_id) {
 
     let popupContent = `
         <div class="popup-content">
-        <form action = "editarTarea" method = post
-            <label>Nombre: <input type="text" id="edit-task-name" value="${taskData.nombre}"></label>
-            <label>Persona: 
-                <select id="edit-task-persona">
-                    ${Personas.map(persona => `<option value="${persona}" ${taskData.persona.includes(persona) ? 'selected' : ''}>${persona}</option>`).join('')}
-                </select>
-                <button class="icon" id="edit-persona-btn"><img class="icon" src="static/edit.png" alt="edit"></button>
+        <form action = "/EditarTarea/" method = "POST">
+            <input type="hidden" name="id" value="${task_id}">
+            <input type="hidden" name="nombre_sprint" value="${task_id}">
+            <label>Nombre: <input type="text" name="nombre_tarea" value="${taskData.nombre}"></label>
+            <label>Persona: <input type="text" name="nombre_persona" value="${taskData.persona}">
+                <button class="icon" id="edit-persona-btn"><img class="icon" src="/static/edit.png" alt="edit"></button>
             </label>
-            <label>Proyecto: 
-                <select id="edit-task-proyecto">
-                    ${Proyectos.map(proj => `<option value="${proj.id}" ${proj.id === taskData.id.split('-')[0] ? 'selected' : ''}>${proj.nombre}</option>`).join('')}
-                </select>
-                <button class="icon" id="edit-proyecto-btn"><img class="icon" src="static/edit.png" alt="edit"></button>
-            </label>
-            <label>Fecha Inicio: <input type="date" id="edit-task-inicio" value="${taskData.inicio}"></label>
-            <label>Fecha Fin: <input type="date" id="edit-task-fin" value="${taskData.termino}"></label>
-            <label>Prioridad: 
-                <select id="edit-task-prioridad">
-                    <option value="alta" ${taskData.prioridad === 'alta' ? 'selected' : ''}>Alta</option>
-                    <option value="media" ${taskData.prioridad === 'media' ? 'selected' : ''}>Media</option>
-                    <option value="baja" ${taskData.prioridad === 'baja' ? 'selected' : ''}>Baja</option>
+            <label>Proyecto: <select name="nombre_proyecto">
+                    ${Proyectos.map(proj => `<option value="${proj.nombre}" ${proj.id === taskData.proyecto ? 'selected' : 'true'}>${proj.nombre}</option>`).join('')}
                 </select>
             </label>
-            <label>Estado: 
-                <select id="edit-task-estado">
-                    <option value="pendiente" ${taskData.estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
-                    <option value="completado" ${taskData.estado === 'completado' ? 'selected' : ''}>Completado</option>
+            <label>Sprint: <select name="nombre_sprint">
+                    ${Sprints.map(proj => `<option value="${proj.nombre}" ${proj.id === taskData.sprint ? 'selected' : 'true'}>${proj.nombre}</option>`).join('')}
                 </select>
             </label>
-            <button id="save-task-btn">Guardar</button>
-            <button id="delete-task-btn">Eliminar</button>
-            <button id="cancel-task-btn">Cancelar</button>
+            <label>Fecha Inicio: <input type="text" name="fecha_inicio" value="${taskData.inicio}"></label>
+            <label>Fecha Fin: <input type="text" name="fecha_fin" value="${taskData.termino}"></label>
+            <label>Prioridad: <select name="prioridad">
+                    <option value="alta" ${taskData.prioridad === 'alta' ? 'selected' : 'true'}>Alta</option>
+                    <option value="media" ${taskData.prioridad === 'media' ? 'selected' : 'true'}>Media</option>
+                    <option value="baja" ${taskData.prioridad === 'baja' ? 'selected' : 'true'}>Baja</option>
+                </select>
+            </label>
+            <label>Estado: <select name="estado">
+                    <option value="en curso" ${taskData.estado === 'en curso' ? 'selected' : ''}>En curso</option>
+                    <option value="hecho" ${taskData.estado === 'hecho' ? 'selected' : ''}>Hecho</option>
+                    <option value="sin empezar" ${taskData.estado === 'sin empezar' ? 'selected' : ''}>Hecho</option>
+                </select>
+            </label>
+            <label>Resumen: <input type="text" name="resumen" value="${taskData.resumen}"></label>
+            </label>
+            <button type="submit">Guardar</button>
+        </form>
+        <button name="cancel-task-btn">Cancelar</button>
+
         </div>
     `;
 
     let popup = new Popup({
         content: popupContent, 
-        width: '400px',
+        width: '60%',
         height: 'auto',
         title: 'Editar tarea',
         fontSizeMultiplier: 0.8
@@ -230,55 +304,61 @@ function edit_task(task_id) {
 
     popup.show();
 
-    document.getElementById('edit-persona-btn').addEventListener('click', () => {
-        let personaInput = document.createElement('input');
-        personaInput.type = 'text';
-        personaInput.id = 'edit-task-persona';
-        document.querySelector('#edit-task-persona').replaceWith(personaInput);
-    });
+    const buttons = document.getElementsByName('cancel-task-btn');
 
-    document.getElementById('edit-proyecto-btn').addEventListener('click', () => {
-        let proyectoInput = document.createElement('input');
-        proyectoInput.type = 'text';
-        proyectoInput.id = 'edit-task-proyecto';
-        document.querySelector('#edit-task-proyecto').replaceWith(proyectoInput);
-    });
-
-    document.getElementById('save-task-btn').addEventListener('click', () => {
-        let newName = document.getElementById('edit-task-name').value;
-        let newPersona = document.getElementById('edit-task-persona').value;
-        let newProyecto = document.getElementById('edit-task-proyecto').value;
-        let newInicio = document.getElementById('edit-task-inicio').value;
-        let newFin = document.getElementById('edit-task-fin').value;
-        let newPrioridad = document.getElementById('edit-task-prioridad').value;
-        let newEstado = document.getElementById('edit-task-estado').value;
-
-        let currentProject = Proyectos.find(proj => proj.id === taskData.id.split('-')[0]);
-        let newProject = Proyectos.find(proj => proj.id === newProyecto) || new Proyecto(`Project-${Proyectos.length}`, newProyecto, '', newInicio, newFin);
-
-        if (!Proyectos.includes(newProject)) {
-            Proyectos.push(newProject);
-        }
-
-        currentProject.tareas = currentProject.tareas.filter(tarea => tarea.id !== task_id);
-        newProject.tareas.push(new Tarea(task_id, newName, newPersona, newInicio, newFin, newPrioridad, newEstado));
-
-        popup.hide();
-        show_project_tasks(active_project_id);
-    });
-
-    document.getElementById('delete-task-btn').addEventListener('click', () => {
-        if (confirm('¿Estás seguro de que deseas eliminar esta tarea?')) {
-            let currentProject = Proyectos.find(proj => proj.id === taskData.id.split('-')[0]);
-            currentProject.tareas = currentProject.tareas.filter(tarea => tarea.id !== task_id);
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
             popup.hide();
-            show_project_tasks(active_project_id);
-        }
+        });
+    });
+}
+
+function read_task(task_id) {
+    
+    let task = document.getElementById(task_id);
+    let taskData = Proyectos.flatMap(proj => proj.tareas).find(tarea => tarea.id === task_id);
+    let project = Proyectos.find(proj => proj.id === taskData.id_proyecto) || Proyectos[0];
+    let sprint = Sprints.find(spri => spri.id === taskData.id_sprint) || Sprints[0];
+    let popupContent = `
+        <div class="popup-content">
+            <h2>Detalles de la Tarea</h2>
+            <strong>Nombre:</strong> ${taskData.nombre}
+            <strong>Persona:</strong> ${taskData.persona}
+            <strong>Proyecto:</strong> ${project.nombre}
+            <strong>Sprint:</strong> ${sprint.nombre}
+            <strong>Fecha Inicio:</strong> ${taskData.inicio}
+            <strong>Fecha Fin:</strong> ${taskData.termino}
+            <strong>Prioridad:</strong> ${taskData.prioridad}
+            <strong>Estado:</strong> ${taskData.estado}
+            <strong>Resumen:</strong> ${taskData.resumen}
+            <button class ="regresar-task-btn-cla" name="regresar-task-btn">Regresar</button>
+
+        </div>
+    `;
+
+    let popup = new Popup({
+        content: popupContent, 
+        width: '60%',
+        height: 'auto',
+        title: 'Editar tarea',
+        fontSizeMultiplier: 0.8
     });
 
-    document.getElementById('cancel-task-btn').addEventListener('click', () => {
-        popup.hide();
+    popup.show();
+
+    const buttons = document.getElementsByName('regresar-task-btn');
+
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            popup.hide();
+        });
     });
+}
+
+function delete_task(task_id){
+    if (confirm('¿Estás seguro de que deseas eliminar esta tarea?')) {
+        location.href =`/EliminarTarea/?nombre_tarea=${task_id}`
+    }
 }
 
 
@@ -333,21 +413,6 @@ function set_active(project_block) {
     show_project_tasks(active_project_id);
 }
 
-function change_status(task_id) {
-    var task = document.getElementById(task_id);
-    var checkbox = task.querySelector('.form-check-input');
-    var status = task.querySelector('.tag-status');
-
-    if (checkbox.checked) {
-        status.textContent = "completado";
-        status.classList.remove('tag-info');
-        status.classList.add('tag-success');
-    } else {
-        status.textContent = "pendiente";
-        status.classList.remove('tag-success');
-        status.classList.add('tag-info');
-    }
-}
 
 function edit_task_details(task_id) {
     //TODO: Implementar la edición de tareas
