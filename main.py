@@ -308,7 +308,7 @@ def CrearTarea(request: Request, nombre_tarea: str = Form(...), estado: str = Fo
         return templates.TemplateResponse("sprint.html", {"request": request, "todo": todo_json, "a":False})
 
 @app.post("/EditarTarea/")
-def EditarTarea(nombre_tarea: str = Form(...), estado: str = Form(...), prioridad: str = Form(...), nombre_persona: str = Form(...),
+def EditarTarea(request:Request, nombre_tarea: str = Form(...), estado: str = Form(...), prioridad: str = Form(...), nombre_persona: str = Form(...), tipo:str=Form(...),
                 resumen: str = Form(...), fecha_fin: str = Form(...), fecha_inicio: str = Form(...), nombre_proyecto: str = Form(...), nombre_sprint: str = Form(...)):
     datos = {
         "nombre_tarea": nombre_tarea,
@@ -321,10 +321,20 @@ def EditarTarea(nombre_tarea: str = Form(...), estado: str = Form(...), priorida
         "nombre_proyecto": nombre_proyecto,
         "nombre_sprint": nombre_sprint
     }
-    return datos
     respuesta = cn.modificar_tarea(datos)
-    return RedirectResponse(url="/", status_code=303)
-
+    if respuesta.status_code==200 and tipo=="proyecto":
+        todo = obtenerTodo()
+        todo_json = json.dumps(todo, ensure_ascii=False)
+        return templates.TemplateResponse("proyectos.html", {"request": request, "todo": todo_json, "a":True})
+    elif respuesta.status_code==200 and tipo=="sprint":
+        todo = obtenerTodo()
+        todo_json = json.dumps(todo, ensure_ascii=False)
+        return templates.TemplateResponse("sprint.html", {"request": request, "todo": todo_json, "a":True})
+    elif respuesta.status_code!=200 and tipo =="proyecto":
+        return templates.TemplateResponse("proyecto.html", {"request": request, "todo": todo_json, "a":False})
+    elif respuesta.status_code!=200 and tipo =="sprint":
+        return templates.TemplateResponse("sprint.html", {"request": request, "todo": todo_json, "a":False})
+    
 # --- Endpoint Eliminar Tarea ---
 @app.get("/EliminarTarea/")
 def EliminarTarea(nombre_tarea:str):

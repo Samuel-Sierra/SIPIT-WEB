@@ -358,6 +358,7 @@ function edit_task(task_id) {
     let taskData = Proyectos.flatMap(proj => proj.tareas).find(tarea => tarea.id === task_id);
 
     let popupContent = `<form action = "/EditarTarea/" method = "POST">
+            <input type = "hidden" name ="tipo" value="proyecto">
             <label>Nombre: <input required type="text" name="nombre_tarea" value="${taskData.nombre}"></label>
             <label>Persona: <input required type="text" name="nombre_persona" value="${taskData.persona}"></label>
             <label>Proyecto: <select required name="nombre_proyecto">
