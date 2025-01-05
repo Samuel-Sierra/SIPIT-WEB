@@ -116,8 +116,6 @@ function show_project_tasks(project_id) {
     let header = document.createElement('h1');
     header.textContent = project.nombre;
     
-
-    
     if (project.id == "Project-0"){
         let summary = document.createElement('p');
         summary.textContent = project.resumen;
@@ -575,7 +573,7 @@ function read_task(task_id) {
 
 function delete_task(task_id){
     if (confirm('¿Estás seguro de que deseas eliminar esta tarea?')) {
-        location.href =`/EliminarTarea/?nombre_tarea=${task_id}`
+        location.href =`/EliminarTarea/?nombre_tarea=${task_id}&tipo=proyecto}`
     }
 }
 

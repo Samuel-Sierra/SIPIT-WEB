@@ -293,6 +293,7 @@ def CrearTarea(request: Request, nombre_tarea: str = Form(...), estado: str = Fo
         "nombre_sprint": nombre_sprint
     }
 
+    global todo_json
     respuesta = cn.crear_tarea(datos)
     if respuesta.status_code==200 and tipo=="proyecto":
         todo = obtenerTodo()
@@ -321,6 +322,7 @@ def EditarTarea(request:Request, nombre_tarea: str = Form(...), estado: str = Fo
         "nombre_proyecto": nombre_proyecto,
         "nombre_sprint": nombre_sprint
     }
+    global todo_json
     respuesta = cn.modificar_tarea(datos)
     if respuesta.status_code==200 and tipo=="proyecto":
         todo = obtenerTodo()
@@ -337,22 +339,13 @@ def EditarTarea(request:Request, nombre_tarea: str = Form(...), estado: str = Fo
     
 # --- Endpoint Eliminar Tarea ---
 @app.get("/EliminarTarea/")
-def EliminarTarea(request:Request,nombre_tarea:str):
+def EliminarTarea(request:Request,nombre_tarea:str,tipo:str):
     try:
         respuesta = cn.eliminar_tarea(nombre_tarea)
-
-        if respuesta.status_code==200 and tipo=="proyecto":
-            todo = obtenerTodo()
-            todo_json = json.dumps(todo, ensure_ascii=False)
-            return templates.TemplateResponse("proyectos.html", {"request": request, "todo": todo_json, "a":True})
-        elif respuesta.status_code==200 and tipo=="sprint":
-            todo = obtenerTodo()
-            todo_json = json.dumps(todo, ensure_ascii=False)
-            return templates.TemplateResponse("sprint.html", {"request": request, "todo": todo_json, "a":True})
-        elif respuesta.status_code!=200 and tipo =="proyecto":
-            return templates.TemplateResponse("proyecto.html", {"request": request, "todo": todo_json, "a":False})
-        elif respuesta.status_code!=200 and tipo =="sprint":
-            return templates.TemplateResponse("sprint.html", {"request": request, "todo": todo_json, "a":False})
+        global todo_json
+        todo = obtenerTodo()
+        todo_json = json.dumps(todo, ensure_ascii=False)
+        return templates.TemplateResponse("proyectos.html", {"request": request, "todo": todo_json})
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
 
@@ -369,7 +362,7 @@ def CrearProyecto(request: Request, nombre_proyecto: str = Form(...), fecha_inic
             "nombre_persona": nombre_persona,
             "estado": estado
         }
-
+        global todo_json
         respuesta = cn.crear_proyecto(datos)
 
         if respuesta.status_code==200:
@@ -396,7 +389,7 @@ def EditarProyecto(request:Request, nombre_proyecto: str = Form(...), fecha_fin:
         "prioridad": prioridad,
         "estado": estado
     }
-
+    global todo_json
     respuesta = cn.modificar_proyecto(datos)
     if respuesta.status_code==200:
         todo = obtenerTodo()
@@ -421,6 +414,67 @@ def EliminarProyecto(request:Request, nombre_proyecto:str):
             return JSONResponse(content=content, status_code=respuesta.status_code)
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
+
+
+# --- Endpoint Crear Proyecto ---
+@app.post("/CrearSprint/")
+def CrearSprint(request: Request, nombre_sprint: str = Form(...), fecha_inicio: str = Form(...), estado: str = Form(...),
+    fecha_fin: str = Form(...)):
+    try:
+        datos = {
+            "nombre": nombre_sprint,
+            "fecha_inicio": fecha_inicio,
+            "fecha_fin": fecha_fin,
+            "estado": estado
+        }
+
+        respuesta = cn.crear_sprint(datos)
+        global todo_json
+        if respuesta.status_code==200:
+            todo = obtenerTodo()
+            todo_json = json.dumps(todo, ensure_ascii=False)
+            return templates.TemplateResponse("sprint.html", {"request": request, "todo": todo_json, "a":True})
+        else:
+            content={"respuesta":respuesta.status_code}
+            return JSONResponse(content=content, status_code=respuesta.status_code)
+    except Exception as e:
+        return f"Excepción al realizar la solicitud: {e}"
+
+# --- Endpoint Editar Proyecto ---
+@app.post("/EditarSprint/")
+def EditarSprint(request:Request, nombre_sprint: str = Form(...), fecha_fin: str = Form(...),fecha_inicio: str = Form(...), 
+     estado: str = Form(...)):
+
+    datos = {
+        "nombre_sprint": nombre_sprint,
+        "fecha_inicio": fecha_inicio,
+        "fecha_fin": fecha_fin,
+        "estado": estado
+    }
+    global todo_json
+    respuesta = cn.modificar_proyecto(datos)
+    if respuesta.status_code==200:
+        todo = obtenerTodo()
+        todo_json = json.dumps(todo, ensure_ascii=False)
+        return templates.TemplateResponse("sprint.html", {"request": request, "todo": todo_json, "a":True})
+    else:
+        content={"respuesta":respuesta.status_code}
+        return JSONResponse(content=content, status_code=respuesta.status_code)
+
+# --- Endpoint Eliminar Proyecto ---
+@app.get("/EliminarSprint/")
+def EliminarSprint(request:Request, nombre_proyecto:str):
+    try:
+        respuesta = cn.eliminar_sprint(nombre_proyecto)
+
+
+        todo = obtenerTodo()
+        todo_json = json.dumps(todo, ensure_ascii=False)
+        return templates.TemplateResponse("sprint.html", {"request": request, "todo": todo_json, "a":True})
+
+    except Exception as e:
+        return f"Excepción al realizar la solicitud: {e}"
+
 
 
 if __name__ == "__main__":

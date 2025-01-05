@@ -12,6 +12,14 @@
   <script src="https://cdn.jsdelivr.net/npm/@simondmc/popup-js@1.4.3/popup.min.js"></script>
   <script>
     // Inyectar la variable 'todo' desde Python a JS
+     // Inyectar la variable 'todo' desde Python a JS
+     {% if a is not none and a == true %}
+        alert("Petición concretada");
+    {% elif a is not none and a == false  %}
+        alert("Ocurrió un error, la petición no se concretó");
+    {% else %}
+        console.log("cuak");
+    {% endif %}
     const Datos_incompletos = {{ todo | safe }};
     console.log("Datos cargados:", Datos_incompletos);
 </script>
@@ -77,6 +85,7 @@
         <header class="welcome-banner">
             <h1>Bienvenido a MinuteMate</h1>
             <p>Puedes ver los proyectos creados en Notion, si seleccionas alguno se desplegarán las tareas relacionadas del lado derecho. </p>
+            <button onclick="create_project()">Crear Sprint</button>
         </header>
         <section class="section" id="projects">
             <div class="section-title">

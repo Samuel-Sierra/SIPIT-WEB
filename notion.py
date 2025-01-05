@@ -323,8 +323,8 @@ class ComandosNotion:
         datos_ant = self.extraer_datos_proyecto(aux)
         modificar = data
         properties = {}
-        if "nombre_nuevo" in modificar:
-            if datos_ant["nombre_proyecto"] != modificar["nombre_nuevo"]:
+        if "nombre_proyecto" in modificar:
+            if datos_ant["nombre_proyecto"] != modificar["nombre_proyecto"]:
                 properties["Nombre del proyecto"] = {"title": [{"text": {"content": modificar["nombre_nuevo"]}}]}
         if "estado" in modificar:
             if datos_ant["estado"] != modificar["estado"]:
@@ -367,13 +367,14 @@ class ComandosNotion:
         aux = datos_previos.get("properties")
         datos_ant = {
             "nombre_tarea": aux.get("Nombre de la tarea", {}).get("title", [{}])[0].get("plain_text", ""),
-            "estado": aux.get("Estado", {}).get("status", {}).get("name", ""),
-            "fecha_inicio": aux.get("Fecha", {}).get("date", {}).get("start", ""),
-            "fecha_fin": aux.get("Fecha", {}).get("date", {}).get("end", ""),
-            "prioridad": aux.get("Prioridad", {}).get("select", {}).get("name", ""),
-            "nombre_proyecto": aux.get("Nombre del Proyecto", {}).get("relation", [{}])[0].get("id", ""),
-            "nombre_sprint": aux.get("Sprint", {}).get("relation", [{}])[0].get("id", ""),
-            "resumen": aux.get("Descripción", {}).get("rich_text", [{}])[0].get("plain_text", "")
+            "estado": aux.get("Estado", {}).get("status", {}).get("name", "") if aux.get("Estado", {}).get("status", []) else "",
+            "fecha_inicio": aux.get("Fecha", {}).get("date", {}).get("start", "") if aux.get("Fecha", {}).get("date", []) else "",
+            "fecha_fin": aux.get("Fecha", {}).get("date", {}).get("end", "")  if aux.get("Fecha", {}).get("date", []) else "",
+            "prioridad": aux.get("Prioridad", {}).get("select", {}).get("name", "") if aux.get("Prioridad", {}).get("select", []) else "",
+            "nombre_proyecto": aux.get("Nombre del Proyecto", {}).get("relation", [{}])[0].get("id", "")if aux.get("Nombre del Proyecto", {}).get("relation", []) else "",
+            "nombre_sprint": aux.get("Sprint", {}).get("relation", [{}])[0].get("id", "") if aux.get("Sprint", {}).get("relation", []) else "" ,
+            "resumen": aux.get("Descripción", {}).get("rich_text", [{}])[0].get("plain_text", "")  if aux.get("Descripción", {}).get("rich_text", []) else ""  ,
+            "nombre_persona": aux.get("Responsable", {}).get("select", {}).get("name", "") if aux.get("Responsable", {}).get("select", []) else ""
         }
 
         properties = {}
@@ -389,11 +390,15 @@ class ComandosNotion:
                 "start": data.get("fecha_inicio", datos_ant["fecha_inicio"]),
                 "end": data.get("fecha_fin", datos_ant["fecha_fin"])
             }}
+        if "nombre_persona" in data:
+            if datos_ant["nombre_persona"] != data["nombre_persona"]:
+                properties["Responsable"] = {"select": {"name": data.get("nombre_persona")}}
+        
         if "prioridad" in data and datos_ant["prioridad"] != data["prioridad"]:
             properties["Prioridad"] = {"select": {"name": data["prioridad"]}}
-        if "nombre_proyecto" in data and datos_ant["nombre_proyecto"] != proyecto_id:
+        if datos_ant["nombre_proyecto"] != proyecto_id:
             properties["Nombre del Proyecto"] ={"relation": [{"id": proyecto_id}]}
-        if "nombre_sprint" in data and datos_ant["nombre_sprint"] != sprint_id:
+        if datos_ant["nombre_sprint"] != sprint_id:
             properties["Sprint"] ={"relation": [{"id": sprint_id}]}
         if "resumen" in data and datos_ant["resumen"] != data["resumen"]:
             properties["Descripción"] = {"rich_text": [{"text": {"content": data["resumen"]}}]}
@@ -515,10 +520,7 @@ class ComandosNotion:
             headers=self.HEADERS,
             json={"archived": True}
         )
-        if response.status_code == 200:
-            print("Tarea archivada con éxito")
-        else:
-            print(f"Error al archivar la tarea: {response.status_code} - {response.text}")
+        
 
         return response
     
@@ -639,8 +641,6 @@ class ComandosNotion:
             url = "https://api.notion.com/v1/databases/1232595bac6f8146a026d520ac1b0fed/query"
         elif tipo == "tarea":
             url = "https://api.notion.com/v1/databases/1232595bac6f812d8674d1f4e4012af9/query"
-        elif tipo == "minuta":
-            url = "https://api.notion.com/v1/databases/13f2595bac6f80c1b9e1d5d80cc7bbbe/query"
         else:
             print("Error: Tipo desconocido.")
             return None
@@ -657,8 +657,6 @@ class ComandosNotion:
                     nombre = propiedades.get("Nombre del Sprint", {}).get("title", [{}])[0].get("plain_text", "")
                 elif tipo == "tarea":
                     nombre = propiedades.get("Nombre de la tarea", {}).get("title", [{}])[0].get("plain_text", "")
-                elif tipo == "minuta":
-                    nombre = propiedades.get("Nombre", {}).get("title", [{}])[0].get("plain_text", "")
                 
                 if nombre:
                     nombres.append(nombre)

@@ -200,7 +200,7 @@ button {
 }
 
 .projects {
-  padding: 10% 10%;
+  padding: 20% 20%;
 }
 
 .welcome-banner h1 {
@@ -209,7 +209,7 @@ button {
 }
 
 .welcome-banner p {
-  font-size: 0.7rem;
+  font-size: 1rem;
   color: var(--mute-text-color);
 }
 

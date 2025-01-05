@@ -46,6 +46,8 @@ let Proyectos = [
     new Proyecto("Project-0", "Tareas sin proyecto", "Proyecto para guardar tareas sin un nombre de proyecto", "2024-12-07", "2024-12-08", "alta", "Karina")
 ];
 
+
+
 let Sprints = [
     new Sprint("Project-0", "Tareas sin sprints", "2024-12-07", "2024-12-08","Current")
 ];
@@ -132,7 +134,35 @@ function show_project_tasks(project_id) {
         project_detail.appendChild(summary);
         project_detail.appendChild(summary2);
         project_detail.appendChild(summary4);
+
+        let taskTemplate = document.getElementById('tem-task-item');
+        let taskItem = taskTemplate.content.cloneNode(true);
+        let task = taskItem.querySelector('.task-list__item');
+
+        let priority = task.querySelector('.tag-priority');
+        let editButton = task.querySelector('.tag-edit');
+        let crear = task.querySelector('.tag-status');
+
+        crear.textContent = "Crear Tarea";
+        crear.style = "width: 20%; inline-block";
+           
+        priority.textContent = "Editar Sprint";
+        priority.classList.add('tag-info');
+        priority.style = "width: 20%; inline-block";
+        editButton.textContent = "Eliminar Sprint";
+        editButton.classList.add('tag-danger');
+        editButton.style = "width: 20%; inline-block";
         
+                
+        editButton.addEventListener('click', () => delete_project(project.nombre));
+        priority.addEventListener('click', () => edit_project(project.id));
+        crear.addEventListener('click', () => create_task(project.nombre));
+
+        const project_detail2 = document.createElement('div');
+        project_detail2.appendChild(crear);
+        project_detail2.appendChild(priority);
+        project_detail2.appendChild(editButton);
+        project_detail.appendChild(project_detail2);
     }
     
     let personas = [...new Set(project.personas)];
@@ -250,6 +280,236 @@ function stop_it(event) {
     event.preventDefault();
 }
 
+
+function create_task(project_nombre) {
+
+    let popupContent = `<form action = "/CrearTarea/" method = "POST">
+            <input type = "hidden" name ="tipo" value="proyecto">
+            <label>Nombre: <input required type="text" name="nombre_tarea" ></label>
+            <label>Persona: <input required type="text" name="nombre_persona" ></label>
+            <label>Proyecto: <select required name="nombre_proyecto">
+                ${Proyectos.map(proj => `<option value="${proj.nombre}" ${proj.id === taskData.proyecto ? 'selected' : 'true'}>${proj.nombre}</option>`).join('')}</select></label>
+            <label>Sprint: <input required type="text" name="nombre_sprint" value="${project_nombre}" readonly></label>
+            <label>Fecha Inicio: <input required type="text" name="fecha_inicio"></label>
+            <label>Fecha Fin: <input required type="text" name="fecha_fin" ></label>
+            <label>Prioridad: <select required name="prioridad">
+                    <option value="alta" >Alta</option>
+                    <option value="media">Media</option>
+                    <option value="baja">Baja</option>
+                </select>
+            </label>
+            <label>Estado: <select required name="estado">
+                    <option value="en curso">En curso</option>
+                    <option value="hecho" >Hecho</option>
+                    <option value="sin empezar">Sin empezar</option>
+                </select>
+            </label>
+            <label>Resumen: 
+                <textarea id="summary-textarea" required name="resumen" style="height: 60px;"></textarea>
+                <button type="button" name="expand-resumen-btn" class="expand-btn">Expandir</button>
+            </label>
+            <button class="pop-btn-submit" type="submit">Guardar</button>
+        </form>
+    `;
+
+    let popup = new Popup({
+        content: popupContent, 
+        width: '60%',
+        height: 'auto',
+        title: 'Crear Tarea',
+        fontSizeMultiplier: 0.8
+    });
+
+    popup.show();
+
+    document.querySelector('.popup-title').style.fontSize = '15px';
+
+
+    const buttons2 = document.getElementsByName('expand-resumen-btn');
+    const textareas = document.getElementsByName('resumen');
+
+    for (let i = 0; i < buttons2.length; i++) {
+        buttons2[i].addEventListener('click', () => {
+            let textarea = textareas[i];
+            let butto = buttons2[i];
+            if (textarea.classList.contains('expanded')) {
+                textarea.classList.remove('expanded');
+                textarea.style.height = '60px'; // Altura contraída
+                butto.textContent = 'Expandir'; // Texto del botón
+            } else {
+                textarea.classList.add('expanded');
+                textarea.style.height = '150px'; // Altura expandida
+                butto.textContent = 'Contraer'; // Texto del botón
+            }
+        });
+    }
+
+}
+
+
+
+function edit_task(task_id) {
+    let taskData = Proyectos.flatMap(proj => proj.tareas).find(tarea => tarea.id === task_id);
+
+    let popupContent = `<form action = "/EditarTarea/" method = "POST">
+            <input type = "hidden" name ="tipo" value="proyecto">
+            <label>Nombre: <input required type="text" name="nombre_tarea" value="${taskData.nombre}"></label>
+            <label>Persona: <input required type="text" name="nombre_persona" value="${taskData.persona}"></label>
+            <label>Proyecto: <select required name="nombre_proyecto">
+                ${Proyectos.map(proj => `<option value="${proj.nombre}" ${proj.id === taskData.proyecto ? 'selected' : 'true'}>${proj.nombre}</option>`).join('')}</select></label>
+            <label>Sprint: <select required name="nombre_sprint">
+                ${Sprints.map(proj => `<option value="${proj.nombre}" ${proj.id === taskData.sprint ? 'selected' : 'true'}>${proj.nombre}</option>`).join('')}</select></label>
+            <label>Fecha Inicio: <input required type="text" name="fecha_inicio" value="${taskData.inicio}"></label>
+            <label>Fecha Fin: <input required type="text" name="fecha_fin" value="${taskData.termino}"></label>
+            <label>Prioridad: <select required name="prioridad">
+                    <option value="alta" ${taskData.prioridad === 'alta' ? 'selected' : 'true'}>Alta</option>
+                    <option value="media" ${taskData.prioridad === 'media' ? 'selected' : 'true'}>Media</option>
+                    <option value="baja" ${taskData.prioridad === 'baja' ? 'selected' : 'true'}>Baja</option>
+                </select>
+            </label>
+            <label>Estado: <select required name="estado">
+                    <option value="en curso" ${taskData.estado === 'en curso' ? 'selected' : 'true'}>En curso</option>
+                    <option value="hecho" ${taskData.estado === 'hecho' ? 'selected' : 'true'}>Hecho</option>
+                    <option value="sin empezar" ${taskData.estado === 'sin empezar' ? 'selected' : 'true'}>Sin empezar</option>
+                </select>
+            </label>
+            <label>Resumen: <textarea required id="summary-textarea" name="resumen" style="height: 60px;">${taskData.resumen}</textarea>
+                <button type="button" name="expand-resumen-btn" class="expand-btn">Expandir</button>
+            </label>
+            <button class="pop-btn-submit" type="submit">Guardar</button>
+        </form>
+    `;
+
+    let popup = new Popup({
+        content: popupContent, 
+        width: '60%',
+        height: 'auto',
+        title: 'Editar tarea',
+        fontSizeMultiplier: 0.8
+    });
+
+    popup.show();
+
+    const buttons2 = document.getElementsByName('expand-resumen-btn');
+    const textareas = document.getElementsByName('resumen');
+
+    for (let i = 0; i < buttons2.length; i++) {
+        buttons2[i].addEventListener('click', () => {
+            let textarea = textareas[i];
+            let butto = buttons2[i];
+            if (textarea.classList.contains('expanded')) {
+                textarea.classList.remove('expanded');
+                textarea.style.height = '60px'; // Altura contraída
+                butto.textContent = 'Expandir'; // Texto del botón
+            } else {
+                textarea.classList.add('expanded');
+                textarea.style.height = '150px'; // Altura expandida
+                butto.textContent = 'Contraer'; // Texto del botón
+            }
+        });
+    }
+}
+
+function create_project() {
+
+    let popupContent = `<form action = "/CrearSprint/" method = "POST">
+            <label>Nombre: <input required type="text" name="nombre_sprint" ></label>
+            <label>Fecha Inicio: <input required type="text" name="fecha_inicio" ></label>
+            <label>Fecha Fin: <input required type="text" name="fecha_fin" ></label>
+            <label>Estado: <select required name="estado">
+                    <option value="Current" >En curso</option>
+                    <option value="Next" }>Hecho</option>
+                    <option value="Future" >Atraso</option>
+                    <option value="Past">Planificación</option>
+                    <option value="Last">En pausa</option>
+                </select>
+            </label>
+            <button class="pop-btn-submit" type="submit">Guardar</button>
+        </form>
+    `;
+
+    let popup = new Popup({
+        content: popupContent, 
+        width: '60%',
+        height: 'auto',
+        title: 'Crear Sprint',
+        fontSizeMultiplier: 0.8
+    });
+
+    popup.show();
+
+    const buttons2 = document.getElementsByName('expand-resumen-btn');
+    const textareas = document.getElementsByName('resumen');
+
+    for (let i = 0; i < buttons2.length; i++) {
+        buttons2[i].addEventListener('click', () => {
+            let textarea = textareas[i];
+            let butto = buttons2[i];
+            if (textarea.classList.contains('expanded')) {
+                textarea.classList.remove('expanded');
+                textarea.style.height = '60px'; // Altura contraída
+                butto.textContent = 'Expandir'; // Texto del botón
+            } else {
+                textarea.classList.add('expanded');
+                textarea.style.height = '150px'; // Altura expandida
+                butto.textContent = 'Contraer'; // Texto del botón
+            }
+        });
+    }
+    
+}
+
+function edit_project(project_name) {
+
+    let projectData = Proyectos.find(proj => proj.id === project_name);
+
+    let popupContent = `<form action = "/EditarSprint/" method = "POST">
+            <label>Nombre: <input required type="text" name="nombre_sprint" value="${projectData.nombre}"></label>
+            <label>Fecha Inicio: <input required type="text" name="fecha_inicio" value="${projectData.fecha_inicio}"></label>
+            <label>Fecha Fin: <input required type="text" name="fecha_fin" value="${projectData.fecha_fin}"></label>
+            <label>Estado: <select required name="estado">
+                    <option value="Current" ${projectData.estado === 'Current' ? 'selected' : 'true'}>En curso</option>
+                    <option value="Next" ${projectData.estado === 'Next' ? 'selected' : 'true'}>Next</option>
+                    <option value="Future" ${projectData.estado === 'Future' ? 'selected' : 'true'}>Future</option>
+                    <option value="Past" ${projectData.estado === 'Past' ? 'selected' : 'true'}>Past</option>
+                    <option value="Last" ${projectData.estado === 'Last' ? 'selected' : 'true'}>Last</option>
+                </select>
+            </label>
+            <button class="pop-btn-submit" type="submit">Guardar</button>
+        </form>
+    `;
+
+    let popup = new Popup({
+        content: popupContent, 
+        width: '60%',
+        height: 'auto',
+        title: 'Editar Proyecto',
+        fontSizeMultiplier: 0.8
+    });
+
+    popup.show();
+
+    const buttons2 = document.getElementsByName('expand-resumen-btn');
+    const textareas = document.getElementsByName('resumen');
+
+    for (let i = 0; i < buttons2.length; i++) {
+        buttons2[i].addEventListener('click', () => {
+            let textarea = textareas[i];
+            let butto = buttons2[i];
+            if (textarea.classList.contains('expanded')) {
+                textarea.classList.remove('expanded');
+                textarea.style.height = '60px'; // Altura contraída
+                butto.textContent = 'Expandir'; // Texto del botón
+            } else {
+                textarea.classList.add('expanded');
+                textarea.style.height = '150px'; // Altura expandida
+                butto.textContent = 'Contraer'; // Texto del botón
+            }
+        });
+    }
+    
+}
+
 function edit_task(task_id) {
     let task = document.getElementById(task_id);
     let taskData = Proyectos.flatMap(proj => proj.tareas).find(tarea => tarea.id === task_id);
@@ -358,6 +618,12 @@ function read_task(task_id) {
 function delete_task(task_id){
     if (confirm('¿Estás seguro de que deseas eliminar esta tarea?')) {
         location.href =`/EliminarTarea/?nombre_tarea=${task_id}`
+    }
+}
+
+function delete_project(task_id){
+    if (confirm('¿Estás seguro de que deseas eliminar este sprint?')) {
+        location.href =`/EliminarSprint/?nombre_proyecto=${task_id}`
     }
 }
 
