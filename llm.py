@@ -201,8 +201,13 @@ def generarJsonComando(content):
         if datos.get("accion") == "consultar":
             respuesta, n = switch_comandos(datos)
             return respuesta, n
-        else:
-            return JSONResponse(content="", status_code=206), "datos incompletos"
+        elif datos.get("accion") == "crear":
+            if datos.get("resumen") == "":
+                datos["resumen"]="Sin resumen"
+            elif datos.get("nombre_tarea") == "":
+                datos["nombre_tarea"]="Sin nombre de tarea"
+            else:
+                return JSONResponse(content="", status_code=206), "datos incompletos"
 
 def generarJsonMinuta(content):
 
