@@ -148,13 +148,9 @@ function show_project_tasks(project_id) {
         let editButton = task.querySelector('.tag-edit');
         let crear = task.querySelector('.tag-status');
 
-        let creartarea = document.createElement('button');
-
-        crear.textContent = "Crear Proyecto";
+        crear.textContent = "Crear Tarea";
         crear.style = "width: 20%; inline-block";
-        creartarea.textContent = "Crear Tarea";
-        creartarea.style = "width: 20%; inline-block";
-                
+           
         priority.textContent = "Editar Proyecto";
         priority.classList.add('tag-info');
         priority.style = "width: 20%; inline-block";
@@ -165,17 +161,14 @@ function show_project_tasks(project_id) {
                 
         editButton.addEventListener('click', () => delete_project(project.nombre));
         priority.addEventListener('click', () => edit_project(project.id));
-        crear.addEventListener('click', () => create_project());
-        creartarea.addEventListener('click', () => create_task(project.nombre));
+        crear.addEventListener('click', () => create_task(project.nombre));
 
         const project_detail2 = document.createElement('div');
         project_detail2.appendChild(crear);
         project_detail2.appendChild(priority);
         project_detail2.appendChild(editButton);
-        project_detail2.appendChild(creartarea);
         project_detail.appendChild(project_detail2);
 
-        
     }
     
 
@@ -365,6 +358,7 @@ function edit_task(task_id) {
     let taskData = Proyectos.flatMap(proj => proj.tareas).find(tarea => tarea.id === task_id);
 
     let popupContent = `<form action = "/EditarTarea/" method = "POST">
+            <input type = "hidden" name ="tipo" value="proyecto">
             <label>Nombre: <input required type="text" name="nombre_tarea" value="${taskData.nombre}"></label>
             <label>Persona: <input required type="text" name="nombre_persona" value="${taskData.persona}"></label>
             <label>Proyecto: <select required name="nombre_proyecto">
@@ -488,7 +482,7 @@ function edit_project(project_name) {
             <label>Persona: <input required type="text" name="nombre_persona" value="${projectData.responsable}"></label>
             <label>Fecha Inicio: <input required type="text" name="fecha_inicio" value="${projectData.fecha_inicio}"></label>
             <label>Fecha Fin: <input required type="text" name="fecha_fin" value="${projectData.fecha_fin}"></label>
-            <label>Estado: <select required  name="estado">
+            <label>Estado: <select required name="estado">
                     <option value="en curso" ${projectData.estado === 'en curso' ? 'selected' : 'true'}>En curso</option>
                     <option value="hecho" ${projectData.estado === 'hecho' ? 'selected' : 'true'}>Hecho</option>
                     <option value="atraso" ${projectData.estado === 'atraso' ? 'selected' : 'true'}>Atraso</option>
@@ -586,7 +580,7 @@ function delete_task(task_id){
 }
 
 function delete_project(task_id){
-    if (confirm('¿Estás seguro de que deseas eliminar esta tarea?')) {
+    if (confirm('¿Estás seguro de que deseas eliminar este proyecto?')) {
         location.href =`/EliminarProyecto/?nombre_proyecto=${task_id}`
     }
 }

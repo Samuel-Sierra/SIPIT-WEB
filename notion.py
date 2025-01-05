@@ -328,7 +328,7 @@ class ComandosNotion:
             if datos_ant["estado"] != modificar["estado"]:
                 properties["Estado"] = {"status": {"name": modificar["estado"]}}
         if "nombre_persona" in modificar:
-            if datos_ant["respnsable"] != modificar["nombre_persona"]:
+            if datos_ant["responsable"] != modificar["nombre_persona"]:
                 properties["Responsable"] = {"select": {"name": modificar.get("nombre_persona")}}
         if "fecha_inicio" in modificar and "fecha_fin" in modificar:
             properties["Fechas"] = {"date": {"start": modificar.get("fecha_inicio"), "end": modificar.get("fecha_fin")}}
@@ -535,12 +535,7 @@ class ComandosNotion:
             headers=self.HEADERS,
             json={"archived": True}
         )
-        if response.status_code == 200:
-            print("Proyecto archivado con éxito")
-        else:
-            print(f"Error al archivar el proyecto: {response.status_code} - {response.text}")
-
-        return response 
+        return response
     
     def eliminar_sprint(self, nombre_sprint):
         id_sprint = self.obtener_id_por_nombre(nombre_sprint, "sprint")
