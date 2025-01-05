@@ -61,32 +61,32 @@ def sprints(request: Request):
 
 def reemplazar_original(match):
     mapa_ordinal = {
-        "1.er": "primer",
-        "2.do": "segundo",
-        "3.er": "tercero",
-        "4.to": "cuarto",
-        "5.to": "quinto",
-        "6.to": "sexto",
-        "7.mo": "séptimo",
-        "8.vo": "octavo",
-        "9.no": "noveno",
-        "10.mo": "décimo",
+        "1.ᵉʳ": "primer",
+        "2.ᵈᵒ": "segundo",
+        "3.ᵉʳ": "tercero",
+        "4.ᵗᵒ": "cuarto",
+        "5.ᵗᵒ": "quinto",
+        "6.ᵗᵒ": "sexto",
+        "7.ᵐᵒ": "séptimo",
+        "8.ᵛᵒ": "octavo",
+        "9.ⁿᵒ": "noveno",
+        "10.ᵐᵒ": "décimo",
     }
 
     ordinal = match.group(0)
     return mapa_ordinal.get(ordinal, ordinal)
 
 def validar(texto):
-    pattern = re.compile(r"\b(\d{1,2})(er|do|ro|to|mo|vo|no)\b")
+    pattern = re.compile(r"\d+\.[ᵉʳᵈᵒᵗᵐᵛⁿ]+", re.UNICODE)
 
-    texto_remplazado =pattern.sub(reemplazar_original, texto)
+    texto_remplazado = pattern.sub(reemplazar_original, texto)
     return texto_remplazado
 
 
 @app.post('/comandos/')
 def comandos(texto:str):
 
-    #Aplicacion del reemplazo
+    # Aplicacion del reemplazo
     texto_reemplazado = validar(texto)
     content={"respuesta":texto}
     return JSONResponse(content=content, status_code=200)
