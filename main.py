@@ -92,11 +92,10 @@ def comandos(texto:str):
     content={"respuesta":texto}
     try:
 
-        respuesta= generarJsonComando(texto_reemplazado)
-        return JSONResponse(content=respuesta, status_code=200)
+        respuesta, n= generarJsonComando(texto_reemplazado)
         
         if respuesta.status_code == 200:
-            content={"respuesta":texto}
+            content={"respuesta":n}
             return JSONResponse(content=content, status_code=200)
         else:
             content={"respuesta":n}

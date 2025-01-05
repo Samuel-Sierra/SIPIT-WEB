@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 from config.db import get_db
 import os
 
+
 cn = ComandosNotion()
 
 fecha_hora_actual = datetime.now()
@@ -166,7 +167,7 @@ def generarJsonComando(content):
         model="gpt-4o",
         messages=[
             {"role": "system",
-            "content": f"Eres un asistente muy util y perspicaz que analiza comandos. Recuerda que la fecha de hoy es {fecha_hora_actual} en caso de no tener fecha de inicio asume que empieza en este momento, lee detalladamente el comando, si menciona alguna tarea devuelve un diccionario JSON con el formato: {{'tipo': 'tarea','accion': 'valor','nombre_proyecto': 'valor', 'nombre_tarea':'valor', 'nombre_persona': 'valor','nombre_sprint':'valor' , 'estado' : 'valor', 'fecha_inicio': 'YYYY-MM-DD', 'fecha_fin': 'YYYY-MM-DD', 'prioridad': 'valor', 'resumen': 'valor'}}, si se menciona un proyecto debes devolver un json con el siguiente formato {{'tipo':'proyecto', 'accion':'valor', 'nombre_persona':'valor', 'nombre_proyecto': 'valor','estado':'valor', 'fecha_inicio':'YYYY-MM-DD', 'fecha_fin':'YYYY-MM-DD', 'prioridad':'valor'}} si se menciona un sprint devuelve un diccionario json con el formato: {{ 'tipo':'sprint', 'accion':'valor', 'nombre' : 'valor', 'fecha_inicio' : 'YYYY-MM-DD', 'fecha_fin' : 'YYYY-MM-DD', 'estado':'valor'}}  accion indica si se desea crear, consultar o modificar; prioridad solo puede tomar los siguientes valores: baja, media y alta, el nombre de la persona en caso de tipo tarea debe ser el nombre de la persona a la que se le asigno la tarea; los valores que puede tomar en estado de tarea y proyecto son unicamente: en curso, atraso, planificación, pausa, hecho y cancelado. Para el caso de estado en sprints los valores que puede tomar son: Past, Last, Next, Future y Current. Si alguno de los valores no viene en el texto, trata de inferirlo solo con la informacion del texto, si no se puede dejalo vacío. Si en tarea no hay resumen el valor de este será: Sin resumen, es importante que no inventes ningun otro dato. únicamente devuelve el JSON, con comillas dobles, sin comentarios ni explicación ni acentos."
+            "content": f"Eres un asistente muy util y perspicaz que analiza comandos. Recuerda que la fecha de hoy es {fecha_hora_actual} en caso de no tener fecha de inicio asume que empieza en este momento, lee detalladamente el comando, si menciona alguna tarea devuelve un diccionario JSON con el formato: {{'tipo': 'tarea','accion': 'valor','nombre_proyecto': 'valor', 'nombre_tarea':'valor', 'nombre_persona': 'valor','nombre_sprint':'valor' , 'estado' : 'valor', 'fecha_inicio': 'YYYY-MM-DD', 'fecha_fin': 'YYYY-MM-DD', 'prioridad': 'valor', 'resumen': 'valor'}}, si se menciona un proyecto debes devolver un json con el siguiente formato {{'tipo':'proyecto', 'accion':'valor', 'nombre_persona':'valor', 'nombre_proyecto': 'valor','estado':'valor', 'fecha_inicio':'YYYY-MM-DD', 'fecha_fin':'YYYY-MM-DD', 'prioridad':'valor'}} si se menciona un sprint devuelve un diccionario json con el formato: {{ 'tipo':'sprint', 'accion':'valor', 'nombre' : 'valor', 'fecha_inicio' : 'YYYY-MM-DD', 'fecha_fin' : 'YYYY-MM-DD', 'estado':'valor'}}  accion indica si se desea crear, consultar o modificar; prioridad solo puede tomar los siguientes valores: baja, media y alta, el nombre de la persona en caso de tipo tarea debe ser el nombre de la persona a la que se le asigno la tarea; los valores que puede tomar en estado de tarea: en curso, sin empezar y hecho. Para el caso de estado en proyecto los valores que puede tomar son: atraso, planificación, pausa, en curso, hecho y cancelado. Para el caso de estado en sprints los valores que puede tomar son: Past, Last, Next, Future y Current. Si alguno de los valores no viene en el texto, trata de inferirlo solo con la informacion del texto, si no se puede dejalo vacío. es importante que no inventes ningun dato. únicamente devuelve el JSON, con comillas dobles, sin comentarios ni explicación ni acentos."
             },
             
             {
@@ -191,7 +192,7 @@ def generarJsonComando(content):
 
     datos = json.loads(texto)
 
-    return datos
+    
     if all(datos[key] != "" for key in datos):  # Verificar si no hay campos vacíos
         
         respuesta, n = switch_comandos(datos)
@@ -200,8 +201,18 @@ def generarJsonComando(content):
         if datos.get("accion") == "consultar":
             respuesta, n = switch_comandos(datos)
             return respuesta, n
-        else:
-            return JSONResponse(content="", status_code=206), "datos incompletos"
+        elif datos.get("accion") == "crear" and datos.get("tipo") =="tarea":
+            if datos.get("resumen") == "":
+                datos["resumen"]="Sin resumen"
+                respuesta, n = switch_comandos(datos)
+                return respuesta, n 
+            elif datos.get("nombre_tarea") == "":
+                datos["nombre_tarea"]="Sin nombre de tarea"
+                respuesta, n = switch_comandos(datos)
+                return respuesta, n 
+            else:
+                return JSONResponse(content="", status_code=206), "datos incompletos"
+
 
 def generarJsonMinuta(content):
 
