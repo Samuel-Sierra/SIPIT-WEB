@@ -301,10 +301,11 @@ def CrearTarea(request: Request, nombre_tarea: str = Form(...), estado: str = Fo
     elif respuesta.status_code==200 and tipo=="sprint":
         todo = obtenerTodo()
         todo_json = json.dumps(todo, ensure_ascii=False)
-        return templates.TemplateResponse("proyectos.html", {"request": request, "todo": todo_json, "a":True})
-    else:
-        content={"respuesta":respuesta.status_code}
-        return JSONResponse(content=content, status_code=respuesta.status_code)
+        return templates.TemplateResponse("sprint.html", {"request": request, "todo": todo_json, "a":True})
+    elif respuesta.status_code!=200 and tipo =="proyecto":
+        return templates.TemplateResponse("proyecto.html", {"request": request, "todo": todo_json, "a":False})
+    elif respuesta.status_code!=200 and tipo =="sprint":
+        return templates.TemplateResponse("sprint.html", {"request": request, "todo": todo_json, "a":False})
 
 @app.post("/EditarTarea/")
 def EditarTarea(nombre_tarea: str = Form(...), estado: str = Form(...), prioridad: str = Form(...), nombre_persona: str = Form(...),
