@@ -309,7 +309,7 @@ def CrearTarea(request: Request, nombre_tarea: str = Form(...), estado: str = Fo
 
 @app.post("/EditarTarea/")
 def EditarTarea(request:Request, nombre_tarea: str = Form(...), estado: str = Form(...), prioridad: str = Form(...), nombre_persona: str = Form(...), tipo:str=Form(...),
-                resumen: str = Form(...), fecha_fin: str = Form(...), fecha_inicio: str = Form(...), nombre_proyecto: str = Form(...), nombre_sprint: str = Form(...)):
+    resumen: str = Form(...), fecha_fin: str = Form(...), fecha_inicio: str = Form(...), nombre_proyecto: str = Form(...), nombre_sprint: str = Form(...)):
     datos = {
         "nombre_tarea": nombre_tarea,
         "nombre_persona": nombre_persona,
