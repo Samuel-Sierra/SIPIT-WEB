@@ -89,7 +89,6 @@ def comandos(texto:str):
     # Aplicacion del reemplazo
     texto_reemplazado = validar(texto)
     content={"respuesta":texto}
-    return JSONResponse(content=content, status_code=200)
     try:
 
         respuesta, n = generarJsonComando(texto_reemplazado)
@@ -102,6 +101,7 @@ def comandos(texto:str):
             return JSONResponse(content=content, status_code=respuesta.status_code)
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
+    
 
 @app.post('/minutatxt/')
 def minutatxt(texto_minuta:str):
