@@ -192,19 +192,9 @@ def generarJsonComando(content):
     datos = json.loads(texto)
 
 
-    if all(datos[key] != "" for key in datos):  # Verificar si no hay campos vacíos
-        
-        respuesta, n = switch_comandos(datos)
-        return respuesta, n 
-    else:
-        if datos.get("accion") == "consultar":
-            respuesta, n = switch_comandos(datos)
-            return respuesta, n
-        elif datos.get("tipo")=="tarea" and isinstance(datos, dict) and datos.get("resumen") == "":
-            respuesta, n = switch_comandos(datos)
-            return respuesta, n
-        else:
-            return JSONResponse(content="", status_code=206), "datos incompletos"
+    respuesta, n = switch_comandos(datos)
+    return respuesta, n 
+
 
 def generarJsonMinuta(content):
 
