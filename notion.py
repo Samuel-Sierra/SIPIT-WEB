@@ -31,6 +31,8 @@ class ComandosNotion:
     def crear_tarea(self, data):
         proyecto_id = self.obtener_id_por_nombre(data["nombre_proyecto"], "proyecto")
         sprint_id = self.obtener_id_por_nombre(data["nombre_sprint"], "sprint")
+        if data["resumen"]=="":
+            data["resumen"]="Sin resumen"
         properties = {
             "Nombre de la tarea": {
                 "title": [{"text": {"content": data["nombre_tarea"]}}]

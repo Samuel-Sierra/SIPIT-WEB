@@ -337,11 +337,24 @@ def EditarTarea(request:Request, nombre_tarea: str = Form(...), estado: str = Fo
     
 # --- Endpoint Eliminar Tarea ---
 @app.get("/EliminarTarea/")
-def EliminarTarea(nombre_tarea:str):
-    datos = {"nombre_tarea": nombre_tarea}
-    return datos
-    respuesta = cn.eliminar_tarea(datos)
-    return RedirectResponse(url="/", status_code=303)
+def EliminarTarea(request:Request,nombre_tarea:str):
+    try:
+        respuesta = cn.eliminar_tarea(nombre_tarea)
+
+        if respuesta.status_code==200 and tipo=="proyecto":
+            todo = obtenerTodo()
+            todo_json = json.dumps(todo, ensure_ascii=False)
+            return templates.TemplateResponse("proyectos.html", {"request": request, "todo": todo_json, "a":True})
+        elif respuesta.status_code==200 and tipo=="sprint":
+            todo = obtenerTodo()
+            todo_json = json.dumps(todo, ensure_ascii=False)
+            return templates.TemplateResponse("sprint.html", {"request": request, "todo": todo_json, "a":True})
+        elif respuesta.status_code!=200 and tipo =="proyecto":
+            return templates.TemplateResponse("proyecto.html", {"request": request, "todo": todo_json, "a":False})
+        elif respuesta.status_code!=200 and tipo =="sprint":
+            return templates.TemplateResponse("sprint.html", {"request": request, "todo": todo_json, "a":False})
+    except Exception as e:
+        return f"Excepción al realizar la solicitud: {e}"
 
 # --- Endpoint Crear Proyecto ---
 @app.post("/CrearProyecto/")
