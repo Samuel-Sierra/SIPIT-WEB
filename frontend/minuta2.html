@@ -31,7 +31,7 @@
     
         <h1>Tareas incompletas</h1>
         <div class="carousel">
-            <div class="carousel-track">
+
                 {% for task in combineds %}
                 <form action="/acompletar{{tipo}}/" method="POST" class="task-card">
                     {% for key, value in task.items() %}
@@ -44,8 +44,7 @@
                 </form>
                 {% endfor %}
             </div>
-            <button class="carousel-button prev-button">Anterior</button>
-            <button class="carousel-button next-button">Siguiente</button>
+
         </div>
     </article>
     
