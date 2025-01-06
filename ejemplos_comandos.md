@@ -15,9 +15,9 @@
 
 Crea un sprint llamado primer sprint con fechas del dieciséis de enero de dos mil veinticinco al veintisiete de enero de dos mil veinticinco y estado Last.
 
-Agrega un sprint llamado segundo con fechas del quince de marzo de dos mil veinticinco al veinte de marzo de dos mil veinticinco y estado Current.
+Sprint nuevo: crea un sprint llamado segundo sprint con fechas del quince de marzo de dos mil veinticinco al veinte de marzo de dos mil veinticinco y estado Current.
 
-Agrega un sprint llamado tercer sprint con fechas del veinte de diciembre de dos mil veinticinco al treinta de diciembre de dos mil veinticinco y estado Future.
+Crea un sprint llamado tercer sprint con fechas del veinte de diciembre de dos mil veinticinco al treinta de diciembre de dos mil veinticinco y estado Future.
 
 # Tareas
 
@@ -35,11 +35,12 @@ Agrega un sprint llamado tercer sprint con fechas del veinte de diciembre de dos
 - **Nombre del proyecto relacionado**: El proyecto al que pertenece la tarea.
 - **Nombre del sprint relacionado**: El sprint en el que se desarrolla la tarea.
 
-Crea una tarea llamada diseño de módulo de pagos con estado Hecho que empezó el dieciséis de enero de dos mil veinticinco y terminó el veintisiete de enero de dos mil veinticinco, asignada a Ulises, con prioridad alta, vinculada al sprint primer sprint y al proyecto Pluma.
 
-Crea una tarea llamada pruebas de rendimiento para backend con estado En curso que empezó el quince de marzo de dos mil veinticinco y termina el veinte de marzo de dos mil veinticinco, asignada a Ulises, con prioridad media, vinculada al sprint primer sprint y al proyecto plataforma de aprendizaje.
+Nueva tarea: Crea una tarea llamada casos de uso con estado Hecho que empieza el diecisiete de mayo de dos mil veinticinco y termina el veintidós de julio de dos mil veinticinco, asignada a Carlos, con prioridad media, vinculada al sprint diccionario y al proyecto sistema de gestión de reservas
 
-Agrega una tarea llamada documentación de arquitectura con estado Sin empezar que empieza el veinte de diciembre de dos mil veinticinco y termina el treinta de diciembre de dos mil veinticinco, asignada a Ulises, con prioridad baja, vinculada al sprint tercer sprint y al proyecto Horizonte.
+Tarea nueva: crea una tarea llamada documentación de arquitectura con estado Sin empezar que empieza el veinte de diciembre de dos mil veinticinco y termina el treinta de diciembre de dos mil veinticinco, asignada a Sam, con prioridad baja, vinculada al sprint segundo sprint y al proyecto sistema de gestión de reservas.
+
+Tarea nueva: crea una tarea llamada implementación de interfaz con estado en curso que empezó el dieciséis de febrero de dos mil veinticinco y termina el veinte de febrero de dos mil veinticinco asignada a ulises con prioridad media vinculada al sprint primer sprint y al proyecto plataforma de aprendizaje
 
 # Proyectos
 
@@ -61,7 +62,4 @@ Crea un proyecto llamado plataforma de aprendizaje que empieza el primero de abr
 
 Crea un proyecto llamado gestión de inventario que empieza el primero de enero de dos mil veinticinco y termina el treinta de junio de dos mil veinticinco con prioridad alta, cuyo dueño es Ulises, con estado Planificación.
 
-Crea un proyecto llamado sistema de gestión de reservas que empieza el quince de marzo de dos mil veinticinco y termina el quince de agosto de dos mil veinticinco con prioridad alta, cuyo dueño es Ulises, con estado Atraso.
-
-
-
+Crea un proyecto llamado sistema de gestión de reservas que empieza el quince de marzo de dos mil veinticinco y termina el quince de agosto de dos mil veinticinco con prioridad alta nombre de persona es Sam con estado planificación
