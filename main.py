@@ -90,6 +90,7 @@ def comandos(texto:str):
     # Aplicacion del reemplazo
     texto_reemplazado = validar(texto)
     content={"respuesta":texto}
+    return JSONResponse(content=content, status_code=200)
     try:
 
         respuesta, n= generarJsonComando(texto_reemplazado)
