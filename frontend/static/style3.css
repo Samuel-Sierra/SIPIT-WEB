@@ -1,0 +1,562 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto:400,400i,700");
+body {
+  min-height: 100vh;
+  font-size: 14px;
+  font-family: Roboto, sans-serif;
+}
+
+:root {
+  --mute-text-color: rgb(118, 121, 136);
+  --info-color-darkest: rgb(38, 42, 65);
+  --success-color-darker: rgb(90, 198, 197);
+  --success-color-lighter: rgb(224, 245, 244);
+  --info-color-darker: rgb(94, 159, 241);
+  --info-color-lighter: rgb(227, 239, 253);
+  --danger-color-darker: rgb(240, 142, 109);
+  --danger-color-lighter: rgb(253, 238, 232);
+  --secondary-color-darker: rgb(133, 145, 159);
+  --secondary-color-lighter: rgb(236, 238, 240);
+  --primary-color: rgb(54, 217, 216);
+  --purple-color: rgb(137, 79, 198);
+  --light-blue-color: rgb(213, 222, 234);
+  --primary-color2: #1f2a44; /* Color oscuro de fondo */
+  --secondary-color: #2c3e50; /* Un tono más suave para los elementos secundarios */
+  --accent-color: #3498db; /* Azul para detalles y botones */
+  --highlight-color: #e74c3c; /* Un rojo suave para destacar algo importante */
+  --text-color-light: #ecf0f1; /* Color de texto claro y suave */
+  --text-color-muted: #95a5a6;
+}
+
+.dashboard {
+  position: relative;
+  width: 1280px;
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  color: rgb(255, 255, 255);
+  background: var(--info-color-darkest);
+  border-radius: 15px;
+}
+
+.projects {
+  padding: 20% 20%; /* aqui se modifica el padding detodo*/
+}
+
+.welcome-banner h1 {
+  margin: 0;
+  font-size: 28px;
+}
+.welcome-banner p {
+  margin: 24px 0 0 0;
+  color: var(--mute-text-color);
+}
+
+.search-bar {
+  margin-top: 12px;
+}
+.search-bar .form-control {
+  --placeholder-color: white;
+  width: 100%;
+  padding: 18px 12px 18px 0;
+  color: white;
+  background: rgb(255, 255, 255);
+  border-color: transparent;
+  border-radius: 15px;
+}
+.search-bar .btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 18px;
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: transparent;
+  border-radius: 15px;
+}
+
+.section .section-title {
+  margin-bottom: 30px;
+}
+.section .section-title .title {
+  font-weight: bold;
+}
+.section .section-title .project-count {
+  color: var(--mute-text-color);
+}
+
+#projects {
+  margin-top: 84px;
+}
+
+.project-list {
+  display: grid;
+  gap: 64px 40px;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+.project-list__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.project-list__item .project-block {
+  --badge-color: white;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 96px;
+  height: 96px;
+  background: var(--project-color, rgba(255, 1, 1, 0.1));
+  border-radius: 15px;
+}
+.project-list__item .project-block[data-badge]::after {
+  box-sizing: border-box;
+  min-width: auto;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--info-color-darkest);
+}
+.project-list__item .project-abbr {
+  font-size: 18px;
+  font-weight: bold;
+}
+.project-list__item .project-name {
+  margin-top: 30px;
+}
+.project-list__item.active .project-block {
+  box-sizing: border-box;
+}
+.project-list__item.active .project-block::before {
+  position: absolute;
+  content: "";
+  top: -12px;
+  left: -12px;
+  right: -12px;
+  bottom: -12px;
+  box-sizing: border-box;
+  background: var(--project-color);
+  border-radius: 20px;
+}
+.project-list__item.active .project-block::after {
+  position: absolute;
+  content: attr(data-abbr);
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  font-size: 18px;
+  font-weight: bold;
+  background: var(--project-color);
+  box-shadow: 0 0 0 9px var(--info-color-darkest);
+  border-radius: 10px;
+}
+
+.ripe-malinka {
+  --project-color: linear-gradient(120deg, #f093fb 0%, #f5576c 100%);
+}
+
+.itmeo-branding {
+  --project-color: linear-gradient(180deg, #2af598 0%, #009efd 100%);
+}
+
+.mixed-hopes {
+  --project-color: linear-gradient(to top, #c471f5 0%, #fa71cd 100%);
+}
+
+.fly-high {
+  --project-color: linear-gradient(to top, #48c6ef 0%, #6f86d6 100%);
+}
+
+.fruit-blend {
+  --project-color: linear-gradient(to right, #f9d423 0%, #ff4e50 100%);
+}
+/*
+.menu {
+  position: absolute;
+  top: 26px;
+  left: 26px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+ esta mamada es el logo de configurac
+.menu svg {
+  fill: white;
+}
+*/
+.project-detail {
+  margin: 8px;
+  padding: 16px 76px;
+  background: #0d11194c;
+  border-radius: 15px;
+  text-align: center;
+}
+.project-detail .section {
+  margin-top: 42px;
+}
+.project-detail .section .section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--secondary-color-lighter);
+}
+.project-detail .section .section-title h3 {
+  margin-top: 0;
+  color: var(--info-color-darkest);
+}
+.project-detail .section .section-title .more svg {
+  fill: var(--secondary-color-darker);
+}
+.project-detail h1 {
+  text-align: center;
+  color: #f3f3f3;  
+}
+
+.project-detail .task-card label {
+  color: #000000;  /* Color para el texto dentro de las tarjetas */
+}
+
+.task-list {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+  background-color: var(--primary-color);
+  color: #000000;
+}
+.task-list__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  white-space: nowrap;
+}
+.task-list__item .form-check-input {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+.task-list__item .form-check-input ~ .form-check-label {
+  margin-left: 18px;
+}
+.task-list__item .form-check-input::before {
+  top: 1px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  line-height: 1;
+}
+.task-list__item .tag {
+  box-sizing: border-box;
+  width: 92px;
+  padding: 6px 18px;
+  border-radius: 10px;
+}
+.project-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.project-intro h1 {
+  margin-top: 0;
+  color: var(--info-color-darkest);
+}
+.project-intro p {
+  line-height: 1.5;
+  color: var(--mute-text-color);
+}
+
+.avatar-list {
+  display: flex;
+  padding: 0 0 0 45px;
+  margin: 0;
+  list-style-type: none;
+}
+.avatar-list__item img {
+  width: 36px;
+  height: 36px;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+.avatar-list__item:not(:last-child) {
+  margin-right: -6px;
+}
+.avatar-list__item:nth-child(1) {
+  z-index: 3;
+}
+.avatar-list__item:nth-child(2) {
+  z-index: 2;
+}
+.avatar-list__item .add-user {
+  position: relative;
+  top: 6%;
+  left: 56%;
+  fill: var(--light-blue-color);
+}
+
+#today {
+  margin-top: 48px;
+}
+
+#upcoming {
+  margin-top: 42px;
+}
+
+.add-task {
+  position: absolute;
+  bottom: 26px;
+  right: 26px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  width: 58px;
+  height: 38px;
+  padding: 21px;
+  line-height: 1;
+  background: var(--purple-color);
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 1.4px 2.8px rgba(137, 79, 198, 0.041), 0 3.3px 6.7px rgba(137, 79, 198, 0.102), 0 6.3px 12.5px rgba(137, 79, 198, 0.15), 0 11.2px 22.3px rgba(137, 79, 198, 0.198), 0 20.9px 41.8px rgba(137, 79, 198, 0.259), 0 50px 100px rgba(137, 79, 198, 0.4);
+}
+.add-task svg {
+  width: 18px;
+  height: 15px;
+  fill: white;
+}
+
+.task-name-div {
+  max-width: 45%; 
+  width: 45%;
+}
+.task-name {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.task-spans {
+  width: 50%;
+  justify-content: flex-end;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  fill: var(--info-color-darkest);
+  border-style: none;
+}
+/* Estilo para la barra superior */
+.top-bar {
+  background-color: #1a1a2e;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Botón "Regresar" */
+.back-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.back-button:hover {
+  background-color: #409444;
+}
+.more-button {
+  background-color: white;
+  position: absolute;
+  color: white;
+  right: 10px;
+  top: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.more-button svg {
+  width: 16px;
+  height: 16px;
+}
+/* Contenedor de tareas */
+.task-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 20px auto;
+  max-width: 800px;
+  max-height: 500px;
+  background-color: #555;
+}
+
+.task-card {
+  background-color: #ffffff;
+  border: 2px solid #e0e0e0;
+  border-radius: 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px;  /* Aumentamos el padding para mayor espacio interior */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-top: 15px;/*esta madre es la distancia entre cartas*/
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  height: auto;
+  
+}
+
+.task-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilo para los textos dentro de las tarjetas */
+.task-card label {
+  font-size: 13px; 
+  color: #333333; /* Color de texto más suave para mejor legibilidad */
+  display: block;
+  margin-bottom: 2px;
+  line-height: 1.0;
+}
+
+.task-card input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  margin-top: 1px;
+  margin-bottom: 3px;
+  border-radius: 8px;
+  border: 2px solid #ccc;
+  box-sizing: border-box; /* Asegura que el padding no afecte al tamaño del input */
+  font-size: 11px; /* Tamaño de fuente más pequeño para los inputs */
+  background-color: #f9f9f9; /* Fondo sutil para los inputs */
+  line-height: 1.0;
+}
+
+.task-card input[type="text"]:focus {
+  border-color: #4f4caf;
+  outline: none;
+  background-color: #e6eaeb; /* Cambio de fondo al estar enfocado */
+}
+/* Botón "Aceptar" */
+.accept-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 1px;
+}
+
+
+.accept-button:hover {
+  background-color: #409444;
+}
+
+.carousel {
+  position: relative;
+  max-width: 800px; /* Ajusta según el diseño deseado */
+  margin: 0 auto;
+  overflow: hidden;
+  padding: 0 60px; /* Espacio lateral para los botones */
+  display: flex;
+  align-items: center; /* Alinea las tarjetas verticalmente */
+  justify-content: left;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  gap: 20px;
+  justify-content: center; /* Centra las tarjetas */
+  text-align: center;
+}
+
+.task-card {
+  background-color: #ffffff;
+  border: 2px solid #e0e0e0;
+  border-radius: 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 90px; /* Reducir padding para menos espacio interior */
+  margin: 0 auto; /* Centrar la tarjeta */
+  width: 100%; /* Ajustar el ancho relativo al contenedor */
+  max-width: 600px; /* Limitar el ancho máximo */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+}
+
+.carousel-button:hover {
+  background-color: #409444;
+}
+
+.prev-button {
+  left: 10px; /* Ajuste para evitar que se corte */
+}
+
+.next-button {
+  right: 10px; /* Ajuste para evitar que se corte */
+}
+
+
+/* Aseguramos que las tarjetas no se vean cortadas */
+.project-detail {
+  padding: 0;
+}
+
+/* Títulos y encabezados */
+.project-detail h1 {
+  text-align: center;
+  color: #f3f3f3;
+  font-size: 28px;
+  margin-bottom: 20px; /* Espacio debajo del título */
+}
+
+.project-detail .task-card p {
+  margin-bottom: 1px;
+  font-size: 14px;
+  color: #555555; /* Color de texto más suave para párrafos */
+}
+
+
+
+

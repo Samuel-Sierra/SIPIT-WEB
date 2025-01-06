@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 from config.db import get_db
 import os
 
+
 cn = ComandosNotion()
 
 fecha_hora_actual = datetime.now()
