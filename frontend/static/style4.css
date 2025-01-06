@@ -204,15 +204,31 @@ button {
   padding: 14% 14%;
 }
 
-.welcome-banner h1 {
-  margin: 0;
-  font-size: 2rem;
-}
+.welcome-banner {
+    padding: 20px;
+    background-color: #007bff;
+    color: #ffffff;
+    border-bottom: 5px solid #0056b3;
+    text-align: center;
+  }
 
-.welcome-banner p {
-  font-size: 1rem;
-  color: var(--mute-text-color);
-}
+  .welcome-banner h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .welcome-banner h2 {
+    font-size: 18px;
+    margin-top: 10px;
+    font-weight: 400;
+    color: #e0e0e0; /* Un tono más claro que el texto principal */
+  }
+
+  .welcome-banner p {
+    font-size: 16px;
+    margin: 5px 0;
+    line-height: 1.5;
+  }
 
 .search-bar {
   margin-top: 36px;

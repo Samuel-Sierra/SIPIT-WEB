@@ -8,12 +8,6 @@
   <link rel="stylesheet" href="/static/style3.css">
   <script src="/static/incompletos.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@simondmc/popup-js@1.4.3/popup.min.js"></script>
- 
-
-
-    
-    
-  </div>
   
 </head>
 <body>
@@ -29,21 +23,24 @@
     </article>
     <article class="project-detail">
     
-        <h1>Tareas incompletas</h1>
+        <h1>Comandos incompletos</h1>
         <div class="carousel">
 
                 {% for task in combineds %}
                 <form action="/acompletar{{tipo}}/" method="POST" class="task-card">
                     {% for key, value in task.items() %}
+                    {%if key == "id"%}
+                        <input type="hidden" name="{{ key }}" value="{{ value }}" class="task-input" required>
+                    {%else%}
                     <label>
                         {{ key }}
                         <input type="text" name="{{ key }}" value="{{ value }}" class="task-input" required>
                     </label>
+                    {%endif%}
                     {% endfor %}
                     <input type="submit" value="Aceptar" class="accept-button">
                 </form>
                 {% endfor %}
-            </div>
 
         </div>
     </article>

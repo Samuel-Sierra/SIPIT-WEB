@@ -23,18 +23,10 @@ app.mount("/static", StaticFiles(directory=folder), name="static")
 templates = Jinja2Templates(directory="frontend")
 cn = ComandosNotion()
 todo_json = ""
-cont =0
 
 @app.get('/')
 def home(request: Request):
     try: 
-        
-        global todo_json
-        global cont
-        if cont == 0:
-            todo = obtenerTodo()
-            todo_json = json.dumps(todo, ensure_ascii=False)
-            cont = cont + 1
         return templates.TemplateResponse("index.html", {"request": request})
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"  
@@ -47,6 +39,9 @@ def home(request: Request):
 def proyectos(request: Request):
     try:
         global todo_json
+        if todo_json=="":
+            todo = obtenerTodo()
+            todo_json = json.dumps(todo, ensure_ascii=False)
         return templates.TemplateResponse("proyectos.html", {"request": request, "todo": todo_json})
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"    
@@ -55,6 +50,9 @@ def proyectos(request: Request):
 def sprints(request: Request):
     try:
         global todo_json
+        if todo_json=="":
+            todo = obtenerTodo()
+            todo_json = json.dumps(todo, ensure_ascii=False)
         return templates.TemplateResponse("sprint.html", {"request": request, "todo": todo_json})
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"    
@@ -142,7 +140,12 @@ def minuta_resumen(texto_minuta:str):
     except Exception as e:
         return f"Error en minutatxt {e}"
     
-    
+@app.get('/obtenerResumenMinutas/')
+def obtenerResumenMinutas(request: Request):
+    db = get_db()
+    resumen_minuta = db.minutasResumen.find()
+    return templates.TemplateResponse("resumen_minuta.html",{"request": request, "res_min": resumen_minuta})
+            
 @app.get('/obtenerProyectosIncompletos/')
 def obtenerProyectosIncompletos(request: Request):
     try:
@@ -209,24 +212,28 @@ def obtenerSprintsIncompletos(request: Request):
 
 
 @app.post('/acompletarproyecto/')
-def acompletarproyecto(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), estado: str = Form(...),
-               fecha_inicio: str = Form(...), fecha_fin: str = Form(...), prioridad: str = Form(...)):
+def acompletarproyecto(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...),
+    nombre_persona: str = Form(...), estado: str = Form(...), fecha_inicio: str = Form(...), fecha_fin: str = Form(...), 
+    prioridad: str = Form(...)):
+
     datos = {
         "tipo": tipo,
         "accion": accion,
         "nombre_proyecto": nombre_proyecto,
+        "nombre_persona": nombre_persona,
         "estado": estado,
         "fecha_inicio": fecha_inicio,
         "fecha_fin": fecha_fin,
         "prioridad": prioridad,
     }
     respuesta, n = switch_comandos(datos)
+    if respuesta.status_code==200:
+        db = get_db()
 
-    db = get_db()
-
-    db.minutas.find_one_and_delete({"_id": ObjectId(id)})
-
-    return RedirectResponse(url="/obtenerProyectosIncompletos/", status_code=303)
+        db.minutas.find_one_and_delete({"_id": ObjectId(id)})
+        return RedirectResponse(url="/obtenerProyectosIncompletos/", status_code=303)
+    else:
+        return JSONResponse(content=n, status_code=respuesta.status_code)
 
 @app.post('/acompletartarea/')
 def acompletartarea(id:str = Form(...), tipo: str = Form(...), accion: str = Form(...), nombre_proyecto: str = Form(...), nombre_tarea: str = Form(...),
@@ -248,10 +255,14 @@ def acompletartarea(id:str = Form(...), tipo: str = Form(...), accion: str = For
         }
         respuesta, n = switch_comandos(datos)
 
-        db = get_db()
+        if respuesta.status_code==200:
+            db = get_db()
 
-        db.minutas.find_one_and_delete({"_id": ObjectId(id)})
-        return RedirectResponse(url="/obtenerTareasIncompletos/", status_code=303)
+            db.minutas.find_one_and_delete({"_id": ObjectId(id)})
+            return RedirectResponse(url="/obtenerTareasIncompletos/", status_code=303)
+        else:
+            return JSONResponse(content=n, status_code=respuesta.status_code)
+        
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"
     
@@ -446,7 +457,7 @@ def EditarSprint(request:Request, nombre_sprint: str = Form(...), fecha_fin: str
      estado: str = Form(...)):
 
     datos = {
-        "nombre_sprint": nombre_sprint,
+        "nombre": nombre_sprint,
         "fecha_inicio": fecha_inicio,
         "fecha_fin": fecha_fin,
         "estado": estado

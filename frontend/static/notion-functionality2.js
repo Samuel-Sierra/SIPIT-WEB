@@ -123,15 +123,13 @@ function show_project_tasks(project_id) {
         project_detail.appendChild(header);
         project_detail.appendChild(summary);
     }else{
-        let summary = document.createElement('p');
-        summary.textContent = "Responsable: "+project.responsable;
+
         let summary2 = document.createElement('p');
         summary2.textContent = "Estado: "+project.estado;
         let summary4 = document.createElement('p');
         summary4.textContent = "Fecha: "+project.fecha_inicio+" - "+project.fecha_fin;
         project_detail.innerHTML = '';
         project_detail.appendChild(header);
-        project_detail.appendChild(summary);
         project_detail.appendChild(summary2);
         project_detail.appendChild(summary4);
 
@@ -461,7 +459,7 @@ function create_project() {
 
 function edit_project(project_name) {
 
-    let projectData = Proyectos.find(proj => proj.id === project_name);
+    let projectData = Sprints.find(proj => proj.id === project_name);
 
     let popupContent = `<form action = "/EditarSprint/" method = "POST">
             <label>Nombre: <input required type="text" name="nombre_sprint" value="${projectData.nombre}"></label>
@@ -483,7 +481,7 @@ function edit_project(project_name) {
         content: popupContent, 
         width: '60%',
         height: 'auto',
-        title: 'Editar Proyecto',
+        title: 'Editar Sprint',
         fontSizeMultiplier: 0.8
     });
 

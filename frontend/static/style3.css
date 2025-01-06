@@ -480,10 +480,11 @@ body {
 
 .carousel {
   position: relative;
+  max-width: 800px; /* Ajusta según el diseño deseado */
   margin: 0 auto;
   overflow: hidden;
   padding: 0 60px; /* Espacio lateral para los botones */
-  display: flex;
+  display: grid;
   align-items: center; /* Alinea las tarjetas verticalmente */
   justify-content: left;
 }
@@ -504,7 +505,7 @@ body {
   padding: 90px; /* Reducir padding para menos espacio interior */
   margin: 0 auto; /* Centrar la tarjeta */
   width: 100%; /* Ajustar el ancho relativo al contenedor */
-  max-width: 600px; /* Limitar el ancho máximo */
+  max-width: 50%; /* Limitar el ancho máximo */
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
