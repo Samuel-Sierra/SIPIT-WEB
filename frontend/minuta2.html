@@ -13,66 +13,8 @@
 </head>
 <body>
 
-  <!-- TEMPLATE ZONE -->
-
-
-  
-<!-- Template para cada elemento de tareas -->
-<template id="tem-task-item">
-    <li class="task-list__item" id="task3" onclick="change_status(this.id)">
-        <input type="checkbox" name="task3" class="form-check-input">
-        <div class="task-name-div">
-            <div class="form-check">
-                <label for="task3" class="form-check-label task-name">Fixing icons with transparent background</label>
-            </div>
-        </div>
-        <div class="task-spans" >
-            <span class="tag tag-status tag-info">In Progress</span>
-            <span class="tag tag-priority ">High</span>
-            <span class="tag tag-edit tag-info">Edit</span>
-        </div>
-    </li>
-</template>
-
-<!-- Template para cada sección de tareas -->
- <template id="tem-task-section">
-    <section class="section" id="tareas-X">
-        <div class="section-title">
-            <h2>Tareas de X</h2>
-            <div class="more">
-              <svg t="1585986433287" class="icon" viewBox="0 0 1024 1024" version="1.1"
-              xmlns="http://www.w3.org/2000/svg" p-id="3285" width="16" height="16">
-                    <!-- Three dots -->
-                    <path d="M164.3 512.2m-100 0a100 100 0 1 0 200 0 100 100 0 1 0-200 0Z" p-id="3286"></path>
-                    <path d="M512.3 512.2m-100 0a100 100 0 1 0 200 0 100 100 0 1 0-200 0Z" p-id="3287"></path>
-                    <path d="M860.4 512.2m-100 0a100 100 0 1 0 200 0 100 100 0 1 0-200 0Z" p-id="3288"></path>
-                </svg>
-            </div>
-        </div>
-
-        <ul class="task-list">
-            
-        </ul>
-    </section>
- </template>
-
-<!-- Template del proyecto -->
-<template id="tem-project-list-item">
-    <li class="project-list__item" onclick="set_active(this)">
-        <div class="project-block" data-abbr="GH">
-            <div class="project-abbr">GH</div>
-        </div>
-        <div class="project-name">Green House</div>
-    </li>
-</template>
-
-  <!-- END OF TEMPLATE ZONE -->
-
-<!-- partial:index.partial.html -->
 <main class="dashboard">
-    <article class="projects">
-        <a href="/" class="menu"><i class="fa fa-home"></i></a>
-    </article>
+    <a href="/" class="menu"><i class="fa fa-home"></i></a>
     <article class="project-detail">
         <h1>Tareas incompletas</h1>
         <div class="carousel">
