@@ -1,0 +1,10 @@
+<article class="projects">
+    <header class="welcome-banner">
+        <h1>Minutas Recientes</h1>
+        {% for res in res_min %}
+            {% for r in res %}
+                <p>{{res[r]}}</p>
+            {% endfor %}
+        {% endfor %}
+    </header>
+</article>
