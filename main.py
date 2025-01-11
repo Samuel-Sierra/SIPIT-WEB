@@ -38,10 +38,8 @@ def home(request: Request):
 @app.get('/proyectos/')
 def proyectos(request: Request):
     try:
-        global todo_json
-        if todo_json=="":
-            todo = obtenerTodo()
-            todo_json = json.dumps(todo, ensure_ascii=False)
+        todo = obtenerTodo()
+        todo_json = json.dumps(todo, ensure_ascii=False)
         return templates.TemplateResponse("proyectos.html", {"request": request, "todo": todo_json})
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"    
@@ -49,10 +47,8 @@ def proyectos(request: Request):
 @app.get('/sprints/')
 def sprints(request: Request):
     try:
-        global todo_json
-        if todo_json=="":
-            todo = obtenerTodo()
-            todo_json = json.dumps(todo, ensure_ascii=False)
+        todo = obtenerTodo()
+        todo_json = json.dumps(todo, ensure_ascii=False)
         return templates.TemplateResponse("sprint.html", {"request": request, "todo": todo_json})
     except Exception as e:
         return f"Excepción al realizar la solicitud: {e}"    
@@ -304,7 +300,7 @@ def CrearTarea(request: Request, nombre_tarea: str = Form(...), estado: str = Fo
         "nombre_sprint": nombre_sprint
     }
 
-    global todo_json
+
     respuesta = cn.crear_tarea(datos)
     if respuesta.status_code==200 and tipo=="proyecto":
         todo = obtenerTodo()
@@ -333,7 +329,6 @@ def EditarTarea(request:Request, nombre_tarea: str = Form(...), estado: str = Fo
         "nombre_proyecto": nombre_proyecto,
         "nombre_sprint": nombre_sprint
     }
-    global todo_json
     respuesta = cn.modificar_tarea(datos)
     if respuesta.status_code==200 and tipo=="proyecto":
         todo = obtenerTodo()
@@ -353,7 +348,6 @@ def EditarTarea(request:Request, nombre_tarea: str = Form(...), estado: str = Fo
 def EliminarTarea(request:Request,nombre_tarea:str,tipo:str):
     try:
         respuesta = cn.eliminar_tarea(nombre_tarea)
-        global todo_json
         todo = obtenerTodo()
         todo_json = json.dumps(todo, ensure_ascii=False)
         return templates.TemplateResponse("proyectos.html", {"request": request, "todo": todo_json})
@@ -373,7 +367,6 @@ def CrearProyecto(request: Request, nombre_proyecto: str = Form(...), fecha_inic
             "nombre_persona": nombre_persona,
             "estado": estado
         }
-        global todo_json
         respuesta = cn.crear_proyecto(datos)
 
         if respuesta.status_code==200:
@@ -400,7 +393,6 @@ def EditarProyecto(request:Request, nombre_proyecto: str = Form(...), fecha_fin:
         "prioridad": prioridad,
         "estado": estado
     }
-    global todo_json
     respuesta = cn.modificar_proyecto(datos)
     if respuesta.status_code==200:
         todo = obtenerTodo()
@@ -440,7 +432,6 @@ def CrearSprint(request: Request, nombre_sprint: str = Form(...), fecha_inicio: 
         }
 
         respuesta = cn.crear_sprint(datos)
-        global todo_json
         if respuesta.status_code==200:
             todo = obtenerTodo()
             todo_json = json.dumps(todo, ensure_ascii=False)
@@ -462,7 +453,6 @@ def EditarSprint(request:Request, nombre_sprint: str = Form(...), fecha_fin: str
         "fecha_fin": fecha_fin,
         "estado": estado
     }
-    global todo_json
     respuesta = cn.modificar_proyecto(datos)
     if respuesta.status_code==200:
         todo = obtenerTodo()
