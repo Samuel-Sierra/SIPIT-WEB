@@ -249,6 +249,8 @@ def acompletartarea(id:str = Form(...), tipo: str = Form(...), accion: str = For
             "prioridad": prioridad,
             "resumen": resumen,
         }
+
+        return JSONResponse(content=datos, status_code=200)
         respuesta, n = switch_comandos(datos)
 
         if respuesta.status_code==200:
@@ -274,6 +276,7 @@ def acompletartarea(id:str = Form(...), tipo: str = Form(...), accion: str = For
             "estado":estado,
             "fecha_inicio":fecha_inicio,
             "fecha_fin":fecha_fin,
+            
         }
         respuesta, n = switch_comandos(datos)
 

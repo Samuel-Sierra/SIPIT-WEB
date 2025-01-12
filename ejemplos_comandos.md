@@ -58,7 +58,7 @@ Tarea nueva: crea una tarea llamada implementación de interfaz con estado en cu
 - **Fecha de inicio**: El día en que comienza el proyecto.
 - **Fecha de fin**: El día en que se termina el proyecto.
 
-Crea un proyecto llamado plataforma de aprendizaje que empieza el primero de abril de dos mil veinticinco y termina el treinta de septiembre de dos mil veinticinco con prioridad media, nombre de persona es Ulises, con estado En curso.
+Crear un proyecto llamado plataforma de aprendizaje que empieza el primero de abril de dos mil veinticinco y termina el treinta de septiembre de dos mil veinticinco con prioridad media, nombre de persona es Ulises, con estado En curso.
 
 Crea un proyecto llamado gestión de inventario que empieza el primero de enero de dos mil veinticinco y termina el treinta de junio de dos mil veinticinco con prioridad alta, cuyo dueño es Ulises, con estado Planificación.
 
